@@ -132,6 +132,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/activity-logs"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <ActivityLogs />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" />
