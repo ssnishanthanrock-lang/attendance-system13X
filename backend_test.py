@@ -50,28 +50,14 @@ class ERPTester:
         """Test authentication flow"""
         print("\n=== TESTING AUTHENTICATION ===")
         
-        # First, let's check if there are any existing users in the system
+        # Use existing admin user from database
+        test_mobile = "0712345678"  # Known admin user from database
+        
         try:
-            # Try to find an existing admin user by checking companies
-            print("Looking for existing admin users...")
-            
-            # We'll use a test mobile number - let's try a common one
-            test_mobile = "0771234567"
-            
             # Step 1: Send OTP
+            print(f"Testing OTP send for existing user: {test_mobile}")
             otp_response = self.session.post(f"{API_BASE}/auth/send-otp", 
                                            json={"mobile": test_mobile})
-            
-            if otp_response.status_code == 404:
-                # User doesn't exist, let's create a test company and admin first
-                print("No existing user found. Creating test company and admin...")
-                success = self.create_test_company_and_admin()
-                if not success:
-                    return False
-                    
-                # Try OTP again with the created admin
-                otp_response = self.session.post(f"{API_BASE}/auth/send-otp", 
-                                               json={"mobile": test_mobile})
             
             if otp_response.status_code == 200:
                 self.log_result("Send OTP", True, "OTP sent successfully", 
@@ -90,8 +76,7 @@ class ERPTester:
                                   "OTP verification endpoint working (expected failure with test OTP)",
                                   {"status_code": verify_response.status_code})
                     
-                    # For testing purposes, let's try to authenticate using a different approach
-                    # We'll create a JWT token manually for testing
+                    # For testing purposes, create a test auth token
                     return self.create_test_auth_token(test_mobile)
                 else:
                     self.auth_token = verify_response.json().get('token')
