@@ -151,7 +151,64 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
-      <Toaster position="top-right" closeButton duration={3000} />
+      <Toaster 
+        position="top-right" 
+        closeButton 
+        duration={3000}
+        toastOptions={{
+          style: { 
+            padding: '16px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500'
+          },
+          className: 'custom-toast',
+          success: {
+            style: {
+              background: '#10b981',
+              color: 'white',
+              border: 'none'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#10b981'
+            }
+          },
+          error: {
+            style: {
+              background: '#ef4444',
+              color: 'white',
+              border: 'none'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#ef4444'
+            }
+          },
+          warning: {
+            style: {
+              background: '#f59e0b',
+              color: 'white',
+              border: 'none'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#f59e0b'
+            }
+          },
+          info: {
+            style: {
+              background: '#3b82f6',
+              color: 'white',
+              border: 'none'
+            },
+            iconTheme: {
+              primary: 'white',
+              secondary: '#3b82f6'
+            }
+          }
+        }}
+      />
     </div>
   );
 }
