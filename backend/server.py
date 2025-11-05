@@ -945,12 +945,16 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
             ]
             employee_ids_by_date = [emp["id"] for emp in employees_by_date]
             
-            # Count attendance only for employees who had joined by this date
-            count = await db.attendance.count_documents({
-                "company_id": current_user.company_id,
-                "date": date,
-                "employee_id": {"$in": employee_ids_by_date}
-            })
+            # Count attendance for this date
+            # If no employees joined by this date, count will be 0
+            if len(employee_ids_by_date) > 0:
+                count = await db.attendance.count_documents({
+                    "company_id": current_user.company_id,
+                    "date": date,
+                    "employee_id": {"$in": employee_ids_by_date}
+                })
+            else:
+                count = 0
             
             attendance_summary.append({
                 "date": date,
