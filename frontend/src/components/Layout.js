@@ -31,6 +31,10 @@ export default function Layout({ children }) {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     
+    // Check if impersonating
+    const impersonation = getImpersonationState();
+    setImpersonationState(impersonation);
+    
     // Try to get cached company info first
     const cachedCompanyInfo = localStorage.getItem('companyInfo');
     if (cachedCompanyInfo) {
