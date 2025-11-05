@@ -84,10 +84,23 @@ export default function Login() {
     setLoading(true);
     try {
       const response = await api.post('/auth/verify-otp', { mobile, otp: otpCode });
+      
+      // Check if role selection is required
+      if (response.data.require_selection) {
+        navigate('/login/select-role', { state: { mobile, otp: otpCode, options: response.data.options } });
+        return;
+      }
+      
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       toast.success('Login successful!');
-      navigate('/');
+      
+      // Route based on role
+      if (response.data.user.role === 'super_admin') {
+        navigate('/superadmin');
+      } else {
+        navigate('/');
+      }
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Invalid OTP');
       setOtp(['', '', '', '', '', '']);
