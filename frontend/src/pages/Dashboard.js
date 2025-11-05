@@ -118,6 +118,8 @@ export default function Dashboard() {
                 icon={<Users className="w-6 h-6" />}
                 color="blue"
                 testId="stat-employees"
+                onClick={() => navigate('/employees')}
+                clickable
               />
               <StatCard
                 title="Present Today"
@@ -125,6 +127,8 @@ export default function Dashboard() {
                 icon={<CheckCircle className="w-6 h-6" />}
                 color="green"
                 testId="stat-attendance"
+                onClick={() => navigate('/attendance')}
+                clickable
               />
               <StatCard
                 title="Pending Leaves"
@@ -132,6 +136,8 @@ export default function Dashboard() {
                 icon={<FileText className="w-6 h-6" />}
                 color="orange"
                 testId="stat-leaves"
+                onClick={() => navigate('/leaves')}
+                clickable
               />
               <StatCard
                 title="Pending Advances"
@@ -139,6 +145,8 @@ export default function Dashboard() {
                 icon={<DollarSign className="w-6 h-6" />}
                 color="purple"
                 testId="stat-advances"
+                onClick={() => navigate('/advances')}
+                clickable
               />
             </>
           ) : (
@@ -149,6 +157,8 @@ export default function Dashboard() {
                 icon={<Calendar className="w-6 h-6" />}
                 color="blue"
                 testId="stat-my-attendance"
+                onClick={() => navigate('/attendance')}
+                clickable
               />
               <StatCard
                 title="Approved Leaves"
@@ -156,6 +166,8 @@ export default function Dashboard() {
                 icon={<CheckCircle className="w-6 h-6" />}
                 color="green"
                 testId="stat-my-leaves"
+                onClick={() => navigate('/leaves')}
+                clickable
               />
               <StatCard
                 title="Total Advances"
@@ -163,6 +175,8 @@ export default function Dashboard() {
                 icon={<DollarSign className="w-6 h-6" />}
                 color="purple"
                 testId="stat-my-advances"
+                onClick={() => navigate('/advances')}
+                clickable
               />
               <StatCard
                 title="Net Salary"
@@ -170,6 +184,8 @@ export default function Dashboard() {
                 icon={<DollarSign className="w-6 h-6" />}
                 color="indigo"
                 testId="stat-my-salary"
+                onClick={() => navigate('/payroll')}
+                clickable
               />
             </>
           )}
