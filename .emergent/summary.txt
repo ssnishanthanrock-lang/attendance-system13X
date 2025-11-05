@@ -1,16 +1,15 @@
 <analysis>
-The AI engineer demonstrated a highly iterative and responsive development approach throughout the trajectory. Initial work focused on core ERP features, UI/UX, and foundational multi-tenancy. A significant portion of the work involved addressing user-reported bugs and feature requests, including refining activity logs, UI spacing, and implementing a robust Super Admin impersonation system. Key technical decisions revolved around adapting the React/FastAPI/MongoDB stack to handle complex features like dynamic salary increments, detailed payroll calculations, and enhanced manual attendance with history tracking. The AI consistently refined UI elements such as icon changes, font sizes, and banner positioning, ensuring a user-centric experience. The development process frequently involved backend API modifications, frontend component creation, and careful state management. The engineer successfully debugged issues like incorrect database connections and  errors, showcasing strong problem-solving skills.
+The AI engineer demonstrated an iterative and responsive approach, continuously refining the application based on user feedback. The core focus initially was on establishing ERP features and multi-tenancy. A significant portion of the work involved a comprehensive overhaul of the payroll system, including detailed backend calculations for various salary components and an evolving frontend UI. Key technical decisions centered on adapting the React/FastAPI/MongoDB stack to handle complex logic for salary increments, payroll, and enhanced attendance tracking. UI/UX improvements were consistently applied, addressing iconography, layout, and data presentation. Performance optimizations were implemented for the Attendance and Employees pages by resolving N+1 query issues. The engineer successfully integrated new features like loan management backend, allowed leave/half-day statuses, and detailed attendance history, while actively debugging calculation errors and display issues.
 </analysis>
 
 <product_requirements>
-The IT Signature ERP is a multi-tenant SaaS application designed for employee attendance and HR management with a responsive UI/UX. It features a dashboard with clickable metrics, comprehensive employee management (including profile pictures and flexible working times), and role-based access control (Admin, Manager, Staff, Employee). Authentication is OTP-based via multiple Sri Lankan SMS gateways. Core modules include Leave Management, Monthly Payroll, and Loan/Increment tracking. Company settings enable configuration of work calendars, office timings, and SMS preferences. A Super Admin manages independent companies, each with custom branding and detailed activity logging. Recent major additions include Super Admin impersonation (with configurable read/write access), scheduled salary increments affecting future payrolls, and a detailed payroll generation system that accounts for month-specific effective salaries, late deductions, and basic loan management. Manual attendance also received enhancements for optional check-out, date validation, duplicate prevention, and edit history. UI/UX improvements targeted menu organization, font sizes, and filter label reduction.
+The IT Signature ERP is a multi-tenant SaaS application managing employee HR, attendance, and payroll with a responsive UI. It features a dashboard with clickable metrics, comprehensive employee management (profiles, flexible working), and role-based access (Admin, Manager, Staff, Employee). Authentication is OTP-based via Sri Lankan SMS gateways. Core modules include Leave Management, Monthly Payroll, and Loan/Increment tracking. Company settings allow configuration of work calendars, timings, and SMS. A Super Admin manages companies with custom branding and activity logging. Recent additions include Super Admin impersonation (configurable read/write), scheduled salary increments impacting future payrolls, and a detailed payroll generation system accounting for month-specific effective salaries, late deductions, and basic loan management. Manual attendance also received enhancements for optional check-out, date validation, duplicate prevention, and edit history. UI/UX was improved with menu organization, font sizes, and filter label reduction.
 </product_requirements>
 
 <key_technical_concepts>
 -   **Tech Stack:** React (frontend), FastAPI (backend), MongoDB (database).
--   **Architecture:** Multi-tenant SaaS, Role-Based Access Control (RBAC), JWT-based authentication.
+-   **Architecture:** Multi-tenant SaaS, Role-Based Access Control (RBAC), JWT authentication.
 -   **Core Features:** Employee CRUD, Attendance, Payroll, Leave, Loan, Increment, Company Settings, Activity Logging, Super Admin Impersonation.
--   **UI/UX:** Shadcn UI components, responsive design, custom styling.
 -   **Data Handling:** UUIDs for IDs,  for time-zone aware and ISO string serialization.
 </key_technical_concepts>
 
@@ -20,72 +19,56 @@ The application uses a standard full-stack architecture with a FastAPI backend a
 
 
 -   ****:
-    -   **Importance**: The central backend logic, API endpoints, and database interactions.
-    -   **Changes**: Extended  and  models for impersonation (). Added impersonation endpoints (, ). Added  model and endpoints (, , ). Added  helper for payroll. Introduced  model and  endpoint for detailed, month-specific payroll calculation. Modified  model and endpoints for optional check-out, history tracking, and date validation. Fixed  serialization issues.
+    -   **Importance**: Central backend logic, API endpoints, and database interactions.
+    -   **Changes**: Extensive modifications for payroll (effective salary, late deductions, loan deductions, extra payments, attendance minutes, earnings calculation, fixed salary handling). Added new  CRUD endpoints,  CRUD endpoints, and an  endpoint. Optimized  to include  flag and pagination. Optimized  to include pending increments. Modified attendance update endpoint to track status changes. Fixed  field name.
 -   ****:
     -   **Importance**: Main React app, handles routing and global setup.
     -   **Changes**: Uses  for role-based access. Configured global .
 -   ****:
     -   **Importance**: Defines the application's overall structure, navigation, and branding.
-    -   **Changes**: Integrated . Reorganized  (moved Activity Logs, Settings to profile section). Adjusted padding/margins for compact menu. Implemented dynamic top padding and sidebar adjustments to accommodate the full-width impersonation banner.
+    -   **Changes**: Integrated . Reorganized  (Activity Logs, Settings to profile). Adjusted padding. Payroll icon changed from  to .
 -   ****:
-    -   **Importance**: **NEW** component to visually indicate when a Super Admin is viewing a company portal.
-    -   **Changes**: Displays warning, company name, access mode, and an Exit button. Implemented fixed positioning, high , full width (, ), and dynamic  for desktop and adjusted  for mobile to prevent overlaps and remove gaps. Simplified text for mobile.
+    -   **Importance**: **NEW** component to visually indicate Super Admin impersonation.
+    -   **Changes**: Displays warning, company name, access mode, and Exit button. Fixed positioning.
 -   ****:
     -   **Importance**: **NEW** utility for managing impersonation state in the frontend.
-    -   **Changes**: Provides functions to start, exit, check impersonation status, and retrieve impersonation details (, , , ). Handles storing and retrieving impersonation data (including original user and token) in .
+    -   **Changes**: Functions to start, exit, check status, and retrieve impersonation details, storing data in .
 -   ****:
     -   **Importance**: Displays company overview and key metrics.
-    -   **Changes**: Added conditional rendering for employee-specific  and  summary cards.
+    -   **Changes**: Removed Welcome back, Super Administrator, Latest leave/advance applications (only Recent... if data exists), and Employee-wise salary overview. Simplified Last 7 days attendance trend.
 -   ****:
     -   **Importance**: Manages employee profiles and details.
-    -   **Changes**: Integrated Add Increment functionality: dialog for input, history table, and a Pending badge on employee cards. Implemented read-only mode by disabling add/edit/delete buttons based on impersonation permissions. Fixed UI layout for the pending increment badge to prevent collapsing.
+    -   **Changes**: Integrated Add Increment functionality. Implemented read-only mode for impersonation. Search filter now only shows if >6 employees. Optimized performance by fetching all pending increments in one go. Employee cards conditionally show allowances.
 -   ****:
     -   **Importance**: Manages employee attendance records.
-    -   **Changes**: Made check-out time optional in manual entry. Added an Edit button for existing records. Displays visual warnings for incomplete records. Implemented date validation (no future dates) and history tracking for edited times. Replaced N/A for empty check-out with an actionable button. Added a clickable history badge to view edit details in a dedicated dialog. Removed Filter Attendance title. Implemented read-only mode.
+    -   **Changes**: Added Allowed Leave and Allowed Half Day as new status options for manual entry. Consolidated Change Status functionality into the Update Attendance dialog. Performance optimized by removing N+1 queries for history and adding pagination. History dialog now explicitly shows , , .
 -   ****:
     -   **Importance**: Displays and manages payroll information.
-    -   **Changes**: Replaced Generate Payroll button with a planned month-wise view (frontend integration not fully detailed yet). Updated  and  to use YYYY-MM format. Fixed  runtime errors by adding null/default checks for payroll data. Changed Dollar icon to Rs icon. Removed Filter Payroll title.
+    -   **Changes**: Major redesign to a month-wise view, then a professional spreadsheet-style report for detailed employee-wise breakdown. Generate Payroll button removed. Rs currency text and  icon. Removed Filter Payroll title. Table fixed for wrapping, made scrollable, columns adjusted (, , , , ,  moved). Earnings changed to Gross. Fixed net salary calculation.
 -   ****:
     -   **Importance**: Displays system activity.
-    -   **Changes**: Removed Filter Logs title. Reduced main title font size.
--   ****:
-    -   **Importance**: Manages Super Admin accounts.
-    -   **Changes**: Added a Full Access toggle for Super Admins to control impersonation permissions.
--   ****:
-    -   **Importance**: Super Admin's overview of companies.
-    -   **Changes**: Added 👁️ View Portal button to each company card to initiate impersonation. Fixed navigation after impersonation.
--   ** (all main pages)**:
-    -   **Changes**: Main page titles had their font sizes reduced from  to .
-
+    -   **Changes**: Reduced main title font size and removed Filter Logs title.
 </code_architecture>
 
 <pending_tasks>
--   **Company Dashboard Salary Summary:** Investigate and resolve the underlying issue with dashboard salary summary calculation when payroll data exists, or provide clearer guidance.
--   **Logo and Favicon Processing:** Implement advanced logo adjustment (black/white conversion, main letter extraction) as originally requested.
--   **Payroll (Live Count & Loan Management):**
-    -   Implement the running live count salary for the current month on the payroll page.
-    -   Develop a simple loan management system (without interest, fixed monthly deduction) and integrate its deductions into payroll.
--   **Manual Attendance (Check-out Time Restriction):** Implement the functionality to only allow check-out time to be added after a certain time (e.g., 5 PM) or after the day's finish time.
--   **Activity Logs Performance:** Address the performance concern regarding too many records making the page load slow, by implementing pagination or other optimization techniques.
+-   Company Dashboard Salary Summary: Investigate and resolve underlying issue or provide clearer guidance.
+-   Logo and Favicon Processing: Implement advanced logo adjustment (black/white conversion, main letter extraction).
+-   Payroll (Live Count): Implement the running live count salary for the current month on the payroll page, with calculations updated per second.
+-   Manual Attendance (Check-out Time Restriction): Implement functionality to only allow check-out time to be added after a certain time (e.g., 5 PM) or after the day's finish time.
+-   Activity Logs Performance: Address performance concern by implementing pagination or other optimization techniques.
 </pending_tasks>
 
 <current_work>
-Immediately before this summary request, the AI engineer was in the middle of a major payroll system overhaul. The user had requested that when Payroll is clicked, it should show all months with calculable salary data, and when a month is selected, a full employee-wise report should be displayed, including detailed salary calculation components (basic salary, late deductions, salary per minute, working days, leave days, advances, increments, loan deductions, and total).
+Immediately before this summary request, the AI engineer was in the final stages of a comprehensive payroll system redesign and bug fixing. The user had requested a spreadsheet-like view for payroll, detailed salary breakdowns, and several specific UI/calculation refinements.
 
-The AI engineer started by implementing **Phase 1: Icon + Month View + Detailed Breakdown**.
-1.  **Icon Change**: Successfully changed the dollar icon to the Rs (Indian Rupee) icon in the navigation menu ().
-2.  **Backend - Detailed Payroll Calculation**: The engineer then moved to the backend to create or enhance a comprehensive payroll generation endpoint () in . This endpoint is responsible for:
-    *   Iterating through all employees for a given month and year.
-    *   Fetching relevant data for each employee (attendance, leaves, advances, increments).
-    *   Crucially, calculating the  for the specific month by considering scheduled increments.
-    *   Calculating  and applying  based on minutes late.
-    *   Including placeholders for future loan deductions.
-    *   Saving these detailed payroll records.
+The AI engineer was working on:
+1.  **Payroll Table Structure**: Restructuring the frontend table to move the  column before  and renaming  to .
+2.  **Payroll Calculation Accuracy**: Ensuring  and  are correctly displayed.
+3.  **Fixed Salary Employee Bug**: Fixing a critical bug where allowances for fixed-salary employees were being double-counted in the net salary calculation, leading to incorrect totals.
 
-The last action recorded was successfully editing  to create this detailed payroll calculation logic and then restarting the backend to apply these changes. The frontend integration for displaying this detailed month-wise payroll data and the running live count was yet to be implemented.
+The last action recorded was successfully editing the backend () to fix the fixed-salary calculation bug (preventing allowances from being double-added) and was in the process of updating the frontend table body in  to reflect the column rearrangement and corrected calculations. This is part of the larger goal to ensure the payroll system correctly calculates and displays all salary components, including a future live count by seconds feature for the current month.
 </current_work>
 
 <optional_next_step>
-Integrate the detailed month-wise payroll view and employee-wise report in the frontend's Payroll page.
+Continue updating the frontend table body in  to accurately reflect the column reordering (Extra Payment before Deductions) and ensure correct Gross and Net salary calculations for all employees, especially fixed-salary ones.
 </optional_next_step>
