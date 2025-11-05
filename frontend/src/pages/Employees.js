@@ -271,19 +271,29 @@ export default function Employees() {
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }} data-testid="employees-title">
             Employee Management
           </h1>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                data-testid="add-employee-button"
-                onClick={resetForm}
-                disabled={!canEdit}
-                title={!canEdit ? "Read-only access - Cannot add employees" : ""}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Employee
-              </Button>
-            </DialogTrigger>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.location.href = '/deleted-employees'}
+              className="text-gray-600 hover:text-gray-800"
+              title="View Deleted Employees"
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button
+                  data-testid="add-employee-button"
+                  onClick={resetForm}
+                  disabled={!canEdit}
+                  title={!canEdit ? "Read-only access - Cannot add employees" : ""}
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Employee
+                </Button>
+              </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>
