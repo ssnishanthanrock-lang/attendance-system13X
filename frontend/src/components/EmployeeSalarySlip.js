@@ -231,10 +231,6 @@ export default function EmployeeSalarySlip({ employee, month, onClose }) {
               </CardContent>
             </Card>
           </div>
-
-          <div className="text-sm text-gray-600 bg-blue-50 p-3 rounded">
-            <p><strong>Tip:</strong> You can right-click on the salary slip above and select "Copy Image" or use the buttons to download/copy.</p>
-          </div>
         </div>
       </DialogContent>
     </Dialog>
