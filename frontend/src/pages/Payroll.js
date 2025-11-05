@@ -251,8 +251,8 @@ export default function Payroll() {
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
                               {emp.allowances.toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
-                              {emp.gross_salary.toLocaleString()}
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50" title={`Attended days: ${attendedDays.toFixed(1)}`}>
+                              {earnings.toLocaleString(undefined, {maximumFractionDigits: 2})}
                             </td>
                             
                             <td className="border border-gray-300 px-2 py-3 text-center text-sm font-semibold text-green-600 bg-green-50">
