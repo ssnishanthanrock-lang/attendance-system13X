@@ -1444,6 +1444,7 @@ async def get_attendance(
     employee_id: Optional[str] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
+    limit: Optional[int] = 100,
     current_user: User = Depends(get_current_user)
 ):
     if current_user.role == "super_admin":
@@ -1465,8 +1466,27 @@ async def get_attendance(
         query["date"] = {"$gte": from_date}
     elif to_date:
         query["date"] = {"$lte": to_date}
+    else:
+        # Default: show last 30 days only if no date filter provided
+        from datetime import datetime, timedelta
+        thirty_days_ago = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d")
+        query["date"] = {"$gte": thirty_days_ago}
     
-    attendance = await db.attendance.find(query, {"_id": 0}).sort("date", -1).to_list(1000)
+    # Limit results
+    attendance = await db.attendance.find(query, {"_id": 0}).sort("date", -1).limit(min(limit, 200)).to_list(length=None)
+    
+    # Check if each record has edit history (add flag)
+    attendance_ids = [att["id"] for att in attendance]
+    history_counts = await db.attendance_history.aggregate([
+        {"$match": {"attendance_id": {"$in": attendance_ids}, "company_id": current_user.company_id}},
+        {"$group": {"_id": "$attendance_id", "count": {"$sum": 1}}}
+    ]).to_list(length=None)
+    
+    history_map = {item["_id"]: item["count"] for item in history_counts}
+    
+    for att in attendance:
+        att["has_history"] = att["id"] in history_map
+        att["history_count"] = history_map.get(att["id"], 0)
     
     return attendance
 
