@@ -20,6 +20,7 @@ export default function Employees() {
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [user, setUser] = useState(null);
+  const [hasDeletedEmployees, setHasDeletedEmployees] = useState(false);
   const [defaultTimes, setDefaultTimes] = useState({
     start_time: '09:00',
     finish_time: '17:00'
