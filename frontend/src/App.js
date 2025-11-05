@@ -6,6 +6,8 @@ import Login from "./pages/Login";
 import LoginRoleSelection from "./pages/LoginRoleSelection";
 import Dashboard from "./pages/Dashboard";
 import SuperAdminDashboard from "./pages/SuperAdminDashboard";
+import SuperAdminCompanyDetail from "./pages/SuperAdminCompanyDetail";
+import SuperAdminManagement from "./pages/SuperAdminManagement";
 import CompanyOnboarding from "./pages/CompanyOnboarding";
 import CompanySettings from "./pages/CompanySettings";
 import Employees from "./pages/Employees";
