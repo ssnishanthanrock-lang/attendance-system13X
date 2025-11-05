@@ -89,6 +89,20 @@ export default function Employees() {
     try {
       const response = await api.get('/employees');
       setEmployees(response.data);
+      
+      // Fetch pending increments for all employees
+      const pendingIncrementsMap = {};
+      for (const emp of response.data) {
+        try {
+          const incResponse = await api.get(`/employees/${emp.id}/pending-increment`);
+          if (incResponse.data) {
+            pendingIncrementsMap[emp.id] = incResponse.data;
+          }
+        } catch (err) {
+          // No pending increment for this employee
+        }
+      }
+      setPendingIncrements(pendingIncrementsMap);
     } catch (error) {
       toast.error('Failed to fetch employees');
     } finally {
