@@ -153,27 +153,38 @@ export default function Payroll() {
                   Updates every second • Last updated: {new Date(livePayroll.timestamp).toLocaleTimeString()}
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  // Show months list as dropdown or navigate to a months page
-                  const monthsListHtml = months.map(m => 
-                    `<button onclick="window.location.href='/payroll/month/${m.month}'" class="block w-full text-left px-4 py-2 hover:bg-gray-100">${formatMonthName(m.month).monthName} ${formatMonthName(m.month).year}</button>`
-                  ).join('');
-                  // For now, navigate to first available month or show a simple selection
-                  if (months.length > 0) {
-                    // Create a simple modal or navigate to the most recent month
-                    const recentMonth = months[0].month;
-                    if (window.confirm(`View monthly history?\n\nAvailable months: ${months.map(m => `${formatMonthName(m.month).monthName} ${formatMonthName(m.month).year}`).join(', ')}\n\nClick OK to view ${formatMonthName(recentMonth).monthName} ${formatMonthName(recentMonth).year}`)) {
-                      handleMonthClick(recentMonth);
+              <div className="relative">
+                <Button
+                  onClick={() => {
+                    const monthsList = months.slice(0, 10).map((m, idx) => 
+                      `${idx + 1}. ${formatMonthName(m.month).monthName} ${formatMonthName(m.month).year}`
+                    ).join('\n');
+                    
+                    if (months.length > 0) {
+                      const selection = window.prompt(
+                        `Select a month to view detailed payroll:\n\n${monthsList}\n\nEnter the number (1-${Math.min(10, months.length)}):`,
+                        '1'
+                      );
+                      
+                      if (selection) {
+                        const idx = parseInt(selection) - 1;
+                        if (idx >= 0 && idx < months.length) {
+                          handleMonthClick(months[idx].month);
+                        } else {
+                          toast.error('Invalid selection');
+                        }
+                      }
+                    } else {
+                      toast.info('No historical data available');
                     }
-                  }
-                }}
-                variant="outline"
-                className="flex items-center gap-2"
-              >
-                <Calendar className="w-4 h-4" />
-                View Monthly History
-              </Button>
+                  }}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  View Monthly History
+                </Button>
+              </div>
             </div>
 
             {/* Summary Cards */}
