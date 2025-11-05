@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { Calendar, Plus, ArrowLeft, Users, TrendingUp, Briefcase, Clock, AlertCircle } from 'lucide-react';
+import { Plus, ArrowLeft, TrendingUp, Briefcase, AlertCircle } from 'lucide-react';
 
 export default function Payroll() {
   const [months, setMonths] = useState([]);
