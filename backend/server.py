@@ -2217,15 +2217,15 @@ async def get_payroll_months(current_user: User = Depends(get_current_user)):
     
     result = []
     for month_str in sorted(month_set, reverse=True):
-        # Calculate total for this month
-        total_salary = 0
-        for emp in employees:
-            salary = await get_effective_salary(emp["id"], current_user.company_id, month_str)
-            total_salary += salary
+        # Get detailed payroll for this month to calculate totals
+        detailed_response = await get_detailed_payroll(month_str, current_user)
+        
+        # Calculate totals from detailed records
+        total_net = sum([emp.get("net_salary", 0) for emp in detailed_response.get("employees", [])])
         
         result.append({
             "month": month_str,
-            "total_salary": total_salary,
+            "total_salary": round(total_net, 2),  # Now showing net salary
             "employee_count": len(employees)
         })
     
