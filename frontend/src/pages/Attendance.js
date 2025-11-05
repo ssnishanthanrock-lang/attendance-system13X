@@ -5,18 +5,28 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { toast } from 'sonner';
-import { Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, XCircle, Plus } from 'lucide-react';
 
 export default function Attendance() {
   const [attendance, setAttendance] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [filters, setFilters] = useState({
     employee_id: '',
     from_date: '',
     to_date: '',
+  });
+  const [manualAttendance, setManualAttendance] = useState({
+    employee_id: '',
+    date: new Date().toISOString().split('T')[0],
+    check_in: '09:00',
+    check_out: '17:00',
+    status: 'present',
+    leave_type: ''
   });
 
   useEffect(() => {
