@@ -951,11 +951,13 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
+    # Store a copy for response before inserting (to avoid _id field)
+    attendance_response = new_attendance.copy()
+    
     await db.attendance.insert_one(new_attendance)
     await log_activity(current_user.company_id, current_user.id, current_user.name, "ADD_ATTENDANCE", f"Added attendance for {capitalize_name(employee['name'])} on {attendance_data['date']}, Status: {attendance_data.get('status', 'present')}, Check-in: {attendance_data.get('check_in', 'N/A')}, Check-out: {attendance_data.get('check_out', 'N/A')}")
     
-    # Return attendance data without MongoDB _id field
-    return {"message": "Attendance added successfully", "attendance": new_attendance}
+    return {"message": "Attendance added successfully", "attendance": attendance_response}
 
 @api_router.delete("/attendance/{attendance_id}")
 async def delete_attendance(attendance_id: str, current_user: User = Depends(get_current_user)):
