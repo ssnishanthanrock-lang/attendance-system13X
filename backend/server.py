@@ -900,6 +900,10 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
     return {"message": "Attendance added successfully", "attendance": new_attendance}
 
 # ============= UTILITY FUNCTIONS =============
+def capitalize_name(name: str) -> str:
+    """Capitalize first letter of each word in a name"""
+    return ' '.join(word.capitalize() for word in name.split())
+
 def calculate_working_days(year: int, month: int, holidays: List[dict], saturday_enabled: bool = True, saturday_type: str = "full") -> dict:
     """
     Calculate working days for a given month considering:
