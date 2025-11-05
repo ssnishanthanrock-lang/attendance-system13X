@@ -360,6 +360,62 @@ async def update_company_sms(company_id: str, sms_settings: SMSSettings, current
     
     return {"message": "SMS settings updated"}
 
+@api_router.get("/superadmin/admins")
+async def get_super_admins(current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    admins = await db.users.find({"role": "super_admin"}, {"_id": 0}).to_list(100)
+    return admins
+
+@api_router.post("/superadmin/admins")
+async def create_super_admin(admin_data: UserCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Check if mobile already exists
+    existing = await db.users.find_one({"mobile": admin_data.mobile})
+    if existing:
+        raise HTTPException(status_code=400, detail="Mobile number already registered")
+    
+    # Create super admin
+    new_admin = User(
+        company_id=None,
+        employee_id=admin_data.employee_id,
+        mobile=admin_data.mobile,
+        name=admin_data.name,
+        role="super_admin",
+        join_date=datetime.now(timezone.utc).date().isoformat()
+    )
+    
+    await db.users.insert_one(new_admin.model_dump())
+    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "CREATE_SUPER_ADMIN", f"Created super admin: {admin_data.name}")
+    
+    return new_admin
+
+@api_router.delete("/superadmin/admins/{admin_id}")
+async def delete_super_admin(admin_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Check if trying to delete self
+    if admin_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot delete yourself")
+    
+    # Check if last super admin
+    super_admin_count = await db.users.count_documents({"role": "super_admin"})
+    if super_admin_count <= 1:
+        raise HTTPException(status_code=400, detail="Cannot delete the last super admin")
+    
+    admin = await db.users.find_one({"id": admin_id, "role": "super_admin"})
+    if not admin:
+        raise HTTPException(status_code=404, detail="Super admin not found")
+    
+    await db.users.delete_one({"id": admin_id})
+    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "DELETE_SUPER_ADMIN", f"Deleted super admin: {admin['name']}")
+    
+    return {"message": "Super admin deleted successfully"}
+
 @api_router.get("/superadmin/dashboard/stats")
 async def get_superadmin_stats(current_user: User = Depends(get_current_user)):
     if current_user.role != "super_admin":
