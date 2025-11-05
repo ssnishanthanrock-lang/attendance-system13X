@@ -137,8 +137,8 @@ export default function Payroll() {
         {/* Live Current Month View */}
         {isLiveView && livePayroll && (
           <div className="space-y-4">
-            {/* Header with Monthly History Button */}
-            <div className="flex items-center justify-between gap-4">
+            {/* Header */}
+            <div className="flex items-center gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
@@ -152,38 +152,6 @@ export default function Payroll() {
                 <p className="text-sm text-gray-600 mt-1">
                   Updates every second • Last updated: {new Date(livePayroll.timestamp).toLocaleTimeString()}
                 </p>
-              </div>
-              <div className="relative">
-                <Button
-                  onClick={() => {
-                    const monthsList = months.slice(0, 10).map((m, idx) => 
-                      `${idx + 1}. ${formatMonthName(m.month).monthName} ${formatMonthName(m.month).year}`
-                    ).join('\n');
-                    
-                    if (months.length > 0) {
-                      const selection = window.prompt(
-                        `Select a month to view detailed payroll:\n\n${monthsList}\n\nEnter the number (1-${Math.min(10, months.length)}):`,
-                        '1'
-                      );
-                      
-                      if (selection) {
-                        const idx = parseInt(selection) - 1;
-                        if (idx >= 0 && idx < months.length) {
-                          handleMonthClick(months[idx].month);
-                        } else {
-                          toast.error('Invalid selection');
-                        }
-                      }
-                    } else {
-                      toast.info('No historical data available');
-                    }
-                  }}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <Calendar className="w-4 h-4" />
-                  View Monthly History
-                </Button>
               </div>
             </div>
 
