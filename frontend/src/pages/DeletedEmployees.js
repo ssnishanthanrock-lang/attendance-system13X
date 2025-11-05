@@ -19,9 +19,9 @@ export default function DeletedEmployees() {
   const fetchDeletedEmployees = async () => {
     try {
       setLoading(true);
-      // Fetch all employees and filter by status = 0
+      // Fetch all employees and filter by status = 0 or is_active = false
       const response = await api.get('/employees');
-      const deleted = response.data.filter(emp => emp.status === 0);
+      const deleted = response.data.filter(emp => emp.status === 0 || emp.is_active === false);
       setDeletedEmployees(deleted);
     } catch (error) {
       toast.error('Failed to fetch deleted employees');
