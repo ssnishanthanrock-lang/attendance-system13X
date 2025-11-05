@@ -235,8 +235,8 @@ export default function Attendance() {
       // Employee + single date
       path = `/attendance/employee/${filters.employee_id}/date/${filters.from_date}`;
     } else if (filters.employee_id && filters.from_date && filters.to_date) {
-      // Employee + date range (need to add this route if needed)
-      path = `/attendance/employee/${filters.employee_id}`;
+      // Employee + date range
+      path = `/attendance/employee/${filters.employee_id}/from/${filters.from_date}/to/${filters.to_date}`;
     } else if (filters.from_date && filters.to_date && filters.from_date === filters.to_date) {
       // Single date only
       path = `/attendance/date/${filters.from_date}`;
@@ -244,8 +244,9 @@ export default function Attendance() {
       // Date range
       path = `/attendance/from/${filters.from_date}/to/${filters.to_date}`;
     } else if (filters.employee_id) {
-      // Employee only
-      path = `/attendance/employee/${filters.employee_id}`;
+      // Employee only - not allowed, dates are required
+      toast.error('Please select date range when filtering by employee');
+      return;
     }
     
     navigate(path, { replace: true });
