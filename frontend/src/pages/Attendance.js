@@ -555,15 +555,12 @@ export default function Attendance() {
           <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="flex-1">
                   <p className="text-sm font-semibold text-amber-900 mb-1">
-                    📅 Showing Last 7 Days Attendance
+                    📅 Showing Last 7 Days Attendance (Grouped by Date)
                   </p>
                   <p className="text-xs text-amber-700">
-                    No attendance recorded for today. Showing recent activity instead.
-                  </p>
-                  <p className="text-sm font-bold text-amber-900 mt-2">
-                    Summary: {todayAttendanceCount} attended from {activeEmployeesCount} active employees
+                    No attendance recorded for today. Showing recent activity grouped by date. Click on any date group to view details.
                   </p>
                 </div>
                 <Button
