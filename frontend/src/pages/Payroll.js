@@ -58,11 +58,13 @@ export default function Payroll() {
 
   const formatMonthName = (monthStr) => {
     const [year, month] = monthStr.split('-');
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
     const monthName = monthNames[parseInt(month) - 1];
     return `${monthName} ${year}`;
   };
-
-  const isAdmin = user?.role === 'admin' || user?.role === 'manager';
 
   if (loading) {
     return (
