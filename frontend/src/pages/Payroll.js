@@ -285,7 +285,7 @@ export default function Payroll() {
                       <div className="flex items-center justify-between">
                         <span className="text-lg font-semibold text-gray-900">Net Salary</span>
                         <span className="text-2xl font-bold text-green-600">
-                          Rs. {payroll.net_salary.toLocaleString()}
+                          Rs. {(payroll.net_salary || 0).toLocaleString()}
                         </span>
                       </div>
                     </div>
