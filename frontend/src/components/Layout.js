@@ -97,13 +97,24 @@ export default function Layout({ children }) {
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
           <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
-            <img 
-              src="https://cfms.lk/img/itsignature_logo_blue_only.png" 
-              alt="IT Signature Logo" 
-              className="h-12 w-auto mb-2 brightness-0 invert"
-            />
+            {companyInfo?.logo ? (
+              <div className="relative h-12 w-auto mb-2 flex items-center justify-center">
+                <img 
+                  src={companyInfo.logo} 
+                  alt={`${companyInfo.name} Logo`} 
+                  className="h-12 w-auto object-contain brightness-0 invert rounded-lg"
+                  style={{ borderRadius: '8px' }}
+                />
+              </div>
+            ) : (
+              <div className="h-12 w-12 bg-white/20 rounded-full flex items-center justify-center mb-2">
+                <span className="text-2xl font-bold text-white">
+                  {companyInfo?.name?.split(' ').map(w => w[0]).join('').slice(0, 2) || 'IT'}
+                </span>
+              </div>
+            )}
             <h1 className="text-xl font-bold text-white text-center" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-              IT Signature ERP
+              {companyInfo?.name || 'IT Signature ERP'}
             </h1>
           </div>
 
