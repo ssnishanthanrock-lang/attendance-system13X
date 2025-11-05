@@ -879,21 +879,22 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
     
     if current_user.role in ["admin", "manager"]:
         # Admin/Manager stats
-        # Get all active employees (status=1 or not set) - without date filter yet
+        # Get all active employees (status=1 or not set, is_active=True) - without date filter yet
         today_str = datetime.now(timezone.utc).date().isoformat()
         all_active_employees = await db.users.find({
             "company_id": current_user.company_id,
             "role": {"$in": ["employee", "staff_member", "manager"]},
             "$or": [
-                {"status": 1},  # status = 1 (active)
-                {"status": {"$exists": False}}  # or status field doesn't exist (default active)
+                {"is_active": True},  # is_active = True
+                {"is_active": {"$exists": False}}  # or is_active field doesn't exist (default active)
             ]
         }).to_list(length=None)
         
-        # Filter for employees who have joined by today
+        # Filter out employees with status=0 (deleted) and check join_date
         active_employees_today = [
             emp for emp in all_active_employees
-            if not emp.get("joining_date") or emp.get("joining_date", "") <= today_str
+            if emp.get("status", 1) != 0  # Exclude status=0 (deleted)
+            and (not emp.get("join_date") or emp.get("join_date", "") <= today_str)  # Check join_date
         ]
         
         total_employees = len(active_employees_today)
