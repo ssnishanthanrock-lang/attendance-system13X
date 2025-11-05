@@ -169,6 +169,40 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return encoded_jwt
 
+async def get_effective_salary(employee_id: str, company_id: str, for_month: str) -> float:
+    """
+    Get the effective salary for an employee for a specific month
+    Considers increment history and returns the salary that was effective in that month
+    
+    Args:
+        employee_id: Employee ID
+        company_id: Company ID
+        for_month: Month in format "YYYY-MM"
+    
+    Returns:
+        Effective salary for that month
+    """
+    # Get employee's current/base salary
+    employee = await db.users.find_one({"id": employee_id, "company_id": company_id})
+    if not employee:
+        return 0.0
+    
+    current_salary = employee.get("basic_salary", 0.0)
+    
+    # Get all increments for this employee that are effective on or before the target month
+    increments = await db.increments.find({
+        "employee_id": employee_id,
+        "company_id": company_id,
+        "effective_from": {"$lte": for_month}
+    }).sort("effective_from", -1).to_list(length=1)
+    
+    # If there's an increment effective for this month or earlier, use the new salary
+    if increments:
+        return increments[0]["new_salary"]
+    
+    # Otherwise, return current salary
+    return current_salary
+
 def send_sms(mobile: str, message: str, company_id: Optional[str] = None):
     """Send SMS via configured gateway"""
     try:
