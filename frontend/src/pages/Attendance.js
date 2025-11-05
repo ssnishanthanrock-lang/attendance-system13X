@@ -432,16 +432,28 @@ export default function Attendance() {
                         <td className="px-4 py-3 text-sm font-semibold text-blue-600">{calculateHours(record.check_in, record.check_out)}</td>
                         {isAdmin && (
                           <td className="px-4 py-3">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleDelete(record.id)}
-                              disabled={!canEdit}
-                              title={!canEdit ? "Read-only access" : ""}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
+                            <div className="flex gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleEdit(record)}
+                                disabled={!canEdit}
+                                title={!canEdit ? "Read-only access" : "Edit attendance"}
+                                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <Edit className="w-4 h-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDelete(record.id)}
+                                disabled={!canEdit}
+                                title={!canEdit ? "Read-only access" : "Delete attendance"}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
                           </td>
                         )}
                       </tr>
