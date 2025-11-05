@@ -198,24 +198,133 @@ export default function SuperAdminCompanyDetail() {
                   </Select>
                 </div>
 
-                <div>
-                  <label className="text-sm font-medium">Username / ID</label>
-                  <Input
-                    value={smsSettings.sms_username}
-                    onChange={(e) => setSmsSettings({...smsSettings, sms_username: e.target.value})}
-                    placeholder="Enter SMS gateway username"
-                  />
-                </div>
+                {/* Textit.biz Fields */}
+                {smsSettings.sms_gateway === 'textit' && (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium">Username</label>
+                      <Input
+                        value={smsSettings.sms_username}
+                        onChange={(e) => setSmsSettings({...smsSettings, sms_username: e.target.value})}
+                        placeholder="Textit.biz username"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Password</label>
+                      <Input
+                        type="password"
+                        value={smsSettings.sms_password}
+                        onChange={(e) => setSmsSettings({...smsSettings, sms_password: e.target.value})}
+                        placeholder="Textit.biz password"
+                      />
+                    </div>
+                  </>
+                )}
 
-                <div>
-                  <label className="text-sm font-medium">Password / API Key</label>
-                  <Input
-                    type="password"
-                    value={smsSettings.sms_password}
-                    onChange={(e) => setSmsSettings({...smsSettings, sms_password: e.target.value})}
-                    placeholder="Enter SMS gateway password"
-                  />
-                </div>
+                {/* Dialog Fields */}
+                {smsSettings.sms_gateway === 'dialog' && (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium">Username</label>
+                      <Input
+                        value={smsSettings.dialog_username}
+                        onChange={(e) => setSmsSettings({...smsSettings, dialog_username: e.target.value})}
+                        placeholder="Dialog username"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Password</label>
+                      <Input
+                        type="password"
+                        value={smsSettings.dialog_password}
+                        onChange={(e) => setSmsSettings({...smsSettings, dialog_password: e.target.value})}
+                        placeholder="Dialog password (will be MD5 hashed)"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Mask (Sender ID)</label>
+                      <Input
+                        value={smsSettings.dialog_mask}
+                        onChange={(e) => setSmsSettings({...smsSettings, dialog_mask: e.target.value})}
+                        placeholder="Your sender ID from Dialog"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">The sender ID visible to message recipients</p>
+                    </div>
+                  </>
+                )}
+
+                {/* Hutch Fields */}
+                {smsSettings.sms_gateway === 'hutch' && (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium">Client ID</label>
+                      <Input
+                        value={smsSettings.hutch_client_id}
+                        onChange={(e) => setSmsSettings({...smsSettings, hutch_client_id: e.target.value})}
+                        placeholder="OAuth 2.0 Client ID"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Client Secret</label>
+                      <Input
+                        type="password"
+                        value={smsSettings.hutch_client_secret}
+                        onChange={(e) => setSmsSettings({...smsSettings, hutch_client_secret: e.target.value})}
+                        placeholder="OAuth 2.0 Client Secret"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Access Token</label>
+                      <Input
+                        value={smsSettings.hutch_access_token}
+                        onChange={(e) => setSmsSettings({...smsSettings, hutch_access_token: e.target.value})}
+                        placeholder="OAuth 2.0 Access Token"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Get this from Hutch login API</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Refresh Token</label>
+                      <Input
+                        value={smsSettings.hutch_refresh_token}
+                        onChange={(e) => setSmsSettings({...smsSettings, hutch_refresh_token: e.target.value})}
+                        placeholder="OAuth 2.0 Refresh Token"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Used to renew access token automatically</p>
+                    </div>
+                  </>
+                )}
+
+                {/* Mobitel Fields */}
+                {smsSettings.sms_gateway === 'mobitel' && (
+                  <>
+                    <div>
+                      <label className="text-sm font-medium">App ID</label>
+                      <Input
+                        value={smsSettings.mobitel_app_id}
+                        onChange={(e) => setSmsSettings({...smsSettings, mobitel_app_id: e.target.value})}
+                        placeholder="Mobitel Application ID"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">App Key (API Key)</label>
+                      <Input
+                        type="password"
+                        value={smsSettings.mobitel_app_key}
+                        onChange={(e) => setSmsSettings({...smsSettings, mobitel_app_key: e.target.value})}
+                        placeholder="Mobitel Application Key"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm font-medium">Client ID (IBM)</label>
+                      <Input
+                        value={smsSettings.mobitel_client_id}
+                        onChange={(e) => setSmsSettings({...smsSettings, mobitel_client_id: e.target.value})}
+                        placeholder="x-ibm-client-id header value"
+                      />
+                      <p className="text-xs text-gray-500 mt-1">Provided by Mobitel during provisioning</p>
+                    </div>
+                  </>
+                )}
 
                 <div className="pt-4">
                   <Button onClick={handleSaveSmS} className="bg-gradient-to-r from-blue-600 to-indigo-600">
