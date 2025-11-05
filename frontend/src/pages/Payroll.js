@@ -201,6 +201,10 @@ export default function Payroll() {
                         const daySalary = emp.working_days > 0 ? (emp.basic_salary / emp.working_days) : 0;
                         const perMinuteSalary = emp.salary_per_minute || 0;
                         
+                        // Calculate earnings based on attended days (present + allowed leaves + allowed half days)
+                        const attendedDays = emp.present_days + (emp.allowed_leaves || 0) + ((emp.allowed_half_days || 0) * 0.5);
+                        const earnings = attendedDays * daySalary;
+                        
                         return (
                           <tr key={emp.employee_id} className="hover:bg-gray-50">
                             <td className="border border-gray-300 px-2 py-3 text-center text-sm">{index + 1}</td>
