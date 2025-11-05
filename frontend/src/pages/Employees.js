@@ -144,7 +144,57 @@ export default function Employees() {
       toast.success('Employee deleted successfully');
       fetchEmployees();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to delete employee');
+      toast.error('Failed to delete employee');
+    }
+  };
+
+  // Increment handlers
+  const fetchIncrements = async (employeeId) => {
+    try {
+      const response = await api.get(`/employees/${employeeId}/increments`);
+      setIncrements(response.data);
+    } catch (error) {
+      toast.error('Failed to fetch increment history');
+    }
+  };
+
+  const handleOpenIncrementDialog = (employee) => {
+    setSelectedEmployeeForIncrement(employee);
+    setIncrementForm({
+      effective_from: new Date().toISOString().slice(0, 7),
+      new_salary: employee.basic_salary,
+      reason: ''
+    });
+    setIncrementDialogOpen(true);
+  };
+
+  const handleOpenIncrementHistory = async (employee) => {
+    setSelectedEmployeeForIncrement(employee);
+    await fetchIncrements(employee.id);
+    setIncrementHistoryOpen(true);
+  };
+
+  const handleAddIncrement = async (e) => {
+    e.preventDefault();
+    
+    if (incrementForm.new_salary <= selectedEmployeeForIncrement.basic_salary) {
+      toast.error('New salary must be greater than current salary');
+      return;
+    }
+
+    try {
+      await api.post(`/employees/${selectedEmployeeForIncrement.id}/increments`, incrementForm);
+      toast.success('Increment added successfully');
+      setIncrementDialogOpen(false);
+      fetchEmployees(); // Refresh to show updated salary
+      
+      // Show success message with details
+      const increase = incrementForm.new_salary - selectedEmployeeForIncrement.basic_salary;
+      toast.success(`Salary increased by Rs. ${increase.toLocaleString()}`, {
+        duration: 4000
+      });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to add increment');
     }
   };
 
