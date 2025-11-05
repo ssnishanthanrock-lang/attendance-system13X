@@ -71,7 +71,21 @@ export default function SuperAdminDashboard() {
   const handleViewPortal = async (company) => {
     try {
       const response = await api.post(`/superadmin/impersonate/${company.company_id}`);
+      
+      // Store the new token
       localStorage.setItem('token', response.data.token);
+      
+      // Update user object to act as company admin
+      const currentUser = JSON.parse(localStorage.getItem('user'));
+      const impersonatedUser = {
+        ...currentUser,
+        company_id: response.data.company_id,
+        role: 'admin',
+        is_impersonating: true
+      };
+      localStorage.setItem('user', JSON.stringify(impersonatedUser));
+      
+      // Store impersonation state
       setImpersonationState(response.data.company_name, response.data.company_id, response.data.can_edit);
       
       // Force navigation to company dashboard
