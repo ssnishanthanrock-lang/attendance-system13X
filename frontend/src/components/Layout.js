@@ -42,6 +42,7 @@ export default function Layout({ children }) {
     { path: '/advances', label: 'Advances', icon: Wallet, roles: ['admin', 'manager', 'employee'] },
     { path: '/increments', label: 'Increments', icon: TrendingUp, roles: ['admin', 'manager', 'employee'] },
     { path: '/payroll', label: 'Payroll', icon: DollarSign, roles: ['admin', 'manager', 'employee', 'staff_member'] },
+    { path: '/settings', label: 'Settings', icon: Phone, roles: ['admin', 'manager'] },
   ];
 
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(user?.role));
