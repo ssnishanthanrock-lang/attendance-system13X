@@ -158,10 +158,24 @@ export default function Attendance() {
     e.preventDefault();
     
     try {
-      await api.put(`/attendance/${editingAttendance.id}`, {
-        check_in: editingAttendance.check_in,
-        check_out: editingAttendance.check_out
-      });
+      // Get original record to check what changed
+      const originalRecord = attendance.find(r => r.id === editingAttendance.id);
+      
+      // Update check-in/out times (if applicable)
+      if (editingAttendance.status === 'present') {
+        await api.put(`/attendance/${editingAttendance.id}`, {
+          check_in: editingAttendance.check_in,
+          check_out: editingAttendance.check_out
+        });
+      }
+      
+      // If status changed, update it separately (this tracks history)
+      if (originalRecord && originalRecord.status !== editingAttendance.status) {
+        await api.put(`/attendance/${editingAttendance.id}/status`, {
+          status: editingAttendance.status
+        });
+      }
+      
       toast.success('Attendance updated successfully');
       setEditDialogOpen(false);
       fetchAttendance();
