@@ -99,10 +99,22 @@ export default function Employees() {
         }
       });
       setPendingIncrements(pendingIncrementsMap);
+      
+      // Check if there are any deleted employees
+      checkDeletedEmployees();
     } catch (error) {
       toast.error('Failed to fetch employees');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkDeletedEmployees = async () => {
+    try {
+      const response = await api.get('/employees?include_deleted=true');
+      setHasDeletedEmployees(response.data.length > 0);
+    } catch (error) {
+      console.error('Failed to check deleted employees:', error);
     }
   };
 
