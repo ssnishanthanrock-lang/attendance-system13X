@@ -158,6 +158,99 @@ export default function SuperAdminCompanyDetail() {
           </CardContent>
         </Card>
 
+        {/* Logo & Branding */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Logo & Branding
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Company Logo */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Company Logo</label>
+                {company?.logo && (
+                  <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed">
+                    <img src={company.logo} alt="Company Logo" className="max-h-24 object-contain" />
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      formData.append('type', 'logo');
+                      formData.append('company_id', companyId);
+                      try {
+                        await api.post('/superadmin/branding', formData, {
+                          headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        toast.success('Logo uploaded successfully', {
+                          style: { background: '#10b981', color: 'white' }
+                        });
+                        fetchCompany();
+                      } catch (error) {
+                        toast.error('Failed to upload logo', {
+                          style: { background: '#ef4444', color: 'white' }
+                        });
+                      }
+                    }
+                  }}
+                />
+                <p className="text-xs text-gray-500">Recommended: PNG/SVG, transparent background, 200x200px</p>
+              </div>
+
+              {/* Favicon */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Favicon</label>
+                {company?.favicon && (
+                  <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed">
+                    <img src={company.favicon} alt="Favicon" className="max-h-16 object-contain rounded" style={{ borderRadius: '4px' }} />
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      formData.append('type', 'favicon');
+                      formData.append('company_id', companyId);
+                      try {
+                        await api.post('/superadmin/branding', formData, {
+                          headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        toast.success('Favicon uploaded successfully', {
+                          style: { background: '#10b981', color: 'white' }
+                        });
+                        fetchCompany();
+                      } catch (error) {
+                        toast.error('Failed to upload favicon', {
+                          style: { background: '#ef4444', color: 'white' }
+                        });
+                      }
+                    }
+                  }}
+                />
+                <p className="text-xs text-gray-500">Recommended: ICO/PNG, 32x32px or 64x64px</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>Note:</strong> Company logo will appear in the sidebar and header for this company's users. Favicon will be used for browser tabs.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* SMS Configuration */}
         <Card>
           <CardHeader>
