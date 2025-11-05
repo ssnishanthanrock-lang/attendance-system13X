@@ -302,6 +302,7 @@ export default function Payroll() {
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.basic_salary, 0).toLocaleString()}
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">-</td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
                         </td>
