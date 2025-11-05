@@ -184,6 +184,8 @@ export default function Payroll() {
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Allowances</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Earnings</th>
                         
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Extra Payment</th>
+                        
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Present</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Leave</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Allowed Leaves</th>
@@ -192,7 +194,6 @@ export default function Payroll() {
                         
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Advance</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Loan</th>
-                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Extra Payment</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Other</th>
                         
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-100">Net</th>
