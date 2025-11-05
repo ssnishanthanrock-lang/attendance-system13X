@@ -976,7 +976,7 @@ async def delete_attendance(attendance_id: str, current_user: User = Depends(get
     
     # Delete from attendance
     await db.attendance.delete_one({"id": attendance_id})
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_ATTENDANCE", f"Deleted attendance for {attendance.get('employee_name', 'employee')}")
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_ATTENDANCE", f"Deleted attendance for {attendance.get('employee_name', 'employee')} on {attendance.get('date', 'N/A')}, Status: {attendance.get('status', 'N/A')}, Check-in: {attendance.get('check_in', 'N/A')}")
     
     return {"message": "Attendance deleted successfully"}
 
