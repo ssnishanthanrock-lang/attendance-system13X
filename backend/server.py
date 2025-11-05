@@ -1846,6 +1846,452 @@ async def delete_extra_payment(payment_id: str, current_user: User = Depends(get
     
     return {"message": "Extra payment deleted successfully"}
 
+# ============= INVOICING ENDPOINTS =============
+
+# Customer endpoints
+@api_router.post("/customers")
+async def create_customer(customer_data: dict, current_user: User = Depends(get_current_user)):
+    """Create a new customer"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    customer = Customer(
+        company_id=current_user.company_id,
+        name=customer_data["name"],
+        email=customer_data.get("email"),
+        phone=customer_data.get("phone"),
+        address=customer_data.get("address")
+    )
+    
+    await db.customers.insert_one(customer.model_dump())
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_CUSTOMER", f"Created customer: {customer.name}")
+    
+    return customer.model_dump()
+
+@api_router.get("/customers")
+async def get_customers(current_user: User = Depends(get_current_user)):
+    """Get all customers for company"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    customers = await db.customers.find({"company_id": current_user.company_id}, {"_id": 0}).sort("created_at", -1).to_list(length=None)
+    return customers
+
+@api_router.put("/customers/{customer_id}")
+async def update_customer(customer_id: str, customer_data: dict, current_user: User = Depends(get_current_user)):
+    """Update customer"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    customer = await db.customers.find_one({"id": customer_id, "company_id": current_user.company_id})
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    await db.customers.update_one(
+        {"id": customer_id, "company_id": current_user.company_id},
+        {"$set": customer_data}
+    )
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_CUSTOMER", f"Updated customer: {customer_data.get('name', customer['name'])}")
+    
+    return {"message": "Customer updated successfully"}
+
+@api_router.delete("/customers/{customer_id}")
+async def delete_customer(customer_id: str, current_user: User = Depends(get_current_user)):
+    """Delete customer"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    customer = await db.customers.find_one({"id": customer_id, "company_id": current_user.company_id})
+    if not customer:
+        raise HTTPException(status_code=404, detail="Customer not found")
+    
+    await db.customers.delete_one({"id": customer_id, "company_id": current_user.company_id})
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_CUSTOMER", f"Deleted customer: {customer['name']}")
+    
+    return {"message": "Customer deleted successfully"}
+
+# Product Category endpoints
+@api_router.post("/product-categories")
+async def create_category(category_data: dict, current_user: User = Depends(get_current_user)):
+    """Create product category"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    category = ProductCategory(
+        company_id=current_user.company_id,
+        name=category_data["name"]
+    )
+    
+    await db.product_categories.insert_one(category.model_dump())
+    return category.model_dump()
+
+@api_router.get("/product-categories")
+async def get_categories(current_user: User = Depends(get_current_user)):
+    """Get all product categories"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    categories = await db.product_categories.find({"company_id": current_user.company_id}, {"_id": 0}).sort("name", 1).to_list(length=None)
+    return categories
+
+# Product endpoints
+@api_router.post("/products")
+async def create_product(product_data: dict, current_user: User = Depends(get_current_user)):
+    """Create a new product"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    product = Product(
+        company_id=current_user.company_id,
+        category_id=product_data.get("category_id"),
+        name=product_data["name"],
+        description=product_data.get("description"),
+        price=product_data["price"],
+        unit=product_data.get("unit", "pcs"),
+        stock_quantity=product_data.get("stock_quantity", 0)
+    )
+    
+    await db.products.insert_one(product.model_dump())
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_PRODUCT", f"Created product: {product.name}")
+    
+    return product.model_dump()
+
+@api_router.get("/products")
+async def get_products(current_user: User = Depends(get_current_user)):
+    """Get all products for company"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    products = await db.products.find({"company_id": current_user.company_id}, {"_id": 0}).sort("name", 1).to_list(length=None)
+    return products
+
+@api_router.put("/products/{product_id}")
+async def update_product(product_id: str, product_data: dict, current_user: User = Depends(get_current_user)):
+    """Update product"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    product = await db.products.find_one({"id": product_id, "company_id": current_user.company_id})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    await db.products.update_one(
+        {"id": product_id, "company_id": current_user.company_id},
+        {"$set": product_data}
+    )
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_PRODUCT", f"Updated product: {product_data.get('name', product['name'])}")
+    
+    return {"message": "Product updated successfully"}
+
+@api_router.delete("/products/{product_id}")
+async def delete_product(product_id: str, current_user: User = Depends(get_current_user)):
+    """Delete product"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    product = await db.products.find_one({"id": product_id, "company_id": current_user.company_id})
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    await db.products.delete_one({"id": product_id, "company_id": current_user.company_id})
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_PRODUCT", f"Deleted product: {product['name']}")
+    
+    return {"message": "Product deleted successfully"}
+
+# Invoice endpoints
+def generate_invoice_number():
+    """Generate invoice number: INV-25-MMDD-XX"""
+    now = datetime.now(timezone.utc)
+    year = now.strftime("%y")
+    month_day = now.strftime("%m%d")
+    return f"INV-{year}-{month_day}"
+
+@api_router.post("/invoices")
+async def create_invoice(invoice_data: dict, current_user: User = Depends(get_current_user)):
+    """Create a new invoice"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    # Generate invoice number with sequence
+    base_number = generate_invoice_number()
+    count = await db.invoices.count_documents({
+        "company_id": current_user.company_id,
+        "invoice_number": {"$regex": f"^{base_number}"}
+    })
+    invoice_number = f"{base_number}-{str(count + 1).zfill(2)}"
+    
+    # Process items
+    items = []
+    for item_data in invoice_data["items"]:
+        item = InvoiceItem(
+            product_id=item_data.get("product_id"),
+            product_name=item_data["product_name"],
+            description=item_data.get("description"),
+            quantity=item_data["quantity"],
+            unit_price=item_data["unit_price"],
+            total=item_data["quantity"] * item_data["unit_price"]
+        )
+        items.append(item.model_dump())
+        
+        # Reduce stock if product_id provided
+        if item_data.get("product_id"):
+            await db.products.update_one(
+                {"id": item_data["product_id"], "company_id": current_user.company_id},
+                {"$inc": {"stock_quantity": -item_data["quantity"]}}
+            )
+    
+    subtotal = sum([item["total"] for item in items])
+    
+    invoice = Invoice(
+        company_id=current_user.company_id,
+        customer_id=invoice_data["customer_id"],
+        invoice_number=invoice_number,
+        invoice_date=invoice_data.get("invoice_date", datetime.now(timezone.utc).date().isoformat()),
+        due_date=invoice_data.get("due_date"),
+        items=items,
+        subtotal=subtotal,
+        total=subtotal,
+        notes=invoice_data.get("notes"),
+        created_by=current_user.id,
+        created_by_name=current_user.name
+    )
+    
+    await db.invoices.insert_one(invoice.model_dump())
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_INVOICE", f"Created invoice: {invoice_number}")
+    
+    return invoice.model_dump()
+
+@api_router.get("/invoices")
+async def get_invoices(
+    status: Optional[str] = None,
+    customer_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get all invoices for company"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    query = {"company_id": current_user.company_id}
+    if status:
+        query["status"] = status
+    if customer_id:
+        query["customer_id"] = customer_id
+    
+    invoices = await db.invoices.find(query, {"_id": 0}).sort("created_at", -1).to_list(length=None)
+    return invoices
+
+@api_router.get("/invoices/{invoice_id}")
+async def get_invoice(invoice_id: str, current_user: User = Depends(get_current_user)):
+    """Get single invoice details"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    invoice = await db.invoices.find_one({"id": invoice_id, "company_id": current_user.company_id}, {"_id": 0})
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    # Get customer details
+    customer = await db.customers.find_one({"id": invoice["customer_id"]}, {"_id": 0})
+    invoice["customer"] = customer
+    
+    # Get payments
+    payments = await db.invoice_payments.find({"invoice_id": invoice_id}, {"_id": 0}).sort("payment_date", -1).to_list(length=None)
+    invoice["payments"] = payments
+    
+    return invoice
+
+@api_router.post("/invoices/{invoice_id}/payments")
+async def add_payment(invoice_id: str, payment_data: dict, current_user: User = Depends(get_current_user)):
+    """Add payment to invoice"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    invoice = await db.invoices.find_one({"id": invoice_id, "company_id": current_user.company_id})
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    payment = Payment(
+        invoice_id=invoice_id,
+        amount=payment_data["amount"],
+        payment_date=payment_data.get("payment_date", datetime.now(timezone.utc).date().isoformat()),
+        payment_method=payment_data["payment_method"],
+        notes=payment_data.get("notes"),
+        created_by=current_user.id,
+        created_by_name=current_user.name
+    )
+    
+    await db.invoice_payments.insert_one(payment.model_dump())
+    
+    # Update invoice amount_paid and status
+    new_amount_paid = invoice["amount_paid"] + payment_data["amount"]
+    new_status = "paid" if new_amount_paid >= invoice["total"] else "partial"
+    
+    await db.invoices.update_one(
+        {"id": invoice_id},
+        {"$set": {"amount_paid": new_amount_paid, "status": new_status}}
+    )
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "ADD_PAYMENT", f"Added payment Rs {payment_data['amount']} to invoice {invoice['invoice_number']}")
+    
+    return {"message": "Payment added successfully"}
+
+# Estimate endpoints
+def generate_estimate_number():
+    """Generate estimate number: EST-25-MMDD-XX"""
+    now = datetime.now(timezone.utc)
+    year = now.strftime("%y")
+    month_day = now.strftime("%m%d")
+    return f"EST-{year}-{month_day}"
+
+@api_router.post("/estimates")
+async def create_estimate(estimate_data: dict, current_user: User = Depends(get_current_user)):
+    """Create a new estimate"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    # Generate estimate number with sequence
+    base_number = generate_estimate_number()
+    count = await db.estimates.count_documents({
+        "company_id": current_user.company_id,
+        "estimate_number": {"$regex": f"^{base_number}"}
+    })
+    estimate_number = f"{base_number}-{str(count + 1).zfill(2)}"
+    
+    # Process items
+    items = []
+    for item_data in estimate_data["items"]:
+        item = InvoiceItem(
+            product_id=item_data.get("product_id"),
+            product_name=item_data["product_name"],
+            description=item_data.get("description"),
+            quantity=item_data["quantity"],
+            unit_price=item_data["unit_price"],
+            total=item_data["quantity"] * item_data["unit_price"]
+        )
+        items.append(item.model_dump())
+    
+    subtotal = sum([item["total"] for item in items])
+    
+    estimate = Estimate(
+        company_id=current_user.company_id,
+        customer_id=estimate_data["customer_id"],
+        estimate_number=estimate_number,
+        estimate_date=estimate_data.get("estimate_date", datetime.now(timezone.utc).date().isoformat()),
+        valid_until=estimate_data.get("valid_until"),
+        items=items,
+        subtotal=subtotal,
+        total=subtotal,
+        notes=estimate_data.get("notes"),
+        created_by=current_user.id,
+        created_by_name=current_user.name
+    )
+    
+    await db.estimates.insert_one(estimate.model_dump())
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_ESTIMATE", f"Created estimate: {estimate_number}")
+    
+    return estimate.model_dump()
+
+@api_router.get("/estimates")
+async def get_estimates(current_user: User = Depends(get_current_user)):
+    """Get all estimates for company"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    estimates = await db.estimates.find({"company_id": current_user.company_id}, {"_id": 0}).sort("created_at", -1).to_list(length=None)
+    return estimates
+
+@api_router.post("/estimates/{estimate_id}/convert")
+async def convert_estimate_to_invoice(estimate_id: str, current_user: User = Depends(get_current_user)):
+    """Convert estimate to invoice"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    estimate = await db.estimates.find_one({"id": estimate_id, "company_id": current_user.company_id})
+    if not estimate:
+        raise HTTPException(status_code=404, detail="Estimate not found")
+    
+    # Generate invoice number
+    base_number = generate_invoice_number()
+    count = await db.invoices.count_documents({
+        "company_id": current_user.company_id,
+        "invoice_number": {"$regex": f"^{base_number}"}
+    })
+    invoice_number = f"{base_number}-{str(count + 1).zfill(2)}"
+    
+    # Create invoice from estimate
+    invoice = Invoice(
+        company_id=estimate["company_id"],
+        customer_id=estimate["customer_id"],
+        invoice_number=invoice_number,
+        invoice_date=datetime.now(timezone.utc).date().isoformat(),
+        due_date=None,
+        items=estimate["items"],
+        subtotal=estimate["subtotal"],
+        total=estimate["total"],
+        notes=estimate.get("notes"),
+        created_by=current_user.id,
+        created_by_name=current_user.name
+    )
+    
+    await db.invoices.insert_one(invoice.model_dump())
+    
+    # Update estimate status
+    await db.estimates.update_one(
+        {"id": estimate_id},
+        {"$set": {"status": "converted"}}
+    )
+    
+    # Reduce stock for products
+    for item in estimate["items"]:
+        if item.get("product_id"):
+            await db.products.update_one(
+                {"id": item["product_id"], "company_id": current_user.company_id},
+                {"$inc": {"stock_quantity": -item["quantity"]}}
+            )
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "CONVERT_ESTIMATE", f"Converted estimate {estimate['estimate_number']} to invoice {invoice_number}")
+    
+    return invoice.model_dump()
+
+# Company invoice settings
+@api_router.put("/company/invoice-settings")
+async def update_invoice_settings(settings_data: dict, current_user: User = Depends(get_current_user)):
+    """Update company invoice settings"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    await db.companies.update_one(
+        {"id": current_user.company_id},
+        {"$set": {
+            "invoice_address": settings_data.get("address"),
+            "invoice_mobile": settings_data.get("mobile"),
+            "invoice_hotline": settings_data.get("hotline"),
+            "bank_name": settings_data.get("bank_name"),
+            "bank_account_name": settings_data.get("bank_account_name"),
+            "bank_account_number": settings_data.get("bank_account_number")
+        }}
+    )
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_INVOICE_SETTINGS", "Updated company invoice settings")
+    
+    return {"message": "Invoice settings updated successfully"}
+
+# Super admin - toggle invoicing
+@api_router.put("/superadmin/companies/{company_id}/invoicing")
+async def toggle_invoicing(company_id: str, data: dict, current_user: User = Depends(get_current_user)):
+    """Enable/disable invoicing for company"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    await db.companies.update_one(
+        {"id": company_id},
+        {"$set": {"invoicing_enabled": data["enabled"]}}
+    )
+    
+    return {"message": f"Invoicing {'enabled' if data['enabled'] else 'disabled'} successfully"}
+
 # ============= ATTENDANCE ENDPOINTS =============
 @api_router.get("/attendance")
 async def get_attendance(
