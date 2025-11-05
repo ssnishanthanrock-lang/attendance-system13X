@@ -430,7 +430,7 @@ export default function Dashboard() {
         {isAdmin && livePayroll && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Live Salary Summary */}
-            <Card>
+            <Card className="cursor-pointer hover:shadow-lg transition-all" onClick={() => navigate('/payroll')}>
                 <CardHeader>
                   <div className="flex items-center gap-3">
                     <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Live Salary Tracker</CardTitle>
