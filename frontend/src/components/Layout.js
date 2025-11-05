@@ -164,6 +164,19 @@ export default function Layout({ children }) {
         { path: '/advances', label: 'Advances', icon: Wallet },
       ]
     },
+    { 
+      label: 'Invoicing', 
+      icon: FileText, 
+      roles: ['admin', 'manager'],
+      isDropdown: true,
+      requiresInvoicing: true,
+      children: [
+        { path: '/invoices', label: 'Invoices', icon: FileText },
+        { path: '/estimates', label: 'Estimates', icon: FileText },
+        { path: '/invoice-customers', label: 'Customers', icon: Users },
+        { path: '/invoice-products', label: 'Products', icon: Wallet },
+      ]
+    },
   ];
 
   // Profile section items (shown at bottom)
