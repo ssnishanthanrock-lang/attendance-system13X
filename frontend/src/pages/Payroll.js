@@ -399,7 +399,9 @@ export default function Payroll() {
                   </div>
                   <p className="text-sm text-gray-600">
                     Working Days - {detailedPayroll.employees[0]?.working_days || 26}
-                    {month === new Date().toISOString().slice(0, 7) && ' • Updates every second'}
+                    {month === new Date().toISOString().slice(0, 7) && detailedPayroll.timestamp && (
+                      <> • Last updated: {new Date(detailedPayroll.timestamp).toLocaleTimeString()}</>
+                    )}
                   </p>
                 </div>
               </div>
