@@ -153,7 +153,7 @@ export default function Layout({ children }) {
     { path: '/attendance', label: 'Attendance', icon: Calendar, roles: ['admin', 'manager', 'employee', 'staff_member'] },
     { path: '/leaves', label: 'Leaves', icon: FileText, roles: ['admin', 'manager'] },
     { path: '/advances', label: 'Advances', icon: Wallet, roles: ['admin', 'manager'] },
-    { path: '/payroll', label: 'Payroll', icon: DollarSign, roles: ['admin', 'manager', 'employee', 'staff_member'] },
+    { path: '/payroll', label: 'Payroll', icon: IndianRupee, roles: ['admin', 'manager', 'employee', 'staff_member'] },
   ];
 
   // Profile section items (shown at bottom)
