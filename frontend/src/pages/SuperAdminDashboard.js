@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
-import { Building2, Users, TrendingUp, LogOut, Plus, CheckCircle, XCircle, Clock, Settings } from 'lucide-react';
+import { Building2, Users, TrendingUp, LogOut, Plus, CheckCircle, XCircle, Clock, Settings, Shield } from 'lucide-react';
 
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
