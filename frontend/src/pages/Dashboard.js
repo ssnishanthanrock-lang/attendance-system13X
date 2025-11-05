@@ -302,6 +302,82 @@ export default function Dashboard() {
             </Card>
           </div>
         )}
+
+        {/* Monthly Summary for Admin/Manager */}
+        {isAdmin && stats?.monthly_salary_summary && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Salary Summary */}
+            <Card data-testid="salary-summary-card">
+              <CardHeader>
+                <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                  {stats.monthly_salary_summary.month} {stats.monthly_salary_summary.year} - Salary Summary
+                </CardTitle>
+                <CardDescription>Employee-wise salary overview</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <span className="text-sm font-medium text-gray-700">Total Employees</span>
+                    <span className="text-sm font-semibold text-blue-600">
+                      {stats.monthly_salary_summary.employee_count}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <span className="text-sm font-medium text-gray-700">Expected Salary</span>
+                    <span className="text-sm font-semibold text-green-600">
+                      Rs. {stats.monthly_salary_summary.total_expected.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                    <span className="text-sm font-medium text-gray-700">Calculated Salary</span>
+                    <span className="text-sm font-semibold text-orange-600">
+                      Rs. {stats.monthly_salary_summary.total_calculated.toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                    <span className="text-sm font-medium text-gray-700">Net Salary</span>
+                    <span className="text-sm font-semibold text-purple-600">
+                      Rs. {stats.monthly_salary_summary.total_net.toLocaleString()}
+                    </span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Attendance Chart */}
+            <Card data-testid="attendance-chart-card">
+              <CardHeader>
+                <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Attendance Summary</CardTitle>
+                <CardDescription>Last 7 days attendance trend</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {stats?.attendance_summary?.map((day, index) => {
+                    const date = new Date(day.date);
+                    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                    const dayDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    const percentage = (day.count / (stats.total_employees || 1)) * 100;
+                    
+                    return (
+                      <div key={index} className="space-y-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium text-gray-700">{dayName}, {dayDate}</span>
+                          <span className="text-gray-600">{day.count} / {stats.total_employees}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
+                            style={{ width: `${percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </Layout>
   );
