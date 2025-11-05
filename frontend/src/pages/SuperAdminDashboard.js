@@ -232,7 +232,7 @@ export default function SuperAdminDashboard() {
                         {company.status}
                       </Badge>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-sm">
                       <div>
                         <p className="text-gray-500">Employees</p>
                         <p className="font-semibold">{company.employee_count}</p>
@@ -240,6 +240,10 @@ export default function SuperAdminDashboard() {
                       <div>
                         <p className="text-gray-500">SMS</p>
                         <p className="font-semibold">{company.sms_enabled ? 'Enabled' : 'Disabled'}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Invoicing</p>
+                        <p className="font-semibold">{company.invoicing_enabled ? 'Enabled' : 'Disabled'}</p>
                       </div>
                       <div>
                         <p className="text-gray-500">Created</p>
