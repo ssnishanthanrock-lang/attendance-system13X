@@ -738,7 +738,7 @@ export default function Attendance() {
                                               <Button
                                                 variant="ghost"
                                                 size="sm"
-                                                onClick={() => handleEditClick(record)}
+                                                onClick={() => handleEdit(record)}
                                                 title="Edit"
                                                 className="h-8 w-8 p-0"
                                               >
