@@ -79,7 +79,7 @@ export default function CompanySettings() {
     <Layout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+          <h1 className="text-xl sm:text-2xl font-bold" style={{ fontFamily: 'Work Sans, sans-serif' }}>
             Company Settings
           </h1>
         </div>

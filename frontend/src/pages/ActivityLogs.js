@@ -109,7 +109,7 @@ export default function ActivityLogs() {
     <Layout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
             Activity Logs
           </h1>
         </div>
