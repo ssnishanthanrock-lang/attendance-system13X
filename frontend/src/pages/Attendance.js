@@ -47,6 +47,32 @@ export default function Attendance() {
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
 
+  // Read URL parameters on mount
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const dateParam = searchParams.get('date');
+    const employeeParam = searchParams.get('employee_id');
+    const fromDateParam = searchParams.get('from_date');
+    const toDateParam = searchParams.get('to_date');
+
+    if (dateParam) {
+      // If single date is provided, set both from and to date
+      setFilters({
+        employee_id: employeeParam || '',
+        from_date: dateParam,
+        to_date: dateParam,
+      });
+      setViewMode('filtered'); // Set to filtered mode
+    } else if (fromDateParam || toDateParam) {
+      setFilters({
+        employee_id: employeeParam || '',
+        from_date: fromDateParam || '',
+        to_date: toDateParam || '',
+      });
+      setViewMode('filtered');
+    }
+  }, [location.search]);
+
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
@@ -56,7 +82,7 @@ export default function Attendance() {
     }
     fetchCompanySettings();
     fetchAttendance();
-  }, []);
+  }, [filters]);
 
   const fetchEmployees = async () => {
     try {
