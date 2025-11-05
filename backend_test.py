@@ -357,9 +357,6 @@ class ERPTester:
         """Test role-based access control"""
         print("\n=== TESTING ROLE-BASED ACCESS CONTROL ===")
         
-        # Test that employee role cannot access admin endpoints
-        # For this test, we'd need to create an employee token, but for now we'll test with admin
-        
         try:
             # Test accessing employees endpoint (should work for admin)
             response = self.session.get(f"{API_BASE}/employees")
@@ -376,9 +373,55 @@ class ERPTester:
                 self.log_result("Company Admin Super Admin Access", True, "Company admin correctly denied super admin access")
             else:
                 self.log_result("Company Admin Super Admin Access", False, f"Company admin has unexpected super admin access: {response.status_code}")
+            
+            # Test employee role access
+            self.test_employee_role_access()
                 
         except Exception as e:
             self.log_result("Role-Based Access", False, f"Role-based access test error: {str(e)}")
+    
+    def test_employee_role_access(self):
+        """Test employee role access restrictions"""
+        try:
+            # Create employee token
+            import jwt
+            employee_payload = {
+                "user_id": "95f4fd94-47ff-44ac-bcb8-b13561fbb446",  # Employee from DB
+                "role": "employee", 
+                "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",
+                "mobile": "0770539581"
+            }
+            
+            jwt_secret = "attendance-system-secret-key-change-in-production"
+            employee_token = jwt.encode(employee_payload, jwt_secret, algorithm="HS256")
+            
+            # Create new session for employee
+            employee_session = requests.Session()
+            employee_session.headers.update({'Authorization': f'Bearer {employee_token}'})
+            
+            # Test employee trying to access admin endpoints (should fail)
+            response = employee_session.get(f"{API_BASE}/employees")
+            
+            if response.status_code == 403:
+                self.log_result("Employee Access Restriction", True, "Employee correctly denied access to employee management")
+            else:
+                self.log_result("Employee Access Restriction", False, f"Employee has unexpected access to admin endpoints: {response.status_code}")
+            
+            # Test employee accessing their own dashboard (should work)
+            response = employee_session.get(f"{API_BASE}/dashboard/stats")
+            
+            if response.status_code == 200:
+                data = response.json()
+                # Employee dashboard should have different fields
+                if 'total_attendance_days' in data:
+                    self.log_result("Employee Dashboard Access", True, "Employee can access their dashboard with correct data structure")
+                else:
+                    self.log_result("Employee Dashboard Access", False, "Employee dashboard missing expected fields")
+            else:
+                self.log_result("Employee Dashboard Access", False, f"Employee cannot access dashboard: {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Employee Role Access", False, f"Employee role access test error: {str(e)}")
     
     def run_all_tests(self):
         """Run all backend tests"""
