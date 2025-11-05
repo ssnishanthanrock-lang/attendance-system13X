@@ -283,18 +283,20 @@ export default function Payroll() {
                     {/* Footer Totals */}
                     <tfoot>
                       <tr className="bg-gray-200 font-bold">
-                        <td colSpan="3" className="border border-gray-300 px-3 py-3 text-center text-sm">
+                        <td colSpan="2" className="border border-gray-300 px-3 py-3 text-center text-sm">
                           TOTAL
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.basic_salary, 0).toLocaleString()}
                         </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">-</td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.total_gross.toLocaleString()}
                         </td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
@@ -306,6 +308,9 @@ export default function Payroll() {
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.loan_deduction || 0), 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.extra_payment || 0), 0).toLocaleString()}
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.other_deductions, 0).toLocaleString()}
