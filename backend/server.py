@@ -2290,7 +2290,8 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
         
         if employee.get("fixed_salary", False):
             # Fixed salary: proportional to days passed in month
-            days_in_month = (datetime(int(year), int(month_num) + 1, 1) - datetime(int(year), int(month_num), 1)).days if int(month_num) < 12 else 31
+            import calendar
+            days_in_month = calendar.monthrange(int(year), int(month_num))[1]
             current_day = now.day
             # Pro-rata calculation: (basic_salary / days_in_month) * current_day
             earnings_so_far = (basic_salary / days_in_month) * current_day
