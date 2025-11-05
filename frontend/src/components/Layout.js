@@ -328,8 +328,8 @@ export default function Layout({ children }) {
       </div>
 
       {/* Main Content */}
-      <div className={`lg:pl-72 flex-1 flex flex-col ${impersonationState ? 'pt-[72px]' : ''}`} style={{ marginTop: '20px' }}>
-        <main className="flex-1 pt-20 lg:pt-0 px-4 sm:px-6 lg:px-8 py-8">{children}</main>
+      <div className={`lg:pl-72 flex-1 flex flex-col ${impersonationState ? 'lg:pt-[72px]' : ''}`} style={{ marginTop: '20px' }}>
+        <main className={`flex-1 lg:pt-0 px-4 sm:px-6 lg:px-8 py-8 ${impersonationState ? 'pt-[152px]' : 'pt-20'}`}>{children}</main>
         
         {/* Footer */}
         <footer className="hidden lg:block border-t border-gray-200 bg-white py-4 px-8">
