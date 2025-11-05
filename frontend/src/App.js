@@ -17,6 +17,7 @@ import Advances from "./pages/Advances";
 import Increments from "./pages/Increments";
 import Payroll from "./pages/Payroll";
 import { Toaster } from "./components/ui/sonner";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
