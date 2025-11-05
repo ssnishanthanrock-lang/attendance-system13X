@@ -140,8 +140,8 @@ export default function Payroll() {
         {/* Live Current Month View */}
         {isLiveView && livePayroll && (
           <div className="space-y-4">
-            {/* Header */}
-            <div className="flex items-center gap-4">
+            {/* Header with View Toggle */}
+            <div className="flex items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
@@ -155,6 +155,24 @@ export default function Payroll() {
                 <p className="text-sm text-gray-600 mt-1">
                   Updates every second • Last updated: {new Date(livePayroll.timestamp).toLocaleTimeString()}
                 </p>
+              </div>
+              
+              {/* View Toggle */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setViewMode('card')}
+                  variant={viewMode === 'card' ? 'default' : 'outline'}
+                  size="sm"
+                >
+                  Card View
+                </Button>
+                <Button
+                  onClick={() => setViewMode('table')}
+                  variant={viewMode === 'table' ? 'default' : 'outline'}
+                  size="sm"
+                >
+                  Table View
+                </Button>
               </div>
             </div>
 
