@@ -545,6 +545,12 @@ export default function Employees() {
                       <span className="text-gray-600">Salary:</span>
                       <span className="font-medium">Rs. {employee.basic_salary.toLocaleString()}</span>
                     </div>
+                    {employee.allowances > 0 && (
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-600">Allowances:</span>
+                        <span className="font-medium text-green-600">Rs. {employee.allowances.toLocaleString()}</span>
+                      </div>
+                    )}
                     {pendingIncrements[employee.id] && (
                       <div className="flex justify-end">
                         <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full inline-flex items-center gap-1">
