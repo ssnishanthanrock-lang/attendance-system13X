@@ -1575,21 +1575,17 @@ async def update_advance_status(advance_id: str, status_data: dict, current_user
 @api_router.post("/leaves")
 async def create_leave(leave_data: dict, current_user: User = Depends(get_current_user)):
     """Create a new leave request"""
-    leave = {
-        "id": str(uuid.uuid4()),
-        "company_id": current_user.company_id,
-        "employee_id": current_user.id,
-        "employee_name": current_user.name,
-        "leave_type": leave_data["leave_type"],
-        "from_date": leave_data["from_date"],
-        "to_date": leave_data["to_date"],
-        "reason": leave_data.get("reason", ""),
-        "status": "pending",
-        "applied_date": datetime.now(timezone.utc).date().isoformat(),
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
+    leave = Leave(
+        company_id=current_user.company_id,
+        employee_id=current_user.id,
+        employee_name=current_user.name,
+        leave_type=leave_data["leave_type"],
+        from_date=leave_data["from_date"],
+        to_date=leave_data["to_date"],
+        reason=leave_data.get("reason", "")
+    )
     
-    result = await db.leaves.insert_one(leave)
+    await db.leaves.insert_one(leave.model_dump())
     
     # Log activity
     await log_activity(
@@ -1600,7 +1596,6 @@ async def create_leave(leave_data: dict, current_user: User = Depends(get_curren
         f"Requested {leave_data['leave_type']} leave from {leave_data['from_date']} to {leave_data['to_date']}"
     )
     
-    # Return the leave without MongoDB ObjectId
     return leave
 
 @api_router.get("/leaves")
