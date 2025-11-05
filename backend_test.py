@@ -1443,8 +1443,12 @@ class ERPTester:
         auth_success = self.test_authentication()
         
         if auth_success:
-            # Run priority tests from review request - PAYROLL SYSTEM FOCUS
-            print("\n🎯 HIGH PRIORITY PAYROLL TESTS (Review Request)")
+            # Run priority tests from review request - LIVE PAYROLL FOCUS
+            print("\n🎯 HIGH PRIORITY LIVE PAYROLL TESTS (Review Request)")
+            self.test_live_payroll_current_month()
+            
+            # Run other payroll tests
+            print("\n🎯 OTHER PAYROLL TESTS")
             self.test_payroll_months_endpoint()
             self.test_payroll_detailed_endpoint()
             self.test_payroll_generate_endpoint()
