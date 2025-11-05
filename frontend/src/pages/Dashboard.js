@@ -307,7 +307,7 @@ export default function Dashboard() {
   );
 }
 
-function StatCard({ title, value, icon, color, testId }) {
+function StatCard({ title, value, icon, color, testId, onClick, clickable }) {
   const colors = {
     blue: 'from-blue-500 to-blue-600',
     green: 'from-green-500 to-emerald-600',
@@ -317,7 +317,11 @@ function StatCard({ title, value, icon, color, testId }) {
   };
 
   return (
-    <Card className="overflow-hidden" data-testid={testId}>
+    <Card 
+      className={`overflow-hidden ${clickable ? 'cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-105' : ''}`} 
+      data-testid={testId}
+      onClick={clickable ? onClick : undefined}
+    >
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
