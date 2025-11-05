@@ -41,6 +41,7 @@ export default function Attendance() {
   const [viewMode, setViewMode] = useState('today'); // 'today' or 'last7days'
   const [todayAttendanceCount, setTodayAttendanceCount] = useState(0);
   const [activeEmployeesCount, setActiveEmployeesCount] = useState(0);
+  const [hasDeletedAttendance, setHasDeletedAttendance] = useState(false);
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
