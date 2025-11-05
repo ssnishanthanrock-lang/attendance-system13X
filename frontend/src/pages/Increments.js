@@ -17,7 +17,7 @@ export default function Increments() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
   const [formData, setFormData] = useState({
-    employee_id: '',
+    employee_id: 'none',
     new_salary: 0,
     effective_date: new Date().toISOString().split('T')[0],
     reason: '',
