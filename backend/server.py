@@ -162,6 +162,33 @@ class Increment(BaseModel):
     created_by_name: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class Advance(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    employee_id: str
+    employee_name: str
+    amount: float
+    reason: str
+    repayment_months: int = 1
+    status: str = "pending"  # pending, approved, rejected
+    request_date: str = Field(default_factory=lambda: datetime.now(timezone.utc).date().isoformat())
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class Leave(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    employee_id: str
+    employee_name: str
+    leave_type: str
+    from_date: str
+    to_date: str
+    reason: str
+    status: str = "pending"  # pending, approved, rejected
+    applied_date: str = Field(default_factory=lambda: datetime.now(timezone.utc).date().isoformat())
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # ============= HELPER FUNCTIONS =============
 def create_access_token(data: dict):
     to_encode = data.copy()
