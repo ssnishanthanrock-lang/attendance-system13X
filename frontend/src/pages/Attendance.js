@@ -331,73 +331,73 @@ export default function Attendance() {
           </CardContent>
         </Card>
 
-        {/* Attendance Records */}
-        <div className="space-y-4" data-testid="attendance-list">
-          {attendance.map((record) => (
-            <Card key={record.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex-1 space-y-3">
-                    <div className="flex items-center justify-between sm:justify-start gap-4">
-                      <div>
-                        <h3 className="font-semibold text-lg text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                          {record.employee_name}
-                        </h3>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Calendar className="w-4 h-4 text-gray-500" />
-                          <span className="text-sm text-gray-600">{record.date}</span>
-                        </div>
-                      </div>
-                      <span
-                        className={`text-xs px-3 py-1 rounded-full ${
-                          record.status === 'present'
-                            ? 'bg-green-100 text-green-700'
-                            : record.status === 'absent'
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-yellow-100 text-yellow-700'
-                        }`}
-                      >
-                        {record.status}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
-                          <span className="text-xs text-gray-600">Check In</span>
-                        </div>
-                        <p className="font-semibold text-green-700">{formatTime(record.check_in)}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <XCircle className="w-4 h-4 text-orange-600" />
-                          <span className="text-xs text-gray-600">Check Out</span>
-                        </div>
-                        <p className="font-semibold text-orange-700">{formatTime(record.check_out)}</p>
-                      </div>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <Clock className="w-4 h-4 text-blue-600" />
-                          <span className="text-xs text-gray-600">Total Hours</span>
-                        </div>
-                        <p className="font-semibold text-blue-700">{calculateHours(record.check_in, record.check_out)}</p>
-                      </div>
-                    </div>
-
-                    {record.notes && (
-                      <div className="pt-2 border-t border-gray-100">
-                        <p className="text-sm text-gray-600">
-                          <span className="font-medium">Notes:</span> {record.notes}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        {/* Attendance Records Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Attendance Records</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full" data-testid="attendance-list">
+                <thead className="bg-gray-50 border-b-2 border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Employee</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check In</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Check Out</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Hours</th>
+                    {isAdmin && <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Action</th>}
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {attendance.length === 0 ? (
+                    <tr>
+                      <td colSpan={isAdmin ? 7 : 6} className="px-4 py-8 text-center text-gray-500">
+                        No attendance records found
+                      </td>
+                    </tr>
+                  ) : (
+                    attendance.map((record) => (
+                      <tr key={record.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{record.employee_name}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{record.date}</td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`inline-block text-xs px-2 py-1 rounded-full ${
+                              record.status === 'present'
+                                ? 'bg-green-100 text-green-700'
+                                : record.status === 'leave'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : 'bg-red-100 text-red-700'
+                            }`}
+                          >
+                            {record.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{formatTime(record.check_in)}</td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{formatTime(record.check_out)}</td>
+                        <td className="px-4 py-3 text-sm font-semibold text-blue-600">{calculateHours(record.check_in, record.check_out)}</td>
+                        {isAdmin && (
+                          <td className="px-4 py-3">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(record.id)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </td>
+                        )}
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
 
         {attendance.length === 0 && (
           <div className="text-center py-12">
