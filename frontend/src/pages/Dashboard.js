@@ -459,27 +459,28 @@ export default function Dashboard() {
                 <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Attendance Summary - Last 7 Days</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {stats?.attendance_summary?.map((day, index) => {
                     const date = new Date(day.date);
                     const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
                     const dayDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    const percentage = (day.count / (stats.total_employees || 1)) * 100;
+                    const totalEmp = day.total_employees || stats.total_employees || 1;
+                    const percentage = (day.count / totalEmp) * 100;
                     
                     return (
                       <div 
                         key={index} 
-                        className="space-y-1 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                        className="cursor-pointer hover:bg-gray-50 p-1.5 rounded transition-colors"
                         onClick={() => navigate(`/attendance/from/${day.date}/to/${day.date}`)}
                         title="Click to view attendance details"
                       >
-                        <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center justify-between text-xs">
                           <span className="font-medium text-gray-700">{dayName}, {dayDate}</span>
-                          <span className="text-gray-600">{day.count} / {day.total_employees || stats.total_employees}</span>
+                          <span className="text-gray-600">{day.count} / {totalEmp}</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
                           <div
-                            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-1.5 rounded-full transition-all"
                             style={{ width: `${percentage}%` }}
                           ></div>
                         </div>
