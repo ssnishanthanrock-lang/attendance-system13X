@@ -18,6 +18,10 @@ export default function Employees() {
   const [editingEmployee, setEditingEmployee] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [user, setUser] = useState(null);
+  const [defaultTimes, setDefaultTimes] = useState({
+    start_time: '09:00',
+    finish_time: '17:00'
+  });
   const [formData, setFormData] = useState({
     employee_id: '',
     mobile: '',
@@ -45,10 +49,18 @@ export default function Employees() {
     try {
       const response = await api.get('/settings');
       if (response.data) {
+        const defaultStartTime = response.data.office_start_time || '09:00';
+        const defaultFinishTime = response.data.office_end_time || '17:00';
+        
+        setDefaultTimes({
+          start_time: defaultStartTime,
+          finish_time: defaultFinishTime
+        });
+        
         setFormData(prev => ({
           ...prev,
-          start_time: response.data.office_start_time || '09:00',
-          finish_time: response.data.office_end_time || '17:00'
+          start_time: defaultStartTime,
+          finish_time: defaultFinishTime
         }));
       }
     } catch (error) {
