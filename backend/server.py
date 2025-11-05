@@ -1137,6 +1137,16 @@ async def get_employee_increments(employee_id: str, current_user: User = Depends
     
     return increments
 
+@api_router.get("/employees/{employee_id}/pending-increment")
+async def get_employee_pending_increment(employee_id: str, current_user: User = Depends(get_current_user)):
+    """Get pending increment for an employee (if any)"""
+    pending = await db.increments.find_one(
+        {"employee_id": employee_id, "company_id": current_user.company_id, "status": "pending"},
+        {"_id": 0}
+    )
+    
+    return pending if pending else None
+
 @api_router.get("/increments")
 async def get_all_increments(current_user: User = Depends(get_current_user)):
     """Get all increments for the company (admin view)"""
