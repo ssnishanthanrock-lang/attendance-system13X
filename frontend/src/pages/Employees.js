@@ -187,41 +187,39 @@ export default function Employees() {
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Employee ID</label>
+                  <div>
                     <Input
                       data-testid="employee-id-input"
                       value={formData.employee_id}
                       onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
-                      placeholder="Auto-generated if left empty"
+                      placeholder="Employee ID (Auto-generated)"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Mobile Number *</label>
+                  <div>
                     <Input
                       data-testid="mobile-number-input"
                       type="tel"
                       value={formData.mobile}
                       onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                       maxLength={10}
+                      placeholder="Mobile Number *"
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Full Name *</label>
+                  <div>
                     <Input
                       data-testid="name-input"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       onBlur={(e) => setFormData({ ...formData, name: capitalizeName(e.target.value) })}
+                      placeholder="Full Name *"
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Role *</label>
+                  <div>
                     <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
                       <SelectTrigger data-testid="role-select">
-                        <SelectValue />
+                        <SelectValue placeholder="Select Role *" />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="admin">Admin</SelectItem>
@@ -231,38 +229,38 @@ export default function Employees() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Department</label>
+                  <div>
                     <Input
                       data-testid="department-input"
                       value={formData.department}
                       onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                      placeholder="Department"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Position</label>
+                  <div>
                     <Input
                       data-testid="position-input"
                       value={formData.position}
                       onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                      placeholder="Position"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Basic Salary (Rs.)</label>
+                  <div>
                     <Input
                       data-testid="salary-input"
                       type="number"
                       value={formData.basic_salary}
                       onChange={(e) => setFormData({ ...formData, basic_salary: parseFloat(e.target.value) })}
+                      placeholder="Basic Salary (Rs.)"
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Allowances (Rs.)</label>
+                  <div>
                     <Input
                       data-testid="allowances-input"
                       type="number"
                       value={formData.allowances}
                       onChange={(e) => setFormData({ ...formData, allowances: parseFloat(e.target.value) })}
+                      placeholder="Allowances (Rs.)"
                     />
                   </div>
                   <div className="space-y-2 sm:col-span-2">
