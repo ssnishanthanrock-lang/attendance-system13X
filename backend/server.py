@@ -648,13 +648,53 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         recent_leaves = await db.leaves.find({"company_id": current_user.company_id}, {"_id": 0}).sort("applied_date", -1).limit(5).to_list(5)
         recent_advances = await db.advances.find({"company_id": current_user.company_id}, {"_id": 0}).sort("request_date", -1).limit(5).to_list(5)
         
+        # Current month salary summary
+        current_month = datetime.now(timezone.utc).strftime("%B")
+        current_year = datetime.now(timezone.utc).year
+        
+        monthly_payrolls = await db.payroll.find({
+            "company_id": current_user.company_id,
+            "month": current_month,
+            "year": current_year
+        }, {"_id": 0}).to_list(1000)
+        
+        # Calculate monthly stats
+        total_expected_salary = sum(p.get("expected_salary", 0) for p in monthly_payrolls)
+        total_calculated_salary = sum(p.get("calculated_salary", 0) for p in monthly_payrolls)
+        total_net_salary = sum(p.get("net_salary", 0) for p in monthly_payrolls)
+        
+        # Current month attendance summary (last 7 days)
+        from datetime import timedelta
+        today = datetime.now(timezone.utc).date()
+        last_7_days = [(today - timedelta(days=i)).isoformat() for i in range(6, -1, -1)]
+        
+        attendance_summary = []
+        for date in last_7_days:
+            count = await db.attendance.count_documents({
+                "company_id": current_user.company_id,
+                "date": date
+            })
+            attendance_summary.append({
+                "date": date,
+                "count": count
+            })
+        
         return {
             "total_employees": total_employees,
             "attendance_today": total_attendance_today,
             "pending_leaves": pending_leaves,
             "pending_advances": pending_advances,
             "recent_leaves": recent_leaves,
-            "recent_advances": recent_advances
+            "recent_advances": recent_advances,
+            "monthly_salary_summary": {
+                "month": current_month,
+                "year": current_year,
+                "total_expected": total_expected_salary,
+                "total_calculated": total_calculated_salary,
+                "total_net": total_net_salary,
+                "employee_count": len(monthly_payrolls)
+            },
+            "attendance_summary": attendance_summary
         }
     else:
         # Employee/Staff stats
