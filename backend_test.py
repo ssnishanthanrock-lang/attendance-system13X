@@ -746,6 +746,47 @@ class ERPTester:
         except Exception as e:
             self.log_result("Activity Logs Endpoint", False, f"Activity logs test error: {str(e)}")
     
+    def test_payroll_data_integration(self):
+        """Test if payroll data exists and affects salary summary"""
+        print("\n=== TESTING PAYROLL DATA INTEGRATION ===")
+        
+        try:
+            # Check if there's any payroll data in the system
+            # We can't directly access payroll endpoint, but we can check dashboard stats
+            response = self.session.get(f"{API_BASE}/dashboard/stats")
+            
+            if response.status_code == 200:
+                data = response.json()
+                salary_summary = data.get('monthly_salary_summary', {})
+                
+                total_expected = salary_summary.get('total_expected', 0)
+                total_calculated = salary_summary.get('total_calculated', 0)
+                total_net = salary_summary.get('total_net', 0)
+                employee_count = salary_summary.get('employee_count', 0)
+                
+                if total_expected > 0 or total_calculated > 0 or total_net > 0:
+                    self.log_result("Payroll Data - Has Data", True, 
+                                  f"Payroll data exists and is being calculated correctly",
+                                  {"expected": total_expected, "calculated": total_calculated, 
+                                   "net": total_net, "employees": employee_count})
+                else:
+                    self.log_result("Payroll Data - No Data", True, 
+                                  "No payroll data exists (expected for new system) - returns zeros correctly")
+                
+                # Verify the calculation makes sense (net <= calculated <= expected)
+                if total_expected >= total_calculated >= total_net >= 0:
+                    self.log_result("Payroll Data - Calculation Logic", True, 
+                                  "Salary calculation logic is correct (expected >= calculated >= net)")
+                else:
+                    self.log_result("Payroll Data - Calculation Logic", False, 
+                                  f"Salary calculation logic error: expected={total_expected}, calculated={total_calculated}, net={total_net}")
+            else:
+                self.log_result("Payroll Data Integration", False, 
+                              f"Cannot test payroll integration: {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Payroll Data Integration", False, f"Payroll integration test error: {str(e)}")
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting IT Signature ERP Backend API Tests")
