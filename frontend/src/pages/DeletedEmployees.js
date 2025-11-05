@@ -133,7 +133,7 @@ export default function DeletedEmployees() {
                           {employee.position || '-'}
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">
-                          {employee.joining_date || '-'}
+                          {employee.join_date || '-'}
                         </td>
                         <td className="px-4 py-3 text-sm">
                           <Button
