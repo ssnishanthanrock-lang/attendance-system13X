@@ -170,7 +170,16 @@ export default function Attendance() {
             Attendance Records
           </h1>
           {isAdmin && (
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => window.location.href = '/deleted-attendance'}
+                className="border-red-600 text-red-600 hover:bg-red-50"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                View Deleted
+              </Button>
+              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button className="bg-gradient-to-r from-blue-600 to-indigo-600">
                   <Plus className="w-4 h-4 mr-2" />
