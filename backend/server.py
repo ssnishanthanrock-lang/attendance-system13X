@@ -821,6 +821,78 @@ async def delete_employee(employee_id: str, current_user: User = Depends(get_cur
     
     return {"message": "Employee deleted successfully"}
 
+# ============= ATTENDANCE ENDPOINTS =============
+@api_router.get("/attendance")
+async def get_attendance(
+    employee_id: Optional[str] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role == "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin cannot access company attendance")
+    
+    query = {"company_id": current_user.company_id}
+    
+    # Filter by employee if provided
+    if employee_id:
+        query["employee_id"] = employee_id
+    elif current_user.role not in ["admin", "manager"]:
+        # Regular employees can only see their own attendance
+        query["employee_id"] = current_user.id
+    
+    # Filter by date range if provided
+    if from_date and to_date:
+        query["date"] = {"$gte": from_date, "$lte": to_date}
+    elif from_date:
+        query["date"] = {"$gte": from_date}
+    elif to_date:
+        query["date"] = {"$lte": to_date}
+    
+    attendance = await db.attendance.find(query, {"_id": 0}).sort("date", -1).to_list(1000)
+    
+    return attendance
+
+@api_router.post("/attendance")
+async def add_manual_attendance(attendance_data: dict, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Validate employee belongs to same company
+    employee = await db.users.find_one({"id": attendance_data["employee_id"], "company_id": current_user.company_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Check if attendance already exists for this date
+    existing = await db.attendance.find_one({
+        "company_id": current_user.company_id,
+        "employee_id": attendance_data["employee_id"],
+        "date": attendance_data["date"]
+    })
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="Attendance already exists for this date")
+    
+    # Create attendance record
+    new_attendance = {
+        "id": str(uuid.uuid4()),
+        "company_id": current_user.company_id,
+        "employee_id": attendance_data["employee_id"],
+        "employee_name": employee["name"],
+        "date": attendance_data["date"],
+        "check_in": attendance_data.get("check_in"),
+        "check_out": attendance_data.get("check_out"),
+        "status": attendance_data.get("status", "present"),
+        "leave_type": attendance_data.get("leave_type"),
+        "created_by": current_user.id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.attendance.insert_one(new_attendance)
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "ADD_ATTENDANCE", f"Added manual attendance for {employee['name']}")
+    
+    return {"message": "Attendance added successfully", "attendance": new_attendance}
+
 # ============= UTILITY FUNCTIONS =============
 def calculate_working_days(year: int, month: int, holidays: List[dict], saturday_enabled: bool = True, saturday_type: str = "full") -> dict:
     """
