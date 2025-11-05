@@ -121,47 +121,71 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "Endpoint already exists at /api/dashboard/stats, verified it handles company data correctly"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Dashboard stats endpoint working correctly. Returns all required fields including total_employees, attendance_today, pending_leaves, pending_advances, recent_leaves, recent_advances arrays, monthly_salary_summary object with month/year/totals, and attendance_summary for last 7 days. Multi-tenancy verified - data filtered by company_id."
   
   - task: "Monthly salary summary and attendance chart data"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Enhanced /api/dashboard/stats endpoint to include monthly_salary_summary and attendance_summary for last 7 days. Needs testing."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Monthly salary summary and attendance chart data working correctly. Dashboard returns monthly_salary_summary with month, year, total_expected, total_calculated, total_net, employee_count fields. Attendance_summary returns last 7 days with date and count for each day."
   
   - task: "Employee CRUD endpoints"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added GET /api/employees, POST /api/employees, PUT /api/employees/{id}, DELETE /api/employees/{id} endpoints. These were missing before."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: All employee CRUD operations working correctly. GET /api/employees returns company-filtered employee list. POST /api/employees creates new employees with proper validation. PUT /api/employees/{id} updates employee data. DELETE /api/employees/{id} performs soft delete (marks as inactive). Multi-tenancy verified - all operations filtered by company_id. Role-based access control working - only admin/manager can access."
   
   - task: "Logo and favicon upload endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added POST /api/company/branding endpoint to handle logo and favicon uploads with base64 encoding"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Branding upload endpoint working correctly. POST /api/company/branding accepts file uploads with type='logo' or type='favicon'. Files are properly converted to base64 and stored in settings collection. Role-based access control verified - only admin/manager can upload."
+  
+  - task: "Profile picture upload endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Profile picture upload endpoint working correctly. POST /api/upload/profile-pic accepts file uploads, converts to base64, and stores in users collection. All users can upload their own profile pictures."
 
 frontend:
   - task: "Remove Employee ID from sidebar"
