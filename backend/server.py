@@ -937,10 +937,11 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         
         attendance_summary = []
         for date in last_7_days:
-            # Get employees who had joined by this specific date
+            # Get employees who had joined by this specific date and are active (status != 0)
             employees_by_date = [
                 emp for emp in all_active_employees 
-                if not emp.get("joining_date") or emp.get("joining_date", "") <= date
+                if emp.get("status", 1) != 0  # Exclude status=0 (deleted)
+                and (not emp.get("join_date") or emp.get("join_date", "") <= date)  # Check join_date
             ]
             employee_ids_by_date = [emp["id"] for emp in employees_by_date]
             
