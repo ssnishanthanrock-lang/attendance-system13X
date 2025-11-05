@@ -314,6 +314,9 @@ export default function Payroll() {
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.earnings || 0), 0).toLocaleString(undefined, {maximumFractionDigits: 2})}
                         </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.extra_payment || 0), 0).toLocaleString()}
+                        </td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
