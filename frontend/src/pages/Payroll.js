@@ -176,7 +176,8 @@ export default function Payroll() {
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Employee Name</th>
                         
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Basic Salary</th>
-                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50" title="Hover to see per minute rate">Day Salary</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Day Salary</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Minute Salary</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Allowances</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Earnings</th>
                         
