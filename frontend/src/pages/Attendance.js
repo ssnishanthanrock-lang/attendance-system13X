@@ -108,14 +108,6 @@ export default function Attendance() {
     fetchCompanySettings();
   }, []);
 
-  // Fetch attendance when filters or viewMode changes
-  useEffect(() => {
-    if (user !== null) {
-      setLoading(true);
-      fetchAttendance();
-    }
-  }, [filters, viewMode, user]);
-
   const fetchEmployees = async () => {
     try {
       const response = await api.get('/employees');
