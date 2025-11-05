@@ -73,11 +73,15 @@ export default function Attendance() {
       newViewMode = 'filtered';
       hasFilters = true;
     } else if (employeeId) {
-      // Only employee filter
+      // Only employee filter - default to current month
+      const today = new Date();
+      const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+      
       newFilters = {
         employee_id: employeeId,
-        from_date: '',
-        to_date: '',
+        from_date: firstDayOfMonth.toISOString().split('T')[0],
+        to_date: lastDayOfMonth.toISOString().split('T')[0],
       };
       newViewMode = 'filtered';
       hasFilters = true;
