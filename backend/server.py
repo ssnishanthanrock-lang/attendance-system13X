@@ -965,10 +965,32 @@ async def delete_attendance(attendance_id: str, current_user: User = Depends(get
     if not attendance:
         raise HTTPException(status_code=404, detail="Attendance record not found")
     
+    # Store in deleted_attendance collection
+    deleted_record = {
+        **attendance,
+        "deleted_by": current_user.id,
+        "deleted_by_name": current_user.name,
+        "deleted_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.deleted_attendance.insert_one(deleted_record)
+    
+    # Delete from attendance
     await db.attendance.delete_one({"id": attendance_id})
     await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_ATTENDANCE", f"Deleted attendance for {attendance.get('employee_name', 'employee')}")
     
     return {"message": "Attendance deleted successfully"}
+
+@api_router.get("/attendance/deleted")
+async def get_deleted_attendance(current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    deleted_records = await db.deleted_attendance.find(
+        {"company_id": current_user.company_id},
+        {"_id": 0}
+    ).sort("deleted_at", -1).to_list(1000)
+    
+    return deleted_records
 
 # ============= UTILITY FUNCTIONS =============
 def capitalize_name(name: str) -> str:
