@@ -228,9 +228,9 @@ export default function Login() {
           </CardContent>
         </Card>
 
-        <div className="text-center text-sm text-gray-600 mt-6 space-y-1">
-          <p className="font-medium">IT Signature (Pvt) Ltd</p>
-          <p>Support Hotline: 011 4848 988 | 077 3966 920</p>
+        <div className="text-center text-sm text-white/80 mt-6 space-y-1 backdrop-blur-sm bg-white/10 rounded-xl p-4">
+          <p className="font-medium text-white">IT Signature (Pvt) Ltd</p>
+          <p className="text-blue-100">Support Hotline: 011 4848 988 | 077 3966 920</p>
         </div>
       </div>
     </div>
