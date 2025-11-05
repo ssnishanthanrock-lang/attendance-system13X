@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { toast } from 'sonner';
 import { Calendar, Clock, CheckCircle, XCircle, Plus, Trash2, Archive } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { canEditInImpersonation, isImpersonating } from '../utils/impersonation';
 
 export default function Attendance() {
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ export default function Attendance() {
     status: 'present',
     leave_type: ''
   });
+
+  // Check if user can edit (not read-only impersonation)
+  const canEdit = !isImpersonating() || canEditInImpersonation();
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
@@ -185,7 +189,11 @@ export default function Attendance() {
                 </Button>
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
-                    <Button className="bg-gradient-to-r from-blue-600 to-indigo-600">
+                    <Button 
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600"
+                      disabled={!canEdit}
+                      title={!canEdit ? "Read-only access - Cannot add attendance" : ""}
+                    >
                       <Plus className="w-4 h-4 mr-2" />
                       Add Manual Attendance
                     </Button>
@@ -391,7 +399,9 @@ export default function Attendance() {
                               variant="ghost"
                               size="sm"
                               onClick={() => handleDelete(record.id)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              disabled={!canEdit}
+                              title={!canEdit ? "Read-only access" : ""}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>
