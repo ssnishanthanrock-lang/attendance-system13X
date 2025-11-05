@@ -5,11 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
-import { Activity, Calendar, User, FileText } from 'lucide-react';
+import { Activity, Calendar, User, FileText, ChevronDown } from 'lucide-react';
 
 export default function ActivityLogs() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [filters, setFilters] = useState({
     from_date: '',
     to_date: '',
@@ -17,30 +20,57 @@ export default function ActivityLogs() {
     search: ''
   });
 
+  const ITEMS_PER_PAGE = 50;
+
   useEffect(() => {
-    fetchLogs();
+    fetchLogs(true);
   }, []);
 
-  const fetchLogs = async () => {
-    setLoading(true);
+  const fetchLogs = async (reset = false) => {
+    if (reset) {
+      setLoading(true);
+      setPage(1);
+    } else {
+      setLoadingMore(true);
+    }
+    
     try {
       const params = new URLSearchParams();
       if (filters.from_date) params.append('from_date', filters.from_date);
       if (filters.to_date) params.append('to_date', filters.to_date);
       if (filters.action_type) params.append('action_type', filters.action_type);
       if (filters.search) params.append('search', filters.search);
+      params.append('limit', ITEMS_PER_PAGE.toString());
       
       const response = await api.get(`/activity-logs?${params.toString()}`);
-      setLogs(response.data);
+      const newLogs = response.data;
+      
+      if (reset) {
+        setLogs(newLogs);
+      } else {
+        setLogs(prev => [...prev, ...newLogs]);
+      }
+      
+      // Check if there are more records
+      setHasMore(newLogs.length === ITEMS_PER_PAGE);
+      
+      if (!reset) {
+        setPage(prev => prev + 1);
+      }
     } catch (error) {
       toast.error('Failed to fetch activity logs');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
   const handleFilter = () => {
-    fetchLogs();
+    fetchLogs(true);
+  };
+
+  const handleLoadMore = () => {
+    fetchLogs(false);
   };
 
   const getActionColor = (action) => {
@@ -87,10 +117,7 @@ export default function ActivityLogs() {
         {/* Filters */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
-              Filter Logs
-            </CardTitle>
+            <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Filters</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -171,6 +198,33 @@ export default function ActivityLogs() {
                 </tbody>
               </table>
             </div>
+            
+            {/* Load More Button */}
+            {hasMore && logs.length > 0 && (
+              <div className="flex justify-center mt-6">
+                <Button
+                  onClick={handleLoadMore}
+                  disabled={loadingMore}
+                  variant="outline"
+                  className="flex items-center gap-2"
+                >
+                  {loadingMore ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  ) : (
+                    <ChevronDown className="w-4 h-4" />
+                  )}
+                  {loadingMore ? 'Loading...' : 'Load More'}
+                </Button>
+              </div>
+            )}
+            
+            {/* Results Info */}
+            {logs.length > 0 && (
+              <div className="text-center mt-4 text-sm text-gray-500">
+                Showing {logs.length} record{logs.length !== 1 ? 's' : ''}
+                {!hasMore && ' (all records loaded)'}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
