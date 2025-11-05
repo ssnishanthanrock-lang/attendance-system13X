@@ -161,7 +161,14 @@ export default function Attendance() {
       // Get original record to check what changed
       const originalRecord = attendance.find(r => r.id === editingAttendance.id);
       
-      // Update check-in/out times (if applicable)
+      // If status changed, update it first (this tracks history)
+      if (originalRecord && originalRecord.status !== editingAttendance.status) {
+        await api.put(`/attendance/${editingAttendance.id}/status`, {
+          status: editingAttendance.status
+        });
+      }
+      
+      // Update check-in/out times (if applicable and if status is present)
       if (editingAttendance.status === 'present') {
         await api.put(`/attendance/${editingAttendance.id}`, {
           check_in: editingAttendance.check_in,
@@ -169,16 +176,12 @@ export default function Attendance() {
         });
       }
       
-      // If status changed, update it separately (this tracks history)
-      if (originalRecord && originalRecord.status !== editingAttendance.status) {
-        await api.put(`/attendance/${editingAttendance.id}/status`, {
-          status: editingAttendance.status
-        });
-      }
-      
       toast.success('Attendance updated successfully');
       setEditDialogOpen(false);
       fetchAttendance();
+      
+      // Refetch history to show the latest changes
+      await fetchEditHistory(editingAttendance.id);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to update attendance');
     }
