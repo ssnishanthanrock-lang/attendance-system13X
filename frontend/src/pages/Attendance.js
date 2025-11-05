@@ -520,16 +520,6 @@ export default function Attendance() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => handleChangeStatus(record)}
-                                disabled={!canEdit}
-                                title={!canEdit ? "Read-only access" : "Change status"}
-                                className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                              >
-                                <RefreshCw className="w-4 h-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
                                 onClick={() => handleDelete(record.id)}
                                 disabled={!canEdit}
                                 title={!canEdit ? "Read-only access" : "Delete attendance"}
