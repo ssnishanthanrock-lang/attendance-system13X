@@ -48,31 +48,34 @@ export default function Attendance() {
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
 
-  // Read URL parameters on mount
+  // Read URL path parameters on mount
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    const dateParam = searchParams.get('date');
-    const employeeParam = searchParams.get('employee_id');
-    const fromDateParam = searchParams.get('from_date');
-    const toDateParam = searchParams.get('to_date');
-
-    if (dateParam) {
-      // If single date is provided, set both from and to date
+    if (date) {
+      // Single date from path parameter
       setFilters({
-        employee_id: employeeParam || '',
-        from_date: dateParam,
-        to_date: dateParam,
+        employee_id: employeeId || '',
+        from_date: date,
+        to_date: date,
       });
-      setViewMode('filtered'); // Set to filtered mode
-    } else if (fromDateParam || toDateParam) {
+      setViewMode('filtered');
+    } else if (fromDate || toDate) {
+      // Date range from path parameters
       setFilters({
-        employee_id: employeeParam || '',
-        from_date: fromDateParam || '',
-        to_date: toDateParam || '',
+        employee_id: employeeId || '',
+        from_date: fromDate || '',
+        to_date: toDate || '',
+      });
+      setViewMode('filtered');
+    } else if (employeeId) {
+      // Only employee filter
+      setFilters({
+        employee_id: employeeId,
+        from_date: '',
+        to_date: '',
       });
       setViewMode('filtered');
     }
-  }, [location.search]);
+  }, [date, employeeId, fromDate, toDate]);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
