@@ -2373,10 +2373,29 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         # Calculate earnings and gross based on salary type
         salary_per_minute = (basic_salary / working_days / working_hours_per_day / 60) if working_days > 0 else 0
         
+        # Check if this is the current month
+        current_month = datetime.now(timezone.utc).strftime("%Y-%m")
+        is_current_month = (month == current_month)
+        
         if employee.get("fixed_salary", False):
-            # Fixed salary: always get full basic + allowances regardless of attendance
-            earnings = basic_salary + allowances
-            gross_salary = earnings + total_extra_payment  # Allowances already in earnings
+            if is_current_month:
+                # For current month: pro-rate based on time passed
+                import calendar
+                now = datetime.now(timezone.utc)
+                days_in_month = calendar.monthrange(int(year), int(month_num))[1]
+                current_day = now.day
+                hours_in_month = days_in_month * 24
+                hours_passed = (current_day - 1) * 24 + now.hour + now.minute / 60 + now.second / 3600
+                
+                # Pro-rata calculation based on time passed
+                earnings_basic = (basic_salary / hours_in_month) * hours_passed
+                earnings_allowances = (allowances / hours_in_month) * hours_passed
+                earnings = earnings_basic + earnings_allowances
+                gross_salary = earnings + total_extra_payment
+            else:
+                # For past completed months: full salary regardless of attendance
+                earnings = basic_salary + allowances
+                gross_salary = earnings + total_extra_payment
         else:
             # Non-fixed salary: based on actual attendance minutes
             earnings = total_attendance_minutes * salary_per_minute
