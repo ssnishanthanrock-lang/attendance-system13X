@@ -403,36 +403,60 @@ function WorkingDaysCalculator({ settings }) {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <label className="text-sm font-medium">Month</label>
-          <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((month, index) => (
-                <SelectItem key={index} value={(index + 1).toString()}>
-                  {month}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <label className="text-sm font-medium">Year</label>
-          <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {[2024, 2025, 2026].map((year) => (
-                <SelectItem key={year} value={year.toString()}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="text-sm font-medium">Select Month</label>
+            <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="max-h-96">
+                {months.map((month, index) => {
+                  const monthNum = index + 1;
+                  const monthData = allMonthsData[monthNum];
+                  
+                  return (
+                    <SelectItem key={index} value={monthNum.toString()}>
+                      <div className="flex items-center justify-between w-full min-w-[280px]">
+                        <span className="font-medium">{month} {selectedYear}</span>
+                        {monthData ? (
+                          <div className="flex gap-3 text-xs ml-4">
+                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 rounded font-semibold">
+                              {monthData.working_days} days
+                            </span>
+                            <span className="px-2 py-0.5 bg-orange-100 text-orange-700 rounded">
+                              {monthData.holidays} holidays
+                            </span>
+                            <span className="px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
+                              {monthData.sundays} sundays
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-gray-400 ml-4">Calculating...</span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="text-sm font-medium">Year</label>
+            <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {[2024, 2025, 2026, 2027].map((year) => (
+                  <SelectItem key={year} value={year.toString()}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
