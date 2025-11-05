@@ -427,7 +427,7 @@ export default function Dashboard() {
         )}
 
         {/* Monthly Summary for Admin/Manager */}
-        {isAdmin && stats?.monthly_salary_summary && (
+        {isAdmin && livePayroll && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Live Salary Summary */}
             {isAdmin && livePayroll && (
