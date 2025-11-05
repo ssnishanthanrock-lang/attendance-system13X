@@ -272,13 +272,34 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
         
-        user = await db.users.find_one({"id": user_id}, {"_id": 0})
-        if user is None:
-            raise HTTPException(status_code=401, detail="User not found")
-        return User(**user)
+        # Check if this is an impersonation token
+        is_impersonating = payload.get("is_impersonating", False)
+        
+        if is_impersonating:
+            # For impersonation, we create a temporary user object with company context
+            original_user = await db.users.find_one({"id": user_id}, {"_id": 0})
+            if original_user is None or original_user.get("role") != "super_admin":
+                raise HTTPException(status_code=401, detail="Invalid impersonation token")
+            
+            # Create a user object with company admin context
+            impersonation_user = User(**{
+                **original_user,
+                "company_id": payload.get("company_id"),
+                "role": "admin",  # Act as company admin
+                "is_impersonating": True,
+                "original_user_id": user_id,
+                "can_edit_in_impersonation": payload.get("can_edit", False)
+            })
+            return impersonation_user
+        else:
+            user = await db.users.find_one({"id": user_id}, {"_id": 0})
+            if user is None:
+                raise HTTPException(status_code=401, detail="User not found")
+            return User(**user)
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except Exception:
+    except Exception as e:
+        logging.error(f"Token validation error: {str(e)}")
         raise HTTPException(status_code=401, detail="Invalid token")
 
 async def log_activity(company_id: str, user_id: str, user_name: str, action: str, details: str):
