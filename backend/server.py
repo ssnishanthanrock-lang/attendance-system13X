@@ -1319,6 +1319,125 @@ async def delete_loan(loan_id: str, current_user: User = Depends(get_current_use
     
     return {"message": "Loan deleted successfully"}
 
+
+# ============= EXTRA PAYMENTS ENDPOINTS =============
+@api_router.post("/extra-payments")
+async def create_extra_payment(payment_data: dict, current_user: User = Depends(get_current_user)):
+    """Create extra payment for an employee for a specific month"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    # Validate employee exists
+    employee = await db.users.find_one({
+        "id": payment_data["employee_id"],
+        "company_id": current_user.company_id
+    })
+    
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    payment = {
+        "id": str(uuid.uuid4()),
+        "company_id": current_user.company_id,
+        "employee_id": payment_data["employee_id"],
+        "employee_name": employee["name"],
+        "month": payment_data["month"],  # Format: YYYY-MM
+        "amount": payment_data["amount"],
+        "reason": payment_data.get("reason", ""),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": current_user.name
+    }
+    
+    await db.extra_payments.insert_one(payment)
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "CREATE_EXTRA_PAYMENT",
+        f"Added extra payment for {employee['name']} - Rs. {payment_data['amount']} for {payment_data['month']}"
+    )
+    
+    return payment
+
+@api_router.get("/extra-payments")
+async def get_extra_payments(employee_id: Optional[str] = None, month: Optional[str] = None, current_user: User = Depends(get_current_user)):
+    """Get extra payments"""
+    query = {"company_id": current_user.company_id}
+    
+    if employee_id:
+        query["employee_id"] = employee_id
+    
+    if month:
+        query["month"] = month
+    
+    payments = await db.extra_payments.find(query, {"_id": 0}).sort("created_at", -1).to_list(length=None)
+    
+    return payments
+
+@api_router.put("/extra-payments/{payment_id}")
+async def update_extra_payment(payment_id: str, payment_data: dict, current_user: User = Depends(get_current_user)):
+    """Update extra payment"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    payment = await db.extra_payments.find_one({
+        "id": payment_id,
+        "company_id": current_user.company_id
+    })
+    
+    if not payment:
+        raise HTTPException(status_code=404, detail="Extra payment not found")
+    
+    update_data = {
+        "amount": payment_data.get("amount", payment["amount"]),
+        "reason": payment_data.get("reason", payment["reason"])
+    }
+    
+    await db.extra_payments.update_one(
+        {"id": payment_id, "company_id": current_user.company_id},
+        {"$set": update_data}
+    )
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "UPDATE_EXTRA_PAYMENT",
+        f"Updated extra payment for {payment['employee_name']}"
+    )
+    
+    return {"message": "Extra payment updated successfully"}
+
+@api_router.delete("/extra-payments/{payment_id}")
+async def delete_extra_payment(payment_id: str, current_user: User = Depends(get_current_user)):
+    """Delete extra payment"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    payment = await db.extra_payments.find_one({
+        "id": payment_id,
+        "company_id": current_user.company_id
+    })
+    
+    if not payment:
+        raise HTTPException(status_code=404, detail="Extra payment not found")
+    
+    await db.extra_payments.delete_one({"id": payment_id, "company_id": current_user.company_id})
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "DELETE_EXTRA_PAYMENT",
+        f"Deleted extra payment for {payment['employee_name']}"
+    )
+    
+    return {"message": "Extra payment deleted successfully"}
+
 # ============= ATTENDANCE ENDPOINTS =============
 @api_router.get("/attendance")
 async def get_attendance(
