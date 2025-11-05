@@ -1290,6 +1290,49 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
     
     return {"message": "Attendance added successfully", "attendance": attendance_response}
 
+@api_router.put("/attendance/{attendance_id}")
+async def update_attendance(attendance_id: str, attendance_data: dict, current_user: User = Depends(get_current_user)):
+    """Update attendance record (e.g., add check-out time)"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Get existing attendance
+    attendance = await db.attendance.find_one({"id": attendance_id, "company_id": current_user.company_id})
+    if not attendance:
+        raise HTTPException(status_code=404, detail="Attendance not found")
+    
+    # Update fields
+    update_data = {}
+    
+    if "check_in" in attendance_data:
+        update_data["check_in"] = f"{attendance['date']}T{attendance_data['check_in']}:00"
+    
+    if "check_out" in attendance_data:
+        update_data["check_out"] = f"{attendance['date']}T{attendance_data['check_out']}:00"
+    
+    if "status" in attendance_data:
+        update_data["status"] = attendance_data["status"]
+    
+    if "leave_type" in attendance_data:
+        update_data["leave_type"] = attendance_data["leave_type"]
+    
+    if update_data:
+        await db.attendance.update_one(
+            {"id": attendance_id},
+            {"$set": update_data}
+        )
+        
+        # Log the update
+        await log_activity(
+            current_user.company_id,
+            current_user.id,
+            current_user.name,
+            "UPDATE_ATTENDANCE",
+            f"Updated attendance for {attendance['employee_name']} on {attendance['date']}: Check-in: {attendance_data.get('check_in', 'unchanged')}, Check-out: {attendance_data.get('check_out', 'unchanged')}"
+        )
+    
+    return {"message": "Attendance updated successfully"}
+
 @api_router.delete("/attendance/{attendance_id}")
 async def delete_attendance(attendance_id: str, current_user: User = Depends(get_current_user)):
     if current_user.role not in ["admin", "manager"]:
