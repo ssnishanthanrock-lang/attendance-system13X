@@ -1085,15 +1085,16 @@ async def update_settings(updates: SettingsUpdate, current_user: User = Depends(
     update_data = {k: v for k, v in updates.model_dump().items() if v is not None}
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
+    # Create detailed log of changes
+    settings_changes = ', '.join([f'{k}: {v}' for k, v in update_data.items() if k not in ['updated_at', '_id']])
+    
     result = await db.settings.update_one(
         {"company_id": current_user.company_id},
-        {"$set": update_data}
+        {"$set": update_data},
+        upsert=True
     )
     
-    if result.modified_count == 0:
-        raise HTTPException(status_code=404, detail="Settings not found")
-    
-    settings_changes = ', '.join([f'{k}: {v}' for k, v in update_data.items() if k not in ['updated_at', '_id']])
+    # Log activity regardless of whether it was an insert or update
     await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_SETTINGS", f"Updated settings: {settings_changes}")
     
     return {"message": "Settings updated successfully"}
