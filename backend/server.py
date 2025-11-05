@@ -2076,8 +2076,23 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
             if loan_start_month <= month:
                 loan_deduction += loan.get("monthly_deduction", 0)
         
-        # Calculate net salary (extra payment is addition, not deduction)
-        gross_salary = basic_salary + allowances + total_extra_payment
+        # Calculate earnings based on attendance
+        # For fixed salary: basic + allowances
+        # For non-fixed: total attendance minutes × per minute salary
+        if employee.get("fixed_salary", False):
+            earnings = basic_salary + allowances
+        else:
+            minutes_per_day = working_hours_per_day * 60
+            # Add full day minutes for allowed leaves/half days
+            total_attendance_minutes += (allowed_leaves * minutes_per_day)
+            total_attendance_minutes += (allowed_half_days * minutes_per_day * 0.5)
+            
+            salary_per_minute = (basic_salary / working_days / working_hours_per_day / 60) if working_days > 0 else 0
+            earnings = total_attendance_minutes * salary_per_minute
+        
+        # Calculate net salary
+        # Net = Earnings + Extra Payment - All Deductions
+        gross_salary = earnings + total_extra_payment
         total_deductions = late_deduction + total_advances + other_deductions + loan_deduction
         net_salary = gross_salary - total_deductions
         
