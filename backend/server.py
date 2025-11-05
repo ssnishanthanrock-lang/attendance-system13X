@@ -1671,6 +1671,61 @@ async def get_attendance_history(attendance_id: str, current_user: User = Depend
     
     return history
 
+
+@api_router.put("/attendance/{attendance_id}/status")
+async def update_attendance_status(attendance_id: str, status_data: dict, current_user: User = Depends(get_current_user)):
+    """Update attendance status with history tracking"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    # Get existing attendance
+    attendance = await db.attendance.find_one({
+        "id": attendance_id,
+        "company_id": current_user.company_id
+    })
+    
+    if not attendance:
+        raise HTTPException(status_code=404, detail="Attendance not found")
+    
+    old_status = attendance.get("status")
+    new_status = status_data.get("status")
+    
+    if old_status == new_status:
+        return {"message": "Status unchanged"}
+    
+    # Save to history
+    history_entry = {
+        "id": str(uuid.uuid4()),
+        "attendance_id": attendance_id,
+        "company_id": current_user.company_id,
+        "employee_id": attendance["employee_id"],
+        "employee_name": attendance["employee_name"],
+        "field_changed": "status",
+        "old_value": old_status,
+        "new_value": new_status,
+        "edited_by": current_user.name,
+        "edited_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.attendance_history.insert_one(history_entry)
+    
+    # Update attendance
+    await db.attendance.update_one(
+        {"id": attendance_id},
+        {"$set": {"status": new_status}}
+    )
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "UPDATE_ATTENDANCE_STATUS",
+        f"Changed status for {attendance['employee_name']} on {attendance['date']} from {old_status} to {new_status}"
+    )
+    
+    return {"message": "Status updated successfully"}
+
 @api_router.delete("/attendance/{attendance_id}")
 async def delete_attendance(attendance_id: str, current_user: User = Depends(get_current_user)):
     if current_user.role not in ["admin", "manager"]:
