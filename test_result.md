@@ -346,8 +346,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Live payroll endpoint for current month"
-    - "Payroll month-wise view with detailed employee breakdown"
+    - "Live Current Month Payroll View with Real-time Updates"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
