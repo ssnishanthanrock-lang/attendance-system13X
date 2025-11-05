@@ -1689,9 +1689,24 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         # Get allowances
         allowances = employee.get("allowances", 0)
         
+        # Get active loans for this employee
+        active_loans = await db.loans.find({
+            "employee_id": employee["id"],
+            "company_id": current_user.company_id,
+            "status": "active"
+        }).to_list(length=None)
+        
+        # Calculate loan deduction for this month
+        loan_deduction = 0
+        for loan in active_loans:
+            # Calculate how many months have passed since loan start
+            loan_start_month = loan.get("start_month", month)
+            if loan_start_month <= month:
+                loan_deduction += loan.get("monthly_deduction", 0)
+        
         # Calculate net salary
         gross_salary = basic_salary + allowances
-        total_deductions = late_deduction + total_advances + other_deductions
+        total_deductions = late_deduction + total_advances + other_deductions + loan_deduction
         net_salary = gross_salary - total_deductions
         
         detailed_records.append({
@@ -1707,6 +1722,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
             "late_deduction": round(late_deduction, 2),
             "advances": round(total_advances, 2),
             "other_deductions": round(other_deductions, 2),
+            "loan_deduction": round(loan_deduction, 2),
             "gross_salary": round(gross_salary, 2),
             "total_deductions": round(total_deductions, 2),
             "net_salary": round(net_salary, 2),
