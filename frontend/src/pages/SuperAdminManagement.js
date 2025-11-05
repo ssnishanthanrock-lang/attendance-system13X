@@ -117,6 +117,7 @@ export default function SuperAdminManagement() {
                     <Input
                       value={formData.name}
                       onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      onBlur={(e) => setFormData({...formData, name: capitalizeName(e.target.value)})}
                       placeholder="Full name"
                       required
                     />
