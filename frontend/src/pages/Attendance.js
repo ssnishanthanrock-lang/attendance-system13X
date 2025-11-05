@@ -683,7 +683,7 @@ export default function Attendance() {
                                             </div>
                                             <div className="flex-1">
                                               <div className="flex items-center gap-2">
-                                                <p className="font-semibold text-gray-900">{record.employee_name}</p>
+                                                <p className="font-semibold text-gray-900">{record.employee_name || 'Unknown'}</p>
                                                 {record.has_history && (
                                                   <button
                                                     onClick={() => handleViewHistory(record)}
