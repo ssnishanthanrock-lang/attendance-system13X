@@ -397,6 +397,35 @@ async def get_superadmin_stats(current_user: User = Depends(get_current_user)):
         "company_stats": company_stats
     }
 
+# Settings Model
+class CompanySettings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    office_start_time: str = "09:00"
+    office_end_time: str = "17:00"
+    saturday_enabled: bool = True
+    saturday_type: str = "full"
+    saturday_start_time: str = "09:00"
+    saturday_end_time: str = "14:00"
+    working_days_per_month: int = 26
+    holidays: List[dict] = []
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class SettingsUpdate(BaseModel):
+    office_start_time: Optional[str] = None
+    office_end_time: Optional[str] = None
+    saturday_enabled: Optional[bool] = None
+    saturday_type: Optional[str] = None
+    saturday_start_time: Optional[str] = None
+    saturday_end_time: Optional[str] = None
+    working_days_per_month: Optional[int] = None
+
+class Holiday(BaseModel):
+    date: str
+    name: str
+    type: str = "public"
+
 # ============= COMPANY ENDPOINTS =============
 @api_router.get("/company/info")
 async def get_company_info(current_user: User = Depends(get_current_user)):
