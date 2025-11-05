@@ -432,7 +432,13 @@ export default function Dashboard() {
             {/* Live Salary Summary */}
             <Card>
                 <CardHeader>
-                  <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Live Salary Tracker</CardTitle>
+                  <div className="flex items-center gap-3">
+                    <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Live Salary Tracker</CardTitle>
+                    <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold animate-pulse">
+                      <Radio className="w-3 h-3" />
+                      LIVE
+                    </div>
+                  </div>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
