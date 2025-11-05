@@ -2601,7 +2601,7 @@ class ERPTester:
 
     def run_all_tests(self):
         """Run all backend tests"""
-        print("🚀 Starting IT Signature ERP Backend API Tests - BUG FIX VALIDATION")
+        print("🚀 Starting IT Signature ERP Backend API Tests - INVOICING SYSTEM TESTING")
         print(f"Testing against: {API_BASE}")
         print("=" * 80)
         
@@ -2609,9 +2609,16 @@ class ERPTester:
         auth_success = self.test_authentication()
         
         if auth_success:
-            # Run Bug Fix Tests (REVIEW REQUEST FOCUS)
+            # Run Invoicing System Tests (REVIEW REQUEST FOCUS)
             print("\n" + "="*80)
-            print("🎯 TESTING 4 BUG FIXES (REVIEW REQUEST FOCUS)")
+            print("🧾 TESTING INVOICING SYSTEM (REVIEW REQUEST FOCUS)")
+            print("="*80)
+            
+            self.test_invoicing_system()
+            
+            # Run Bug Fix Tests (Previous)
+            print("\n" + "="*80)
+            print("🎯 TESTING 4 BUG FIXES (Previous)")
             print("="*80)
             
             self.test_bug_fix_activity_logs_login_events()
@@ -2620,7 +2627,7 @@ class ERPTester:
             self.test_bug_fix_payroll_months_current_month()
             
             # Run priority tests from review request - LIVE PAYROLL FOCUS
-            print("\n🎯 HIGH PRIORITY LIVE PAYROLL TESTS (Review Request)")
+            print("\n🎯 HIGH PRIORITY LIVE PAYROLL TESTS")
             self.test_live_payroll_current_month()
             
             # Run other payroll tests
