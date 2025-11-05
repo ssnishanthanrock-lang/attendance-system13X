@@ -185,41 +185,28 @@ export default function Payroll() {
         {!selectedMonth && (
           <>
             {months.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {months.map((monthData) => (
                   <Card
                     key={monthData.month}
-                    className="cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-l-4 border-l-blue-500"
+                    className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
                     onClick={() => handleMonthClick(monthData.month)}
                   >
                     <CardContent className="p-6">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
-                          <Calendar className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                            {formatMonthName(monthData.month)}
-                          </h3>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-3">
-                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-gray-500" />
-                            <span className="text-sm text-gray-600">Employees</span>
-                          </div>
-                          <span className="text-sm font-bold text-gray-900">{monthData.employee_count}</span>
+                      <div className="text-center space-y-3">
+                        <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                          {formatMonthName(monthData.month)}
+                        </h3>
+                        
+                        <div className="pt-3 border-t border-gray-200">
+                          <p className="text-sm text-gray-500 mb-1">Total Salary</p>
+                          <p className="text-2xl font-bold text-green-600">
+                            Rs {monthData.total_salary.toLocaleString()}
+                          </p>
                         </div>
                         
-                        <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                          <span className="text-sm font-medium text-green-700">Total Payroll</span>
-                          <div className="text-right">
-                            <span className="text-lg font-bold text-green-700">
-                              Rs {monthData.total_salary.toLocaleString()}
-                            </span>
-                          </div>
+                        <div className="text-xs text-gray-400">
+                          {monthData.employee_count} employee{monthData.employee_count !== 1 ? 's' : ''}
                         </div>
                       </div>
                     </CardContent>
@@ -228,9 +215,6 @@ export default function Payroll() {
               </div>
             ) : (
               <div className="text-center py-16">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-                  <Calendar className="w-8 h-8 text-gray-400" />
-                </div>
                 <p className="text-gray-500 text-lg">No payroll data available</p>
                 <p className="text-gray-400 text-sm mt-2">Generate payroll to get started</p>
               </div>
