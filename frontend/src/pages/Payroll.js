@@ -30,37 +30,29 @@ export default function Payroll() {
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
-    if (userData?.role === 'admin' || userData?.role === 'manager') {
-      fetchEmployees();
-    }
-    fetchPayrolls();
+    fetchMonths();
   }, []);
 
-  const fetchEmployees = async () => {
+  const fetchMonths = async () => {
     try {
-      const response = await api.get('/employees');
-      setEmployees(response.data);
+      setLoading(true);
+      const response = await api.get('/payroll/months');
+      setMonths(response.data);
     } catch (error) {
-      toast.error('Failed to fetch employees');
+      toast.error('Failed to fetch payroll months');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const fetchPayrolls = async () => {
+  const fetchDetailedPayroll = async (month) => {
     try {
-      const params = new URLSearchParams();
-      if (filters.employee_id) params.append('employee_id', filters.employee_id);
-      
-      // Combine month and year into YYYY-MM format if both are provided
-      if (filters.month && filters.year) {
-        const monthIndex = months.indexOf(filters.month) + 1;
-        const monthStr = monthIndex.toString().padStart(2, '0');
-        params.append('month', `${filters.year}-${monthStr}`);
-      }
-
-      const response = await api.get(`/payroll?${params.toString()}`);
-      setPayrolls(response.data);
+      setLoading(true);
+      const response = await api.get(`/payroll/detailed/${month}`);
+      setDetailedPayroll(response.data);
+      setSelectedMonth(month);
     } catch (error) {
-      toast.error('Failed to fetch payrolls');
+      toast.error('Failed to fetch detailed payroll');
     } finally {
       setLoading(false);
     }
