@@ -346,6 +346,27 @@ export default function Attendance() {
     }
   };
 
+
+  // Group attendance by date
+  const groupAttendanceByDate = () => {
+    const grouped = {};
+    attendance.forEach(record => {
+      const date = record.date;
+      if (!grouped[date]) {
+        grouped[date] = [];
+      }
+      grouped[date].push(record);
+    });
+    return grouped;
+  };
+
+  const formatDateForDisplay = (dateStr) => {
+    const date = new Date(dateStr);
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  };
+
+
   const isAdmin = user?.role === 'admin' || user?.role === 'manager';
 
   if (loading) {
