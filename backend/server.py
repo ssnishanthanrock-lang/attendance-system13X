@@ -93,7 +93,7 @@ class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     company_id: Optional[str] = None
-    employee_id: str
+    employee_id: Optional[str] = None
     mobile: str
     name: str
     role: str  # super_admin, admin, manager, employee, staff_member
@@ -103,6 +103,9 @@ class User(BaseModel):
     allowances: float = 0.0
     join_date: str
     profile_pic: Optional[str] = None
+    start_time: Optional[str] = None
+    finish_time: Optional[str] = None
+    fixed_salary: bool = False
     custom_start_time: Optional[str] = None
     custom_end_time: Optional[str] = None
     ot_allowed: bool = False
@@ -111,7 +114,7 @@ class User(BaseModel):
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class UserCreate(BaseModel):
-    employee_id: str
+    employee_id: Optional[str] = None
     mobile: str
     name: str
     role: str
@@ -120,6 +123,9 @@ class UserCreate(BaseModel):
     basic_salary: float = 0.0
     allowances: float = 0.0
     join_date: str
+    start_time: Optional[str] = None
+    finish_time: Optional[str] = None
+    fixed_salary: Optional[bool] = False
 
 class OTPRequest(BaseModel):
     mobile: str
