@@ -34,9 +34,9 @@ export default function Attendance() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingAttendance, setEditingAttendance] = useState(null);
   const [editHistory, setEditHistory] = useState([]);
-  const [historyCount, setHistoryCount] = useState({});
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [viewingHistoryRecord, setViewingHistoryRecord] = useState(null);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
