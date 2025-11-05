@@ -142,11 +142,21 @@ export default function SuperAdminDashboard() {
               <form onSubmit={handleCreateCompany} className="space-y-4">
                 <div>
                   <label className="text-sm font-medium">Company Name *</label>
-                  <Input value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} required />
+                  <Input 
+                    value={formData.name} 
+                    onChange={(e) => setFormData({...formData, name: e.target.value})} 
+                    onBlur={(e) => setFormData({...formData, name: capitalizeName(e.target.value)})}
+                    required 
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium">Admin Name *</label>
-                  <Input value={formData.admin_name} onChange={(e) => setFormData({...formData, admin_name: e.target.value})} required />
+                  <Input 
+                    value={formData.admin_name} 
+                    onChange={(e) => setFormData({...formData, admin_name: e.target.value})} 
+                    onBlur={(e) => setFormData({...formData, admin_name: capitalizeName(e.target.value)})}
+                    required 
+                  />
                 </div>
                 <div>
                   <label className="text-sm font-medium">Admin Mobile (10 digits) *</label>
