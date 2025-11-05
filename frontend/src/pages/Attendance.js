@@ -441,7 +441,22 @@ export default function Attendance() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{formatTime(record.check_in)}</td>
-                        <td className="px-4 py-3 text-sm text-gray-600">{formatTime(record.check_out)}</td>
+                        <td className="px-4 py-3">
+                          {record.check_out ? (
+                            <span className="text-sm text-gray-600">{formatTime(record.check_out)}</span>
+                          ) : (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleEdit(record)}
+                              disabled={!canEdit}
+                              className="text-xs px-2 py-1 h-7 bg-amber-50 border-amber-300 text-amber-700 hover:bg-amber-100"
+                            >
+                              <Clock className="w-3 h-3 mr-1" />
+                              Add Check-out
+                            </Button>
+                          )}
+                        </td>
                         <td className="px-4 py-3 text-sm font-semibold text-blue-600">{calculateHours(record.check_in, record.check_out)}</td>
                         {isAdmin && (
                           <td className="px-4 py-3">
