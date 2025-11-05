@@ -15,6 +15,9 @@ import {
   Phone,
   Settings,
 } from 'lucide-react';
+import ImpersonationBanner from './ImpersonationBanner';
+import { getImpersonationState, clearImpersonationState } from '../utils/impersonation';
+import { api } from '../App';
 
 export default function Layout({ children }) {
   const navigate = useNavigate();
