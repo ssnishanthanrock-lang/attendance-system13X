@@ -14,18 +14,7 @@ export default function Payroll() {
   const [selectedMonth, setSelectedMonth] = useState(null);
   const [detailedPayroll, setDetailedPayroll] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
-  const [generating, setGenerating] = useState(false);
-  const [generateForm, setGenerateForm] = useState({
-    month: new Date().toLocaleString('default', { month: 'long' }),
-    year: new Date().getFullYear(),
-  });
-
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
