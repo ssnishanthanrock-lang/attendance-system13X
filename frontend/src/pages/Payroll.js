@@ -258,25 +258,25 @@ export default function Payroll() {
                       <div className="bg-blue-50 p-3 rounded-lg">
                         <p className="text-xs text-blue-600 mb-1">Basic Salary</p>
                         <p className="text-base font-bold text-blue-700">
-                          Rs. {payroll.basic_salary.toLocaleString()}
+                          Rs. {(payroll.basic_salary || 0).toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-green-50 p-3 rounded-lg">
                         <p className="text-xs text-green-600 mb-1">Allowances</p>
                         <p className="text-base font-bold text-green-700">
-                          Rs. {payroll.allowances.toLocaleString()}
+                          Rs. {(payroll.allowances || 0).toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-orange-50 p-3 rounded-lg">
                         <p className="text-xs text-orange-600 mb-1">Deductions</p>
                         <p className="text-base font-bold text-orange-700">
-                          Rs. {payroll.deductions.toLocaleString()}
+                          Rs. {(payroll.deductions || 0).toLocaleString()}
                         </p>
                       </div>
                       <div className="bg-red-50 p-3 rounded-lg">
                         <p className="text-xs text-red-600 mb-1">Advances</p>
                         <p className="text-base font-bold text-red-700">
-                          Rs. {payroll.advances.toLocaleString()}
+                          Rs. {(payroll.advances || 0).toLocaleString()}
                         </p>
                       </div>
                     </div>
