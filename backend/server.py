@@ -142,7 +142,7 @@ class ActivityLog(BaseModel):
     user_id: str
     user_name: str
     action: str
-    description: str
+    details: str
     timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 # ============= HELPER FUNCTIONS =============
