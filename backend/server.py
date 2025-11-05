@@ -1000,17 +1000,30 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
 
 # ============= EMPLOYEE ENDPOINTS =============
 @api_router.get("/employees")
-async def get_employees(include_pending_increments: bool = False, current_user: User = Depends(get_current_user)):
+async def get_employees(include_pending_increments: bool = False, include_deleted: bool = False, current_user: User = Depends(get_current_user)):
     if current_user.role == "super_admin":
         raise HTTPException(status_code=403, detail="Super admin cannot access company employees")
     
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or manager access required")
     
-    employees = await db.users.find(
-        {"company_id": current_user.company_id, "role": {"$ne": "super_admin"}},
-        {"_id": 0}
-    ).to_list(1000)
+    # Build query - exclude super_admin role
+    query = {"company_id": current_user.company_id, "role": {"$ne": "super_admin"}}
+    
+    # By default, only show active employees (status != 0 or status doesn't exist)
+    if not include_deleted:
+        query["$or"] = [
+            {"status": {"$ne": 0}},
+            {"status": {"$exists": False}}
+        ]
+    else:
+        # If include_deleted=True, only show deleted (status = 0 or is_active = false)
+        query["$or"] = [
+            {"status": 0},
+            {"is_active": False}
+        ]
+    
+    employees = await db.users.find(query, {"_id": 0}).to_list(1000)
     
     # Optionally include pending increments
     if include_pending_increments:
