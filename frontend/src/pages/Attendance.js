@@ -987,13 +987,6 @@ export default function Attendance() {
             </div>
           </CardContent>
         </Card>
-
-        {attendance.length === 0 && (
-          <div className="text-center py-12">
-            <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">No attendance records found</p>
-          </div>
-        )}
       </div>
 
       {/* Edit Attendance Dialog */}
