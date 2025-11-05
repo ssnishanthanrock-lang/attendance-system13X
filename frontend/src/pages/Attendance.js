@@ -27,10 +27,12 @@ export default function Attendance() {
     employee_id: '',
     date: new Date().toISOString().split('T')[0],
     check_in: '09:00',
-    check_out: '17:00',
+    check_out: '',
     status: 'present',
     leave_type: ''
   });
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingAttendance, setEditingAttendance] = useState(null);
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
