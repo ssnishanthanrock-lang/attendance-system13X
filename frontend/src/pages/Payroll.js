@@ -177,12 +177,12 @@ export default function Payroll() {
               {isAdmin && (
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Employee</label>
-                  <Select value={filters.employee_id} onValueChange={(value) => setFilters({ ...filters, employee_id: value })}>
+                  <Select value={filters.employee_id || "all"} onValueChange={(value) => setFilters({ ...filters, employee_id: value === "all" ? "" : value })}>
                     <SelectTrigger data-testid="employee-filter">
                       <SelectValue placeholder="All Employees" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Employees</SelectItem>
+                      <SelectItem value="all">All Employees</SelectItem>
                       {employees.map((emp) => (
                         <SelectItem key={emp.id} value={emp.id}>
                           {emp.name}
