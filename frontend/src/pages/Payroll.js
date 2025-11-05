@@ -1,26 +1,38 @@
 import { useState, useEffect, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../App';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, User, Radio } from 'lucide-react';
+import { ArrowLeft, User, Radio, Calendar } from 'lucide-react';
 
 export default function Payroll() {
+  const { month } = useParams();
+  const navigate = useNavigate();
   const [months, setMonths] = useState([]);
-  const [selectedMonth, setSelectedMonth] = useState(null);
   const [detailedPayroll, setDetailedPayroll] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
-  const [isLiveView, setIsLiveView] = useState(false);
   const [livePayroll, setLivePayroll] = useState(null);
   const liveIntervalRef = useRef(null);
+
+  // Determine view mode based on URL
+  const isLiveView = !month; // If no month param, show live view
+  const isMonthView = !!month; // If month param exists, show month detail
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     fetchMonths();
   }, []);
+
+  // Handle month parameter changes
+  useEffect(() => {
+    if (month) {
+      fetchDetailedPayroll(month);
+    }
+  }, [month]);
 
   // Live payroll update effect
   useEffect(() => {
