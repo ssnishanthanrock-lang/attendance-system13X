@@ -121,14 +121,9 @@ export default function Payroll() {
                 Back
               </Button>
             )}
-            <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                {selectedMonth ? formatMonthName(selectedMonth) : 'Payroll Management'}
-              </h1>
-              {!selectedMonth && (
-                <p className="text-sm text-gray-500 mt-1">View and manage employee payroll</p>
-              )}
-            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+              {selectedMonth ? formatMonthName(selectedMonth) : 'Payroll Management'}
+            </h1>
           </div>
           {isAdmin && (
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
