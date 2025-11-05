@@ -178,7 +178,7 @@ export default function Payroll() {
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Basic Salary</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50" title="Hover to see per minute rate">Day Salary</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Allowances</th>
-                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Gross</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Earnings</th>
                         
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Present</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Leave</th>
