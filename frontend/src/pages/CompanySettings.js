@@ -172,23 +172,13 @@ export default function CompanySettings() {
           </CardContent>
         </Card>
 
-        {/* Working Days */}
+        {/* Working Days Calculator */}
         <Card>
           <CardHeader>
-            <CardTitle>Salary Calculation</CardTitle>
+            <CardTitle>Salary Calculation - Working Days</CardTitle>
           </CardHeader>
           <CardContent>
-            <div>
-              <label className="text-sm font-medium">Working Days Per Month</label>
-              <Input
-                type="number"
-                min="20"
-                max="31"
-                value={settings?.working_days_per_month || 26}
-                onChange={(e) => handleUpdateSettings({ working_days_per_month: parseInt(e.target.value) })}
-              />
-              <p className="text-xs text-gray-500 mt-1">Used for salary and deduction calculations</p>
-            </div>
+            <WorkingDaysCalculator settings={settings} />
           </CardContent>
         </Card>
 
