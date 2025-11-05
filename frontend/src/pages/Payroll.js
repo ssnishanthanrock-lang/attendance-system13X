@@ -195,7 +195,7 @@ export default function Payroll() {
             {/* Header with Back Button */}
             <div className="flex items-center gap-4">
               <Button
-                onClick={handleBackToMonths}
+                onClick={handleBackToLive}
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
@@ -350,7 +350,7 @@ export default function Payroll() {
             {/* Header with Back Button */}
             <div className="flex items-center gap-4">
               <Button
-                onClick={handleBackToMonths}
+                onClick={handleBackToLive}
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
