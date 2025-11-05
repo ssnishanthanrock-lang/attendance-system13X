@@ -442,13 +442,18 @@ export default function Dashboard() {
             {/* Live Salary Summary */}
             <Card className="cursor-pointer hover:shadow-lg transition-all" onClick={() => navigate(`/payroll/month/${livePayroll.month}`)}>
                 <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Live Salary Tracker</CardTitle>
-                    <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold animate-pulse">
-                      <Radio className="w-3 h-3" />
-                      LIVE
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Live Salary Tracker</CardTitle>
+                      <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold animate-pulse">
+                        <Radio className="w-3 h-3" />
+                        LIVE
+                      </div>
                     </div>
                   </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Last updated: {livePayroll.timestamp ? new Date(livePayroll.timestamp).toLocaleTimeString() : 'Loading...'}
+                  </p>
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
