@@ -141,6 +141,12 @@ export default function Attendance() {
     }
   };
 
+  const handleViewHistory = async (record) => {
+    setViewingHistoryRecord(record);
+    await fetchEditHistory(record.id);
+    setHistoryDialogOpen(true);
+  };
+
   const handleEdit = async (record) => {
     setEditingAttendance({
       id: record.id,
