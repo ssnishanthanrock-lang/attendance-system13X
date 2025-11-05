@@ -849,7 +849,7 @@ async def update_employee(employee_id: str, updates: dict, current_user: User = 
         {"$set": updates}
     )
     
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_EMPLOYEE", f"Updated employee {employee['name']}")
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_EMPLOYEE", f"Updated employee: {employee['name']}. Changes: {', '.join([f'{k}={v}' for k, v in updates.items() if k not in ['_id', 'created_at']])}")
     
     return {"message": "Employee updated successfully"}
 
