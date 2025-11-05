@@ -297,6 +297,8 @@ export default function Attendance() {
                               <SelectItem value="present">Present</SelectItem>
                               <SelectItem value="leave">Leave</SelectItem>
                               <SelectItem value="half_day">Half Day</SelectItem>
+                              <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
+                              <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
