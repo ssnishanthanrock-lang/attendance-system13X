@@ -182,6 +182,161 @@ export default function Payroll() {
           </>
         )}
 
+        {/* Live Current Month View */}
+        {isLiveView && livePayroll && (
+          <div className="space-y-4">
+            {/* Header with Back Button */}
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={handleBackToMonths}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </Button>
+              <div className="flex-1">
+                <div className="flex items-center gap-3">
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                    Live Salary Tracker - {formatMonthName(livePayroll.month).monthName} {formatMonthName(livePayroll.month).year}
+                  </h1>
+                  <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold animate-pulse">
+                    <Radio className="w-3 h-3" />
+                    LIVE
+                  </div>
+                </div>
+                <p className="text-sm text-gray-600 mt-1">
+                  Updates every second • Last updated: {new Date(livePayroll.timestamp).toLocaleTimeString()}
+                </p>
+              </div>
+            </div>
+
+            {/* Summary Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-gray-600 mb-1">Total Gross (So Far)</p>
+                  <p className="text-2xl font-bold text-blue-700">Rs {livePayroll.total_gross.toLocaleString()}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                  <p className="text-2xl font-bold text-red-700">Rs {livePayroll.total_deductions.toLocaleString()}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-gray-600 mb-1">Total Net (So Far)</p>
+                  <p className="text-2xl font-bold text-green-700">Rs {livePayroll.total_net.toLocaleString()}</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Employee Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {livePayroll.employees.map((emp) => (
+                <Card key={emp.employee_id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-5">
+                    {/* Employee Header */}
+                    <div className="flex items-center gap-3 mb-4 pb-4 border-b">
+                      <div className="w-12 h-12 rounded-full flex-shrink-0">
+                        {emp.profile_picture && emp.profile_picture.trim() !== '' ? (
+                          <img 
+                            src={emp.profile_picture} 
+                            alt={emp.employee_name} 
+                            className="w-12 h-12 rounded-full object-cover"
+                            onError={(e) => {
+                              e.target.outerHTML = '<div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                            <User className="w-6 h-6 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-900">{emp.employee_name}</h3>
+                        <p className="text-sm text-gray-500">{emp.position}</p>
+                        {emp.fixed_salary && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Fixed Salary</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Earnings Section */}
+                    <div className="space-y-2 mb-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Basic Salary:</span>
+                        <span className="font-semibold">Rs {emp.basic_salary.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Allowances:</span>
+                        <span className="font-semibold">Rs {emp.allowances.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Earned So Far:</span>
+                        <span className="font-semibold text-green-600">Rs {emp.earnings.toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Extra Payment:</span>
+                        <span className="font-semibold text-green-600">Rs {(emp.extra_payment || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm pt-2 border-t">
+                        <span className="text-gray-700 font-semibold">Gross Salary:</span>
+                        <span className="font-bold text-blue-600">Rs {emp.gross_salary.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Deductions Section */}
+                    <div className="space-y-2 mb-3 pt-3 border-t">
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Deductions</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Late Deduction:</span>
+                        <span className="text-red-600">Rs {emp.late_deduction.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Advances:</span>
+                        <span className="text-red-600">Rs {emp.advances.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Loan:</span>
+                        <span className="text-red-600">Rs {(emp.loan_deduction || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Other:</span>
+                        <span className="text-red-600">Rs {emp.other_deductions.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Net Salary */}
+                    <div className="pt-3 border-t bg-green-50 -mx-5 -mb-5 px-5 py-3 rounded-b-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="font-bold text-gray-900">Net Salary (So Far):</span>
+                        <span className="text-xl font-bold text-green-700">Rs {emp.net_salary.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Attendance Info */}
+                    <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Present: {emp.present_days}</span>
+                        <span>Leave: {emp.leave_days}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Minutes Worked: {emp.total_attendance_minutes}</span>
+                        <span>Late: {emp.late_minutes} min</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Detailed Payroll Sheet - Spreadsheet Style */}
         {selectedMonth && detailedPayroll && (
           <div className="space-y-4">
