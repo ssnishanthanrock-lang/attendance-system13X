@@ -720,11 +720,23 @@ export default function Attendance() {
                                                 {record.check_in && (
                                                   <span className="flex items-center gap-1">
                                                     <Clock className="w-3 h-3" />
-                                                    {new Date(record.check_in).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                                    {(() => {
+                                                      try {
+                                                        return new Date(record.check_in).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                                                      } catch {
+                                                        return 'N/A';
+                                                      }
+                                                    })()}
                                                     {record.check_out && (
                                                       <>
                                                         <span className="mx-1">→</span>
-                                                        {new Date(record.check_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                                        {(() => {
+                                                          try {
+                                                            return new Date(record.check_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                                                          } catch {
+                                                            return 'N/A';
+                                                          }
+                                                        })()}
                                                       </>
                                                     )}
                                                   </span>
