@@ -170,6 +170,15 @@ export default function Layout({ children }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+      {/* Impersonation Banner */}
+      {impersonationState && (
+        <ImpersonationBanner
+          companyName={impersonationState.companyName}
+          canEdit={impersonationState.canEdit}
+          onExit={handleExitImpersonation}
+        />
+      )}
+
       {/* Desktop Sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
