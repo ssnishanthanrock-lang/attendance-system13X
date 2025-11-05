@@ -474,7 +474,7 @@ export default function Dashboard() {
                       <div 
                         key={index} 
                         className="cursor-pointer hover:bg-gray-50 p-1.5 rounded transition-colors"
-                        onClick={() => navigate(`/attendance/from/${day.date}/to/${day.date}`)}
+                        onClick={() => navigate(`/attendance/date/${day.date}`)}
                         title="Click to view attendance details"
                       >
                         <div className="flex items-center justify-between text-xs">
