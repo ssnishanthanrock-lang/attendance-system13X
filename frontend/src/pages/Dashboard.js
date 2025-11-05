@@ -19,6 +19,9 @@ export default function Dashboard() {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     fetchStats();
+    if (userData?.role === 'admin' || userData?.role === 'manager') {
+      fetchLivePayroll();
+    }
   }, []);
 
   const fetchStats = async () => {
