@@ -38,7 +38,23 @@ export default function Employees() {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     fetchEmployees();
+    fetchCompanySettings();
   }, []);
+
+  const fetchCompanySettings = async () => {
+    try {
+      const response = await api.get('/settings');
+      if (response.data) {
+        setFormData(prev => ({
+          ...prev,
+          start_time: response.data.office_start_time || '09:00',
+          finish_time: response.data.office_end_time || '17:00'
+        }));
+      }
+    } catch (error) {
+      // Use defaults if settings not found
+    }
+  };
 
   const fetchEmployees = async () => {
     try {
