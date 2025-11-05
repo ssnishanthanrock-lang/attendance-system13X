@@ -312,10 +312,18 @@ export default function Layout({ children }) {
                 </div>
 
                 <div className="p-3 border-t border-gray-200">
-                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 mb-3">
+                  {/* Profile Menu Items */}
+                  {profileMenuItems.filter((item) => item.roles.includes(user?.role)).map((item) => (
+                    <NavLink key={item.path} item={item} onClick={() => setMobileMenuOpen(false)} />
+                  ))}
+                  
+                  {/* User Info */}
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 mb-2 mt-3">
                     <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
                     <p className="text-xs text-gray-600 mt-0.5 capitalize">{user?.role?.replace('_', ' ')}</p>
                   </div>
+                  
+                  {/* Logout Button */}
                   <Button
                     onClick={handleLogout}
                     variant="outline"
