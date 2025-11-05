@@ -273,6 +273,7 @@ export default function Attendance() {
                 </form>
               </DialogContent>
             </Dialog>
+            </div>
           )}
         </div>
 
