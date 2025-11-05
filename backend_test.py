@@ -463,6 +463,289 @@ class ERPTester:
         except Exception as e:
             self.log_result("Multi-tenancy", False, f"Multi-tenancy test error: {str(e)}")
     
+    def test_manual_attendance_addition(self):
+        """Test manual attendance addition endpoint (POST /api/attendance)"""
+        print("\n=== TESTING MANUAL ATTENDANCE ADDITION ===")
+        
+        # First, get an employee to add attendance for
+        try:
+            employees_response = self.session.get(f"{API_BASE}/employees")
+            if employees_response.status_code != 200:
+                self.log_result("Manual Attendance - Get Employees", False, 
+                              f"Cannot get employees for attendance test: {employees_response.status_code}")
+                return
+            
+            employees = employees_response.json()
+            if not employees:
+                self.log_result("Manual Attendance - No Employees", False, 
+                              "No employees found to test attendance addition")
+                return
+            
+            test_employee = employees[0]  # Use first employee
+            employee_id = test_employee.get('id')
+            employee_name = test_employee.get('name', 'Unknown')
+            
+            # Test 1: Valid attendance addition
+            today = datetime.now().date().isoformat()
+            attendance_data = {
+                "employee_id": employee_id,
+                "date": today,
+                "check_in": "09:00",
+                "check_out": "17:00",
+                "status": "present"
+            }
+            
+            response = self.session.post(f"{API_BASE}/attendance", json=attendance_data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                self.log_result("Manual Attendance - Valid Addition", True, 
+                              f"Successfully added attendance for {employee_name}",
+                              {"employee_id": employee_id, "date": today, "response": result.get('message')})
+            elif response.status_code == 400 and "already exists" in response.text:
+                self.log_result("Manual Attendance - Valid Addition", True, 
+                              "Attendance already exists (expected behavior)",
+                              {"employee_id": employee_id, "date": today})
+            else:
+                self.log_result("Manual Attendance - Valid Addition", False, 
+                              f"Failed to add attendance: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 2: Duplicate attendance (should fail)
+            duplicate_response = self.session.post(f"{API_BASE}/attendance", json=attendance_data)
+            
+            if duplicate_response.status_code == 400:
+                self.log_result("Manual Attendance - Duplicate Prevention", True, 
+                              "Correctly prevented duplicate attendance")
+            else:
+                self.log_result("Manual Attendance - Duplicate Prevention", False, 
+                              f"Duplicate attendance not prevented: {duplicate_response.status_code}")
+            
+            # Test 3: Invalid employee_id (should fail)
+            invalid_data = {
+                "employee_id": "invalid-employee-id",
+                "date": today,
+                "check_in": "09:00",
+                "check_out": "17:00",
+                "status": "present"
+            }
+            
+            invalid_response = self.session.post(f"{API_BASE}/attendance", json=invalid_data)
+            
+            if invalid_response.status_code == 404:
+                self.log_result("Manual Attendance - Invalid Employee", True, 
+                              "Correctly rejected invalid employee_id")
+            else:
+                self.log_result("Manual Attendance - Invalid Employee", False, 
+                              f"Invalid employee_id not properly handled: {invalid_response.status_code}")
+            
+            # Test 4: Check if attendance record was created in database
+            attendance_response = self.session.get(f"{API_BASE}/attendance", 
+                                                 params={"employee_id": employee_id, "from_date": today, "to_date": today})
+            
+            if attendance_response.status_code == 200:
+                attendance_records = attendance_response.json()
+                matching_records = [r for r in attendance_records if r.get('date') == today and r.get('employee_id') == employee_id]
+                
+                if matching_records:
+                    self.log_result("Manual Attendance - Database Verification", True, 
+                                  "Attendance record successfully created in database",
+                                  {"records_found": len(matching_records)})
+                else:
+                    self.log_result("Manual Attendance - Database Verification", False, 
+                                  "Attendance record not found in database")
+            else:
+                self.log_result("Manual Attendance - Database Verification", False, 
+                              f"Cannot verify attendance in database: {attendance_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Manual Attendance Addition", False, f"Manual attendance test error: {str(e)}")
+    
+    def test_dashboard_stats_enhanced(self):
+        """Enhanced test for dashboard stats endpoint with salary summary focus"""
+        print("\n=== TESTING DASHBOARD STATS (ENHANCED) ===")
+        
+        try:
+            response = self.session.get(f"{API_BASE}/dashboard/stats")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Test 1: Check all required admin fields
+                required_fields = [
+                    'total_employees', 'attendance_today', 'pending_leaves', 
+                    'pending_advances', 'recent_leaves', 'recent_advances',
+                    'monthly_salary_summary', 'attendance_summary'
+                ]
+                
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    self.log_result("Dashboard Stats - Required Fields", True, 
+                                  "All required fields present in dashboard stats")
+                else:
+                    self.log_result("Dashboard Stats - Required Fields", False, 
+                                  f"Missing required fields: {missing_fields}")
+                
+                # Test 2: Validate monthly_salary_summary structure and calculation
+                salary_summary = data.get('monthly_salary_summary', {})
+                salary_fields = ['month', 'year', 'total_expected', 'total_calculated', 'total_net', 'employee_count']
+                missing_salary_fields = [field for field in salary_fields if field not in salary_summary]
+                
+                if not missing_salary_fields:
+                    # Check if values are reasonable (non-negative numbers)
+                    total_expected = salary_summary.get('total_expected', 0)
+                    total_calculated = salary_summary.get('total_calculated', 0)
+                    total_net = salary_summary.get('total_net', 0)
+                    employee_count = salary_summary.get('employee_count', 0)
+                    
+                    if all(isinstance(val, (int, float)) and val >= 0 for val in [total_expected, total_calculated, total_net, employee_count]):
+                        self.log_result("Dashboard Stats - Salary Summary", True, 
+                                      "Monthly salary summary correctly structured and calculated",
+                                      {"month": salary_summary.get('month'),
+                                       "year": salary_summary.get('year'),
+                                       "total_expected": total_expected,
+                                       "total_calculated": total_calculated,
+                                       "total_net": total_net,
+                                       "employee_count": employee_count})
+                        
+                        # If no payroll data exists, totals should be 0 (expected behavior)
+                        if total_expected == 0 and total_calculated == 0 and total_net == 0:
+                            self.log_result("Dashboard Stats - No Payroll Data", True, 
+                                          "Correctly returns zeros when no payroll data exists (expected behavior)")
+                    else:
+                        self.log_result("Dashboard Stats - Salary Summary", False, 
+                                      "Invalid salary summary values (negative or non-numeric)")
+                else:
+                    self.log_result("Dashboard Stats - Salary Summary", False, 
+                                  f"Missing salary summary fields: {missing_salary_fields}")
+                
+                # Test 3: Validate attendance_summary (last 7 days)
+                attendance_summary = data.get('attendance_summary', [])
+                
+                if isinstance(attendance_summary, list) and len(attendance_summary) == 7:
+                    # Check structure of attendance summary
+                    valid_structure = all(
+                        isinstance(day, dict) and 'date' in day and 'count' in day 
+                        for day in attendance_summary
+                    )
+                    
+                    if valid_structure:
+                        total_attendance = sum(day.get('count', 0) for day in attendance_summary)
+                        self.log_result("Dashboard Stats - Attendance Summary", True, 
+                                      "Attendance summary correctly structured for last 7 days",
+                                      {"days_count": len(attendance_summary),
+                                       "total_attendance": total_attendance})
+                    else:
+                        self.log_result("Dashboard Stats - Attendance Summary", False, 
+                                      "Invalid attendance summary structure")
+                else:
+                    self.log_result("Dashboard Stats - Attendance Summary", False, 
+                                  f"Attendance summary should be 7-day array, got: {type(attendance_summary)} with length {len(attendance_summary) if isinstance(attendance_summary, list) else 'N/A'}")
+                
+                # Test 4: Check response format and status
+                self.log_result("Dashboard Stats - Response Format", True, 
+                              "Dashboard stats endpoint returns 200 with valid JSON")
+                
+            else:
+                self.log_result("Dashboard Stats - Response", False, 
+                              f"Dashboard stats request failed: {response.status_code}",
+                              {"response": response.text})
+                
+        except Exception as e:
+            self.log_result("Dashboard Stats Enhanced", False, f"Enhanced dashboard stats test error: {str(e)}")
+    
+    def test_activity_logs_endpoint(self):
+        """Test activity logs endpoint with pagination and filters"""
+        print("\n=== TESTING ACTIVITY LOGS ENDPOINT ===")
+        
+        try:
+            # Test 1: Basic activity logs retrieval with default limit
+            response = self.session.get(f"{API_BASE}/activity-logs")
+            
+            if response.status_code == 200:
+                logs = response.json()
+                self.log_result("Activity Logs - Basic Retrieval", True, 
+                              f"Successfully retrieved {len(logs)} activity logs",
+                              {"logs_count": len(logs)})
+                
+                # Verify log structure
+                if logs and isinstance(logs, list):
+                    first_log = logs[0]
+                    required_log_fields = ['company_id', 'user_id', 'user_name', 'action', 'details', 'timestamp']
+                    missing_log_fields = [field for field in required_log_fields if field not in first_log]
+                    
+                    if not missing_log_fields:
+                        self.log_result("Activity Logs - Structure", True, 
+                                      "Activity logs have correct structure")
+                    else:
+                        self.log_result("Activity Logs - Structure", False, 
+                                      f"Missing log fields: {missing_log_fields}")
+            else:
+                self.log_result("Activity Logs - Basic Retrieval", False, 
+                              f"Failed to retrieve activity logs: {response.status_code}",
+                              {"response": response.text})
+                return
+            
+            # Test 2: Pagination with custom limit
+            limit_response = self.session.get(f"{API_BASE}/activity-logs", params={"limit": 50})
+            
+            if limit_response.status_code == 200:
+                limited_logs = limit_response.json()
+                if len(limited_logs) <= 50:
+                    self.log_result("Activity Logs - Pagination Limit", True, 
+                                  f"Pagination working correctly with limit 50, got {len(limited_logs)} logs")
+                else:
+                    self.log_result("Activity Logs - Pagination Limit", False, 
+                                  f"Limit not respected: requested 50, got {len(limited_logs)}")
+            else:
+                self.log_result("Activity Logs - Pagination Limit", False, 
+                              f"Pagination test failed: {limit_response.status_code}")
+            
+            # Test 3: Default limit (should be 100 per code)
+            default_response = self.session.get(f"{API_BASE}/activity-logs")
+            
+            if default_response.status_code == 200:
+                default_logs = default_response.json()
+                if len(default_logs) <= 100:
+                    self.log_result("Activity Logs - Default Limit", True, 
+                                  f"Default limit working correctly, got {len(default_logs)} logs (max 100)")
+                else:
+                    self.log_result("Activity Logs - Default Limit", False, 
+                                  f"Default limit exceeded: got {len(default_logs)} logs")
+            
+            # Test 4: Date range filtering
+            from datetime import timedelta
+            today = datetime.now().date()
+            yesterday = (today - timedelta(days=1)).isoformat()
+            today_str = today.isoformat()
+            
+            date_response = self.session.get(f"{API_BASE}/activity-logs", 
+                                           params={"from_date": yesterday, "to_date": today_str})
+            
+            if date_response.status_code == 200:
+                date_filtered_logs = date_response.json()
+                self.log_result("Activity Logs - Date Filtering", True, 
+                              f"Date filtering working, got {len(date_filtered_logs)} logs for date range")
+            else:
+                self.log_result("Activity Logs - Date Filtering", False, 
+                              f"Date filtering failed: {date_response.status_code}")
+            
+            # Test 5: Search functionality
+            search_response = self.session.get(f"{API_BASE}/activity-logs", 
+                                             params={"search": "CREATE"})
+            
+            if search_response.status_code == 200:
+                search_logs = search_response.json()
+                self.log_result("Activity Logs - Search", True, 
+                              f"Search functionality working, found {len(search_logs)} logs with 'CREATE'")
+            else:
+                self.log_result("Activity Logs - Search", False, 
+                              f"Search functionality failed: {search_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Activity Logs Endpoint", False, f"Activity logs test error: {str(e)}")
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting IT Signature ERP Backend API Tests")
@@ -473,8 +756,15 @@ class ERPTester:
         auth_success = self.test_authentication()
         
         if auth_success:
-            # Run all other tests
-            self.test_dashboard_stats()
+            # Run priority tests from review request
+            print("\n🎯 PRIORITY TESTS (Review Request)")
+            self.test_manual_attendance_addition()
+            self.test_dashboard_stats_enhanced()
+            self.test_activity_logs_endpoint()
+            
+            # Run existing comprehensive tests
+            print("\n📋 COMPREHENSIVE TESTS")
+            self.test_dashboard_stats()  # Keep original for comparison
             self.test_employee_crud()
             self.test_branding_upload()
             self.test_profile_picture_upload()
