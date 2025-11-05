@@ -254,13 +254,7 @@ export default function SuperAdminCompanyDetail() {
 
         {/* Invoicing Module */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="w-5 h-5" />
-              Invoicing Module
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
               <div>
                 <p className="font-medium">Enable Invoicing</p>
