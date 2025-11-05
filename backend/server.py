@@ -1475,6 +1475,153 @@ async def delete_loan(loan_id: str, current_user: User = Depends(get_current_use
     return {"message": "Loan deleted successfully"}
 
 
+# ============= ADVANCES ENDPOINTS =============
+@api_router.post("/advances")
+async def create_advance(advance_data: dict, current_user: User = Depends(get_current_user)):
+    """Create a new advance request"""
+    advance = {
+        "id": str(uuid.uuid4()),
+        "company_id": current_user.company_id,
+        "employee_id": current_user.id,
+        "employee_name": current_user.name,
+        "amount": advance_data["amount"],
+        "reason": advance_data.get("reason", ""),
+        "repayment_months": advance_data.get("repayment_months", 1),
+        "status": "pending",
+        "request_date": datetime.now(timezone.utc).date().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.advances.insert_one(advance)
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "CREATE_ADVANCE",
+        f"Requested advance of Rs. {advance_data['amount']}"
+    )
+    
+    return advance
+
+@api_router.get("/advances")
+async def get_advances(current_user: User = Depends(get_current_user)):
+    """Get all advances (admin/manager see all, employees see only their own)"""
+    if current_user.role in ["admin", "manager"]:
+        query = {"company_id": current_user.company_id}
+    else:
+        query = {"company_id": current_user.company_id, "employee_id": current_user.id}
+    
+    advances = await db.advances.find(query, {"_id": 0}).sort("request_date", -1).to_list(length=None)
+    
+    return advances
+
+@api_router.put("/advances/{advance_id}")
+async def update_advance_status(advance_id: str, status_data: dict, current_user: User = Depends(get_current_user)):
+    """Update advance status (approve/reject)"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    advance = await db.advances.find_one({
+        "id": advance_id,
+        "company_id": current_user.company_id
+    })
+    
+    if not advance:
+        raise HTTPException(status_code=404, detail="Advance not found")
+    
+    await db.advances.update_one(
+        {"id": advance_id, "company_id": current_user.company_id},
+        {"$set": {"status": status_data["status"]}}
+    )
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "UPDATE_ADVANCE_STATUS",
+        f"Updated advance status to {status_data['status']} for {advance['employee_name']}"
+    )
+    
+    return {"message": "Advance status updated successfully"}
+
+
+# ============= LEAVES ENDPOINTS =============
+@api_router.post("/leaves")
+async def create_leave(leave_data: dict, current_user: User = Depends(get_current_user)):
+    """Create a new leave request"""
+    leave = {
+        "id": str(uuid.uuid4()),
+        "company_id": current_user.company_id,
+        "employee_id": current_user.id,
+        "employee_name": current_user.name,
+        "leave_type": leave_data["leave_type"],
+        "from_date": leave_data["from_date"],
+        "to_date": leave_data["to_date"],
+        "reason": leave_data.get("reason", ""),
+        "status": "pending",
+        "applied_date": datetime.now(timezone.utc).date().isoformat(),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.leaves.insert_one(leave)
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "CREATE_LEAVE",
+        f"Requested {leave_data['leave_type']} leave from {leave_data['from_date']} to {leave_data['to_date']}"
+    )
+    
+    return leave
+
+@api_router.get("/leaves")
+async def get_leaves(current_user: User = Depends(get_current_user)):
+    """Get all leaves (admin/manager see all, employees see only their own)"""
+    if current_user.role in ["admin", "manager"]:
+        query = {"company_id": current_user.company_id}
+    else:
+        query = {"company_id": current_user.company_id, "employee_id": current_user.id}
+    
+    leaves = await db.leaves.find(query, {"_id": 0}).sort("applied_date", -1).to_list(length=None)
+    
+    return leaves
+
+@api_router.put("/leaves/{leave_id}")
+async def update_leave_status(leave_id: str, status_data: dict, current_user: User = Depends(get_current_user)):
+    """Update leave status (approve/reject)"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    leave = await db.leaves.find_one({
+        "id": leave_id,
+        "company_id": current_user.company_id
+    })
+    
+    if not leave:
+        raise HTTPException(status_code=404, detail="Leave not found")
+    
+    await db.leaves.update_one(
+        {"id": leave_id, "company_id": current_user.company_id},
+        {"$set": {"status": status_data["status"]}}
+    )
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "UPDATE_LEAVE_STATUS",
+        f"Updated leave status to {status_data['status']} for {leave['employee_name']}"
+    )
+    
+    return {"message": "Leave status updated successfully"}
+
+
 # ============= EXTRA PAYMENTS ENDPOINTS =============
 @api_router.post("/extra-payments")
 async def create_extra_payment(payment_data: dict, current_user: User = Depends(get_current_user)):
