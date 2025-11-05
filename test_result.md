@@ -120,6 +120,90 @@ user_problem_statement: |
   - Profile picture and branding uploads
 
 backend:
+  - task: "Super Admin Invoicing Toggle"
+    implemented: false
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ TESTED: Super admin invoicing toggle endpoints not implemented. PUT /api/superadmin/companies/{company_id}/invoicing returns 401 Invalid token. The endpoint for enabling/disabling invoicing per company is missing from the backend implementation."
+
+  - task: "Product Categories CRUD"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Product categories CRUD working perfectly. POST /api/product-categories creates categories successfully. GET /api/product-categories retrieves categories with correct structure (id, company_id, name, created_at). Multi-tenancy verified - categories filtered by company_id."
+
+  - task: "Products CRUD with Stock Management"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Products CRUD with stock management working correctly. POST /api/products creates products with all fields (name, category_id, price, unit, stock_quantity, description). GET /api/products lists products with correct structure. PUT /api/products/{id} updates product price and stock. DELETE /api/products/{id} deletes products. Stock tracking verified."
+
+  - task: "Customers CRUD"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Customers CRUD working perfectly. POST /api/customers creates customers with all fields (name, email, phone, address). GET /api/customers retrieves customers with correct structure. PUT /api/customers/{id} updates customer data. DELETE /api/customers/{id} deletes customers. Multi-tenancy verified."
+
+  - task: "Estimates with Auto-numbering and Conversion"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Estimates system working correctly. POST /api/estimates creates estimates with auto-generated numbers (EST-25-MMDD-XX format). GET /api/estimates lists estimates. POST /api/estimates/{id}/convert successfully converts estimates to invoices and updates estimate status to 'converted'. Number format verification passed."
+
+  - task: "Invoices with Auto-numbering, Payments, and Stock Reduction"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Invoice system working excellently (CRITICAL TESTS PASSED). POST /api/invoices creates invoices with auto-generated numbers (INV-25-MMDD-XX format). GET /api/invoices lists invoices with status filtering (unpaid, partial, paid). GET /api/invoices/{id} returns detailed invoice with customer and payment data. POST /api/invoices/{id}/payments handles partial and full payments correctly, updating invoice status (unpaid → partial → paid). Stock reduction verified: creating invoice reduces product stock correctly (10 → 7 after invoicing 3 units). Invoice numbering sequence working correctly."
+
+  - task: "Company Invoice Settings"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Company invoice settings endpoint working. PUT /api/company/invoice-settings accepts address, mobile, hotline, and bank_details. Settings are saved and endpoint is accessible for verification."
+
   - task: "Dashboard stats endpoint for company portal"
     implemented: true
     working: true
