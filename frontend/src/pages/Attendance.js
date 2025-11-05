@@ -50,6 +50,8 @@ export default function Attendance() {
 
   // Read URL path parameters on mount
   useEffect(() => {
+    let hasFilters = false;
+    
     if (date) {
       // Single date from path parameter
       setFilters({
@@ -58,6 +60,7 @@ export default function Attendance() {
         to_date: date,
       });
       setViewMode('filtered');
+      hasFilters = true;
     } else if (fromDate && toDate) {
       // Date range from path parameters
       setFilters({
@@ -66,6 +69,7 @@ export default function Attendance() {
         to_date: toDate,
       });
       setViewMode('filtered');
+      hasFilters = true;
     } else if (employeeId) {
       // Only employee filter
       setFilters({
@@ -74,9 +78,17 @@ export default function Attendance() {
         to_date: '',
       });
       setViewMode('filtered');
-    } else {
+      hasFilters = true;
+    }
+    
+    if (!hasFilters) {
       // No URL parameters, reset to default
       setViewMode('today');
+      setFilters({
+        employee_id: '',
+        from_date: '',
+        to_date: '',
+      });
     }
   }, [date, employeeId, fromDate, toDate]);
 
