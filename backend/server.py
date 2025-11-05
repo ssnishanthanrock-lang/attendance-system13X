@@ -1492,7 +1492,7 @@ async def create_advance(advance_data: dict, current_user: User = Depends(get_cu
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
-    await db.advances.insert_one(advance)
+    result = await db.advances.insert_one(advance)
     
     # Log activity
     await log_activity(
@@ -1503,6 +1503,7 @@ async def create_advance(advance_data: dict, current_user: User = Depends(get_cu
         f"Requested advance of Rs. {advance_data['amount']}"
     )
     
+    # Return the advance without MongoDB ObjectId
     return advance
 
 @api_router.get("/advances")
