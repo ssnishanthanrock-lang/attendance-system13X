@@ -760,10 +760,10 @@ export default function Payroll() {
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
                       </tr>
                     </tfoot>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Summary Cards at Bottom - Only for Table View */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
