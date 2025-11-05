@@ -2099,6 +2099,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
             "profile_picture": employee.get("profile_pic"),
             "basic_salary": round(basic_salary, 2),
             "allowances": round(allowances, 2),
+            "earnings": round(earnings, 2),
             "working_days": working_days,
             "present_days": present_days,
             "leave_days": leave_days,
@@ -2116,7 +2117,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
             "total_deductions": round(total_deductions, 2),
             "net_salary": round(net_salary, 2),
             "fixed_salary": employee.get("fixed_salary", False),
-            "salary_per_minute": round((basic_salary / working_days / working_hours_per_day / 60), 2)
+            "salary_per_minute": round(salary_per_minute, 2)
         })
     
     return {
