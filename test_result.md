@@ -308,6 +308,31 @@ agent_communication:
       
       Please test the company portal dashboard, employee management, and branding features.
   
+  - agent: "main"
+    message: |
+      🔧 CURRENT FIXES IN PROGRESS (Phase 3):
+      
+      ISSUES BEING ADDRESSED:
+      1. ✅ Attendance page: Changed "View Deleted" to icon-only button (Archive icon)
+      2. ✅ Activity Logs: Removed "Filter Logs" text, changed to "Filters"
+      3. ✅ Attendance page: Removed "Filter Attendance" text, changed to "Filters"
+      4. ✅ Payroll page: Removed "Filter Payroll" text, changed to "Filters"
+      5. ✅ Activity Logs: Implemented pagination with "Load More" (50 records per page)
+      6. 🔄 Manual attendance: Investigating "Failed to add attendance" error
+      7. 🔄 Dashboard salary summary: Investigating zero values issue
+      
+      CHANGES MADE:
+      - Attendance.js: Added Archive icon button for deleted attendance, moved to header
+      - ActivityLogs.js: Implemented pagination (50 items per page) with Load More button
+      - All filter card titles standardized to just "Filters"
+      - Manual attendance form: Enhanced error handling and response validation
+      
+      NEEDS TESTING:
+      - Manual attendance submission
+      - Activity logs pagination and load more functionality
+      - Dashboard salary summary calculation
+      - All filter sections across pages
+  
   - agent: "testing"
     message: |
       🎯 BACKEND TESTING COMPLETED - ALL TESTS PASSED (17/17)
