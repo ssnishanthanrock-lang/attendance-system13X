@@ -364,15 +364,6 @@ export default function Attendance() {
                 >
                   <Archive className="w-4 h-4" />
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate('/deleted-employees')}
-                  className="text-gray-600 hover:text-gray-800"
-                  title="View Deleted Employees"
-                >
-                  <Users className="w-4 h-4" />
-                </Button>
                 <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                   <DialogTrigger asChild>
                     <Button 
