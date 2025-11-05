@@ -6,8 +6,9 @@ import { Input } from '../components/ui/input';
 import { Card, CardContent } from '../components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Badge } from '../components/ui/badge';
+import { Switch } from '../components/ui/switch';
 import { toast } from 'sonner';
-import { ArrowLeft, Plus, Shield, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Shield, Trash2, Eye, Edit } from 'lucide-react';
 import { capitalizeName } from '../utils/helpers';
 
 export default function SuperAdminManagement() {
