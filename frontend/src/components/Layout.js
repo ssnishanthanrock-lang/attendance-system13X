@@ -278,7 +278,7 @@ export default function Layout({ children }) {
       </div>
 
       {/* Main Content */}
-      <div className="lg:pl-72 flex-1 flex flex-col">
+      <div className="lg:pl-72 flex-1 flex flex-col" style={{ marginTop: '20px' }}>
         <main className="flex-1 pt-20 lg:pt-0 px-4 sm:px-6 lg:px-8 py-8">{children}</main>
         
         {/* Footer */}
