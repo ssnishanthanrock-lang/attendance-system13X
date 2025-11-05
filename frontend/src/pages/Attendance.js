@@ -119,35 +119,32 @@ export default function Attendance() {
       const params = new URLSearchParams();
       const today = new Date().toISOString().split('T')[0];
       
-      // If in today view mode and no filters set, fetch only today's attendance
-      if (viewMode === 'today' && !filters.employee_id && !filters.from_date && !filters.to_date) {
+      // If filters are set (from URL or manual), use them
+      if (filters.from_date || filters.to_date || filters.employee_id) {
+        if (filters.employee_id) params.append('employee_id', filters.employee_id);
+        if (filters.from_date) params.append('from_date', filters.from_date);
+        if (filters.to_date) params.append('to_date', filters.to_date);
+      } else if (viewMode === 'today') {
+        // No filters, today view
         params.append('from_date', today);
         params.append('to_date', today);
-      } else if (viewMode === 'last7days' && !filters.from_date && !filters.to_date) {
-        // Last 7 days view
+      } else if (viewMode === 'last7days') {
+        // No filters, last 7 days view
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
         params.append('from_date', sevenDaysAgo.toISOString().split('T')[0]);
         params.append('to_date', today);
-      } else {
-        // Use manual filters if set
-        if (filters.employee_id) params.append('employee_id', filters.employee_id);
-        if (filters.from_date) params.append('from_date', filters.from_date);
-        if (filters.to_date) params.append('to_date', filters.to_date);
       }
 
       const response = await api.get(`/attendance?${params.toString()}`);
       setAttendance(response.data);
       
-      // If today view, check if we have any attendance
-      if (viewMode === 'today' && response.data.length === 0) {
-        // Switch to last 7 days view and fetch summary
+      // Only auto-switch to last 7 days if no filters and in today mode with no data
+      if (viewMode === 'today' && !filters.from_date && !filters.to_date && response.data.length === 0) {
         setViewMode('last7days');
         fetchLast7DaysSummary();
-      } else if (viewMode === 'today') {
-        // We have today's attendance
+      } else if (viewMode === 'today' && !filters.from_date && !filters.to_date) {
         setTodayAttendanceCount(response.data.length);
-        // Fetch total active employees count
         if (user?.role === 'admin' || user?.role === 'manager') {
           const empResponse = await api.get('/employees');
           setActiveEmployeesCount(empResponse.data.length);
