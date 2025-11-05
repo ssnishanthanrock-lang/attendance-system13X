@@ -931,3 +931,49 @@ agent_communication:
       - Test that admin users now appear in payroll calculations
       - Check Dashboard shows animated LIVE indicator on Live Salary Tracker card
       - Verify the indicator matches Payroll page styling (green, pulsing, with Radio icon)
+  
+  - agent: "main"
+    message: |
+      ✅ BUG FIXES COMPLETED - 4 New Issues Resolved (Phase 2)
+      
+      ISSUE 1: Activity Logs - Missing login events
+      - FIXED: Added activity logging for OTP send, invalid OTP, expired OTP, and successful login
+      - OTP_SENT: Logged when OTP is sent to user's mobile
+      - INVALID_OTP: Logged when user enters wrong OTP
+      - EXPIRED_OTP: Logged when OTP has expired
+      - LOGIN_SUCCESS: Logged on successful authentication
+      - File: /app/backend/server.py (lines 366-477)
+      
+      ISSUE 2: Loans/Advances Error - "Failed to fetch advances"
+      - ROOT CAUSE: /advances and /leaves endpoints were missing from backend
+      - FIXED: Created complete CRUD endpoints for advances and leaves
+      - Added POST /api/advances (create advance request)
+      - Added GET /api/advances (fetch advances - role-based filtering)
+      - Added PUT /api/advances/{advance_id} (approve/reject advance)
+      - Added POST /api/leaves (create leave request)
+      - Added GET /api/leaves (fetch leaves - role-based filtering)
+      - Added PUT /api/leaves/{leave_id} (approve/reject leave)
+      - All endpoints include activity logging
+      - File: /app/backend/server.py (lines 1478-1636)
+      
+      ISSUE 3: Live Payroll - Wrong earned amount for fixed salary employees
+      - ROOT CAUSE: Fixed salary was pro-rated by days passed, but user expects full salary
+      - FIXED: Changed fixed salary logic to show full basic_salary + allowances regardless of attendance
+      - Removed pro-rata calculation for fixed salary employees
+      - Fixed salary employees now always show full monthly salary in "Earned So Far"
+      - Non-fixed salary employees still calculate based on actual attendance minutes
+      - File: /app/backend/server.py (lines 2576-2583)
+      
+      ISSUE 4: Monthly History Count - Current month showing in history
+      - ROOT CAUSE: Backend includes current month in /api/payroll/months response
+      - FIXED: Frontend now filters out current month from "Monthly Salary History" section
+      - Only past months appear in history cards below live tracker
+      - Current month data only shown in "Live Salary Tracker" section
+      - File: /app/frontend/src/pages/Payroll.js (line 290)
+      
+      TESTING NEEDED:
+      - Test login flow and verify activity logs capture OTP events and login
+      - Test Advances and Leaves pages - should load without errors
+      - Create, view, approve/reject advances and leaves
+      - Verify fixed salary employees show full salary in live payroll
+      - Verify current month doesn't appear in Monthly Salary History section
