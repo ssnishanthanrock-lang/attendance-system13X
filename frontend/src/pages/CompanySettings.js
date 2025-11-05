@@ -355,3 +355,110 @@ export default function CompanySettings() {
     </Layout>
   );
 }
+
+function WorkingDaysCalculator({ settings }) {
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const [workingDaysData, setWorkingDaysData] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  useEffect(() => {
+    calculateWorkingDays();
+  }, [selectedMonth, selectedYear, settings?.holidays]);
+
+  const calculateWorkingDays = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/settings/working-days/${selectedYear}/${selectedMonth}`);
+      setWorkingDaysData(response.data);
+    } catch (error) {
+      toast.error('Failed to calculate working days');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="text-sm font-medium">Month</label>
+          <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month, index) => (
+                <SelectItem key={index} value={(index + 1).toString()}>
+                  {month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="text-sm font-medium">Year</label>
+          <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[2024, 2025, 2026].map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center py-8">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      ) : workingDaysData ? (
+        <div className="space-y-3">
+          <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200">
+            <div className="text-center">
+              <p className="text-3xl font-bold text-blue-600" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                {workingDaysData.working_days}
+              </p>
+              <p className="text-sm text-gray-600 mt-1">Working Days</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-600">Total Days</p>
+              <p className="text-lg font-semibold text-gray-900">{workingDaysData.total_days}</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-600">Sundays</p>
+              <p className="text-lg font-semibold text-gray-900">{workingDaysData.sundays}</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-600">Holidays</p>
+              <p className="text-lg font-semibold text-gray-900">{workingDaysData.holidays}</p>
+            </div>
+            <div className="p-3 bg-gray-50 rounded-lg">
+              <p className="text-xs text-gray-600">Half Days</p>
+              <p className="text-lg font-semibold text-gray-900">{workingDaysData.half_days}</p>
+            </div>
+          </div>
+
+          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-xs text-green-700 font-medium">
+              💡 This calculation is based on your Holiday Calendar and Saturday settings
+            </p>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
