@@ -366,7 +366,7 @@ export default function Attendance() {
             Attendance Records
           </h1>
           <div className="flex gap-2">
-            {isAdmin && (
+            {isAdmin && hasDeletedAttendance && (
               <>
                 <Button
                   variant="outline"
