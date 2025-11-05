@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { toast } from 'sonner';
-import { Calendar, Clock, CheckCircle, XCircle, Plus, Trash2, Archive, Edit } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, XCircle, Plus, Trash2, Archive, Edit, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { canEditInImpersonation, isImpersonating } from '../utils/impersonation';
 
