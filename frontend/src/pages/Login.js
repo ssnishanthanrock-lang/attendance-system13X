@@ -157,36 +157,33 @@ export default function Login() {
                   </label>
                   <div className="relative group">
                     <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-300"></div>
-                    <div className="relative bg-white rounded-xl border-2 border-gray-200 focus-within:border-blue-500 transition-all duration-300">
-                      <div className="flex items-center px-4 py-3">
-                        <span className="text-gray-400 font-semibold text-lg mr-2">+94</span>
-                        <div className="flex-1 flex gap-1">
-                          {[0, 1, 2].map((group) => (
-                            <div key={group} className="flex gap-1">
-                              {Array.from({ length: group === 0 ? 3 : group === 1 ? 4 : 3 }).map((_, idx) => {
-                                const position = group === 0 ? idx : group === 1 ? 3 + idx : 7 + idx;
-                                const digit = mobile[position] || '';
-                                return (
-                                  <div
-                                    key={position}
-                                    className={`w-8 h-10 sm:w-10 sm:h-12 flex items-center justify-center rounded-lg border-2 transition-all duration-200 ${
-                                      digit
-                                        ? 'border-blue-500 bg-blue-50 shadow-sm scale-105'
-                                        : position === mobile.length
-                                        ? 'border-blue-300 bg-blue-50/50 animate-pulse'
-                                        : 'border-gray-200 bg-gray-50'
-                                    }`}
-                                  >
-                                    <span className={`text-lg font-bold ${digit ? 'text-blue-600' : 'text-gray-300'}`}>
-                                      {digit || '·'}
-                                    </span>
-                                  </div>
-                                );
-                              })}
-                              {group < 2 && <div className="w-2"></div>}
-                            </div>
-                          ))}
-                        </div>
+                    <div className="relative bg-white rounded-xl border-2 border-gray-200 focus-within:border-blue-500 transition-all duration-300 overflow-hidden">
+                      <div className="flex items-center justify-center px-3 py-3 gap-1">
+                        {[0, 1, 2].map((group) => (
+                          <div key={group} className="flex gap-1">
+                            {Array.from({ length: group === 0 ? 3 : group === 1 ? 4 : 3 }).map((_, idx) => {
+                              const position = group === 0 ? idx : group === 1 ? 3 + idx : 7 + idx;
+                              const digit = mobile[position] || '';
+                              return (
+                                <div
+                                  key={position}
+                                  className={`w-7 h-11 sm:w-9 sm:h-12 flex items-center justify-center rounded-lg border-2 transition-all duration-200 ${
+                                    digit
+                                      ? 'border-blue-500 bg-blue-50 shadow-sm scale-105'
+                                      : position === mobile.length
+                                      ? 'border-blue-300 bg-blue-50/50 animate-pulse'
+                                      : 'border-gray-200 bg-gray-50'
+                                  }`}
+                                >
+                                  <span className={`text-lg font-bold ${digit ? 'text-blue-600' : 'text-gray-300'}`}>
+                                    {digit || '·'}
+                                  </span>
+                                </div>
+                              );
+                            })}
+                            {group < 2 && <div className="w-1.5"></div>}
+                          </div>
+                        ))}
                       </div>
                       <input
                         data-testid="mobile-input"
