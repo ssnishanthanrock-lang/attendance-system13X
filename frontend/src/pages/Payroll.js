@@ -242,11 +242,11 @@ export default function Payroll() {
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
                               {emp.basic_salary.toLocaleString()}
                             </td>
-                            <td 
-                              className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50 cursor-help" 
-                              title={`Per minute: Rs ${perMinuteSalary.toFixed(2)}`}
-                            >
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
                               {daySalary.toLocaleString(undefined, {maximumFractionDigits: 2})}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
+                              {perMinuteSalary.toFixed(2)}
                             </td>
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
                               {emp.allowances.toLocaleString()}
