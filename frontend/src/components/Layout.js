@@ -151,12 +151,15 @@ export default function Layout({ children }) {
     { path: '/', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'manager', 'employee', 'staff_member'] },
     { path: '/employees', label: 'Employees', icon: Users, roles: ['admin', 'manager'] },
     { path: '/attendance', label: 'Attendance', icon: Calendar, roles: ['admin', 'manager', 'employee', 'staff_member'] },
-    { path: '/leaves', label: 'Leaves', icon: FileText, roles: ['admin', 'manager', 'employee'] },
-    { path: '/advances', label: 'Advances', icon: Wallet, roles: ['admin', 'manager', 'employee'] },
-    { path: '/increments', label: 'Increments', icon: TrendingUp, roles: ['admin', 'manager', 'employee'] },
+    { path: '/leaves', label: 'Leaves', icon: FileText, roles: ['admin', 'manager'] },
+    { path: '/advances', label: 'Advances', icon: Wallet, roles: ['admin', 'manager'] },
     { path: '/payroll', label: 'Payroll', icon: DollarSign, roles: ['admin', 'manager', 'employee', 'staff_member'] },
-    { path: '/activity-logs', label: 'Activity Logs', icon: FileText, roles: ['admin', 'manager'] },
+  ];
+
+  // Profile section items (shown at bottom)
+  const profileMenuItems = [
     { path: '/settings', label: 'Settings', icon: Settings, roles: ['admin', 'manager'] },
+    { path: '/activity-logs', label: 'Activity Logs', icon: FileText, roles: ['admin', 'manager'] },
   ];
 
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(user?.role));
