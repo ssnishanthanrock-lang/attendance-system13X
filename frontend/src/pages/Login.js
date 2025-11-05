@@ -156,30 +156,30 @@ export default function Login() {
                     Mobile Number
                   </label>
                   <div className="relative">
-                    <div className="flex items-center justify-center gap-1 py-2">
+                    <div className="flex items-center justify-center gap-2 py-4">
                       {[0, 1, 2].map((group) => (
-                        <div key={group} className="flex gap-1">
+                        <div key={group} className="flex gap-2">
                           {Array.from({ length: group === 0 ? 3 : group === 1 ? 4 : 3 }).map((_, idx) => {
                             const position = group === 0 ? idx : group === 1 ? 3 + idx : 7 + idx;
                             const digit = mobile[position] || '';
                             return (
                               <div
                                 key={position}
-                                className={`w-8 h-12 sm:w-10 sm:h-14 flex items-center justify-center rounded-lg border-2 transition-all duration-200 ${
-                                  digit
-                                    ? 'border-blue-500 bg-blue-50 shadow-lg scale-105'
-                                    : position === mobile.length
-                                    ? 'border-blue-400 bg-blue-50/50 animate-pulse shadow-md'
-                                    : 'border-gray-300 bg-white/50 backdrop-blur-sm'
-                                }`}
+                                className="flex items-center justify-center transition-all duration-200"
                               >
-                                <span className={`text-xl font-bold ${digit ? 'text-blue-600' : 'text-gray-400'}`}>
-                                  {digit || '·'}
+                                <span className={`text-4xl sm:text-5xl font-bold transition-all duration-300 ${
+                                  digit
+                                    ? 'text-white scale-110'
+                                    : position === mobile.length
+                                    ? 'text-blue-300 animate-pulse'
+                                    : 'text-white/30'
+                                }`}>
+                                  {digit || '_'}
                                 </span>
                               </div>
                             );
                           })}
-                          {group < 2 && <div className="w-2"></div>}
+                          {group < 2 && <div className="w-4"></div>}
                         </div>
                       ))}
                     </div>
