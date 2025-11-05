@@ -260,8 +260,10 @@ export default function Attendance() {
                           type="date"
                           value={manualAttendance.date}
                           onChange={(e) => setManualAttendance({...manualAttendance, date: e.target.value})}
+                          max={new Date().toISOString().split('T')[0]}
                           required
                         />
+                        <p className="text-xs text-gray-500">Only today and past dates allowed</p>
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Status *</label>
