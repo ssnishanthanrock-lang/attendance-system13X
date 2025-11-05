@@ -633,156 +633,145 @@ export default function Attendance() {
                       </td>
                     </tr>
                   ) : viewMode === 'last7days' ? (
-                    // Grouped by date view - Card-based design
-                    <tr>
-                      <td colSpan="7" className="p-0">
-                        <div className="space-y-4 p-4">
-                          {Object.entries(groupAttendanceByDate())
-                            .sort(([dateA], [dateB]) => dateB.localeCompare(dateA))
-                            .map(([date, records]) => (
-                              <Card key={date} className="overflow-hidden border-l-4 border-l-blue-500">
-                                {/* Date Header */}
-                                <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-indigo-50 px-4 py-3 border-b border-blue-200">
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                      <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
-                                        <Calendar className="w-5 h-5 text-white" />
-                                      </div>
-                                      <div>
-                                        <h3 className="font-bold text-gray-900 text-base">
-                                          {formatDateForDisplay(date)}
-                                        </h3>
-                                        <p className="text-xs text-gray-600">
-                                          {records.length} attendance record{records.length !== 1 ? 's' : ''}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
+                    // Grouped by date view - Table with date headers
+                    <>
+                      {Object.entries(groupAttendanceByDate())
+                        .sort(([dateA], [dateB]) => dateB.localeCompare(dateA))
+                        .map(([date, records]) => (
+                          <>
+                            {/* Date Header Row - Full Width */}
+                            <tr key={`header-${date}`} className="bg-gradient-to-r from-blue-600 to-indigo-600">
+                              <td colSpan="7" className="px-4 py-3">
+                                <div className="flex items-center gap-3">
+                                  <Calendar className="w-5 h-5 text-white" />
+                                  <span className="font-bold text-white text-base">
+                                    {formatDateForDisplay(date)}
+                                  </span>
+                                  <span className="text-xs bg-white/20 text-white px-3 py-1 rounded-full">
+                                    {records.length} record{records.length !== 1 ? 's' : ''}
+                                  </span>
                                 </div>
-                                
-                                {/* Records Grid */}
-                                <CardContent className="p-0">
-                                  <div className="divide-y divide-gray-100">
-                                    {records.map((record) => (
-                                      <div 
-                                        key={record.id} 
-                                        className={`p-4 hover:bg-gray-50 transition-colors ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}
-                                      >
-                                        <div className="flex items-center justify-between gap-4">
-                                          {/* Employee Info */}
-                                          <div className="flex items-center gap-3 flex-1">
-                                            <div className="w-10 h-10 rounded-full flex-shrink-0">
-                                              {record.profile_pic && record.profile_pic.trim() !== '' ? (
-                                                <img 
-                                                  src={record.profile_pic} 
-                                                  alt={record.employee_name} 
-                                                  className="w-10 h-10 rounded-full object-cover"
-                                                  onError={(e) => {
-                                                    e.target.outerHTML = '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
-                                                  }}
-                                                />
-                                              ) : (
-                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                                                  <User className="w-5 h-5 text-white" />
-                                                </div>
-                                              )}
-                                            </div>
-                                            <div className="flex-1">
-                                              <div className="flex items-center gap-2">
-                                                <p className="font-semibold text-gray-900">{record.employee_name || 'Unknown'}</p>
-                                                {record.has_history && (
-                                                  <button
-                                                    onClick={() => handleViewHistory(record)}
-                                                    className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
-                                                    title="View edit history"
-                                                  >
-                                                    <Clock className="w-3 h-3" />
-                                                    {record.history_count}
-                                                  </button>
-                                                )}
-                                              </div>
-                                              <div className="flex items-center gap-3 mt-1 text-sm text-gray-600">
-                                                <span
-                                                  className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${
-                                                    record.status === 'present'
-                                                      ? 'bg-green-100 text-green-700'
-                                                      : record.status === 'leave'
-                                                      ? 'bg-yellow-100 text-yellow-700'
-                                                      : record.status === 'allowed_leave'
-                                                      ? 'bg-blue-100 text-blue-700'
-                                                      : record.status === 'allowed_half_day'
-                                                      ? 'bg-blue-100 text-blue-700'
-                                                      : 'bg-red-100 text-red-700'
-                                                  }`}
-                                                >
-                                                  {record.status || 'N/A'}
-                                                </span>
-                                                {record.check_in && (
-                                                  <span className="flex items-center gap-1">
-                                                    <Clock className="w-3 h-3" />
-                                                    {(() => {
-                                                      try {
-                                                        return new Date(record.check_in).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                                                      } catch {
-                                                        return 'N/A';
-                                                      }
-                                                    })()}
-                                                    {record.check_out && (
-                                                      <>
-                                                        <span className="mx-1">→</span>
-                                                        {(() => {
-                                                          try {
-                                                            return new Date(record.check_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-                                                          } catch {
-                                                            return 'N/A';
-                                                          }
-                                                        })()}
-                                                      </>
-                                                    )}
-                                                  </span>
-                                                )}
-                                                {record.check_in && record.check_out && (
-                                                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">
-                                                    {calculateHours(record.check_in, record.check_out)}
-                                                  </span>
-                                                )}
-                                              </div>
-                                            </div>
-                                          </div>
-
-                                          {/* Actions */}
-                                          {canEdit && (
-                                            <div className="flex gap-1">
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleEdit(record)}
-                                                title="Edit"
-                                                className="h-8 w-8 p-0"
-                                              >
-                                                <Edit className="w-4 h-4 text-blue-600" />
-                                              </Button>
-                                              <Button
-                                                variant="ghost"
-                                                size="sm"
-                                                onClick={() => handleDelete(record.id)}
-                                                title="Delete"
-                                                className="h-8 w-8 p-0"
-                                              >
-                                                <Trash2 className="w-4 h-4 text-red-600" />
-                                              </Button>
-                                            </div>
-                                          )}
+                              </td>
+                            </tr>
+                            
+                            {/* Records for this date */}
+                            {records.map((record) => (
+                              <tr key={record.id} className={`hover:bg-gray-50 transition-colors border-b border-gray-100 ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}>
+                                {/* Employee Column with Profile Picture */}
+                                <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full flex-shrink-0">
+                                      {record.profile_pic && record.profile_pic.trim() !== '' ? (
+                                        <img 
+                                          src={record.profile_pic} 
+                                          alt={record.employee_name} 
+                                          className="w-8 h-8 rounded-full object-cover"
+                                          onError={(e) => {
+                                            e.target.outerHTML = '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
+                                          }}
+                                        />
+                                      ) : (
+                                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                          <User className="w-4 h-4 text-white" />
                                         </div>
-                                      </div>
-                                    ))}
+                                      )}
+                                    </div>
+                                    <span>{record.employee_name || 'Unknown'}</span>
+                                    {record.has_history && (
+                                      <button
+                                        onClick={() => handleViewHistory(record)}
+                                        className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
+                                        title="Click to view edit history"
+                                      >
+                                        <Clock className="w-3 h-3" />
+                                        {record.history_count}
+                                      </button>
+                                    )}
                                   </div>
-                                </CardContent>
-                              </Card>
+                                </td>
+                                
+                                {/* Date Column */}
+                                <td className="px-4 py-3 text-sm text-gray-600">{record.date}</td>
+                                
+                                {/* Status Column */}
+                                <td className="px-4 py-3">
+                                  <span
+                                    className={`inline-block text-xs px-2 py-1 rounded-full ${
+                                      record.status === 'present'
+                                        ? 'bg-green-100 text-green-700'
+                                        : record.status === 'leave'
+                                        ? 'bg-yellow-100 text-yellow-700'
+                                        : record.status === 'allowed_leave'
+                                        ? 'bg-blue-100 text-blue-700'
+                                        : record.status === 'allowed_half_day'
+                                        ? 'bg-blue-100 text-blue-700'
+                                        : 'bg-red-100 text-red-700'
+                                    }`}
+                                  >
+                                    {record.status || 'N/A'}
+                                  </span>
+                                </td>
+                                
+                                {/* Check In Column */}
+                                <td className="px-4 py-3 text-sm text-gray-600">
+                                  {record.check_in ? (() => {
+                                    try {
+                                      return new Date(record.check_in).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                                    } catch {
+                                      return '-';
+                                    }
+                                  })() : '-'}
+                                </td>
+                                
+                                {/* Check Out Column */}
+                                <td className="px-4 py-3 text-sm text-gray-600">
+                                  {record.check_out ? (() => {
+                                    try {
+                                      return new Date(record.check_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+                                    } catch {
+                                      return '-';
+                                    }
+                                  })() : '-'}
+                                </td>
+                                
+                                {/* Hours Column */}
+                                <td className="px-4 py-3 text-sm text-gray-600">
+                                  {calculateHours(record.check_in, record.check_out)}
+                                </td>
+                                
+                                {/* Action Column */}
+                                <td className="px-4 py-3 text-sm">
+                                  {canEdit && (
+                                    <div className="flex gap-2">
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleEdit(record)}
+                                        title="Edit Attendance"
+                                      >
+                                        <Edit className="w-4 h-4 text-blue-600" />
+                                      </Button>
+                                      <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={() => handleDelete(record.id)}
+                                        title="Delete Attendance"
+                                      >
+                                        <Trash2 className="w-4 h-4 text-red-600" />
+                                      </Button>
+                                    </div>
+                                  )}
+                                </td>
+                              </tr>
                             ))}
-                        </div>
-                      </td>
-                    </tr>
+                            
+                            {/* Spacing Row Between Date Groups */}
+                            <tr className="bg-gray-50">
+                              <td colSpan="7" className="h-2"></td>
+                            </tr>
+                          </>
+                        ))}
+                    </>
                   ) : (
                     // Today view - normal list
                     attendance.map((record) => (
