@@ -127,6 +127,14 @@ function App() {
             }
           />
           <Route
+            path="/attendance/employee/:employeeId/from/:fromDate/to/:toDate"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
+                <Attendance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/attendance/from/:fromDate/to/:toDate"
             element={
               <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
