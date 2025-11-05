@@ -92,6 +92,7 @@ export default function Attendance() {
     }
   }, [date, employeeId, fromDate, toDate]);
 
+  // Initialize user and settings once
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
@@ -102,12 +103,13 @@ export default function Attendance() {
     fetchCompanySettings();
   }, []);
 
-  // Separate effect to fetch attendance when filters change
+  // Fetch attendance when filters or viewMode changes
   useEffect(() => {
-    if (user) {
+    if (user !== null) {
+      setLoading(true);
       fetchAttendance();
     }
-  }, [filters, viewMode]);
+  }, [filters, viewMode, user]);
 
   const fetchEmployees = async () => {
     try {
