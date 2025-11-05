@@ -38,6 +38,9 @@ export default function Attendance() {
   const [viewingHistoryRecord, setViewingHistoryRecord] = useState(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [companySettings, setCompanySettings] = useState(null);
+  const [viewMode, setViewMode] = useState('today'); // 'today' or 'last7days'
+  const [todayAttendanceCount, setTodayAttendanceCount] = useState(0);
+  const [activeEmployeesCount, setActiveEmployeesCount] = useState(0);
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
