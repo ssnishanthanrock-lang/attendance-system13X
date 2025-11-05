@@ -102,33 +102,33 @@ function App() {
           <Route
             path="/leaves"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
                 <Leaves />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/advances"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
                 <Advances />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/increments"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
                 <Increments />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/payroll"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
                 <Payroll />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
         </Routes>
