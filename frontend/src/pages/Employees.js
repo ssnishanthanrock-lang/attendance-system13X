@@ -237,6 +237,16 @@ export default function Employees() {
                       required
                     />
                   </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <label className="text-sm font-medium">Profile Picture</label>
+                    <Input
+                      data-testid="profile-picture-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setFormData({ ...formData, profile_picture: e.target.files[0] })}
+                    />
+                    <p className="text-xs text-gray-500">Upload a profile picture (JPG, PNG, max 5MB)</p>
+                  </div>
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
                   <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
