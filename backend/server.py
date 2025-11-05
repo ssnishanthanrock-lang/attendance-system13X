@@ -1311,14 +1311,25 @@ async def update_attendance(attendance_id: str, attendance_data: dict, current_u
     if not attendance:
         raise HTTPException(status_code=404, detail="Attendance not found")
     
+    # Store old values for history
+    old_check_in = attendance.get("check_in")
+    old_check_out = attendance.get("check_out")
+    
     # Update fields
     update_data = {}
+    changes = []
     
     if "check_in" in attendance_data:
-        update_data["check_in"] = f"{attendance['date']}T{attendance_data['check_in']}:00"
+        new_check_in = f"{attendance['date']}T{attendance_data['check_in']}:00"
+        update_data["check_in"] = new_check_in
+        if old_check_in != new_check_in:
+            changes.append(f"Check-in: {old_check_in or 'None'} → {new_check_in}")
     
-    if "check_out" in attendance_data:
-        update_data["check_out"] = f"{attendance['date']}T{attendance_data['check_out']}:00"
+    if "check_out" in attendance_data and attendance_data["check_out"]:
+        new_check_out = f"{attendance['date']}T{attendance_data['check_out']}:00"
+        update_data["check_out"] = new_check_out
+        if old_check_out != new_check_out:
+            changes.append(f"Check-out: {old_check_out or 'None'} → {new_check_out}")
     
     if "status" in attendance_data:
         update_data["status"] = attendance_data["status"]
@@ -1332,16 +1343,46 @@ async def update_attendance(attendance_id: str, attendance_data: dict, current_u
             {"$set": update_data}
         )
         
+        # Save edit history
+        if changes:
+            history_record = {
+                "id": str(uuid.uuid4()),
+                "attendance_id": attendance_id,
+                "company_id": current_user.company_id,
+                "employee_id": attendance["employee_id"],
+                "employee_name": attendance["employee_name"],
+                "date": attendance["date"],
+                "changes": ", ".join(changes),
+                "old_check_in": old_check_in,
+                "old_check_out": old_check_out,
+                "new_check_in": update_data.get("check_in", old_check_in),
+                "new_check_out": update_data.get("check_out", old_check_out),
+                "edited_by": current_user.name,
+                "edited_by_id": current_user.id,
+                "edited_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.attendance_history.insert_one(history_record)
+        
         # Log the update
         await log_activity(
             current_user.company_id,
             current_user.id,
             current_user.name,
             "UPDATE_ATTENDANCE",
-            f"Updated attendance for {attendance['employee_name']} on {attendance['date']}: Check-in: {attendance_data.get('check_in', 'unchanged')}, Check-out: {attendance_data.get('check_out', 'unchanged')}"
+            f"Updated attendance for {attendance['employee_name']} on {attendance['date']}: {', '.join(changes) if changes else 'No changes'}"
         )
     
     return {"message": "Attendance updated successfully"}
+
+@api_router.get("/attendance/{attendance_id}/history")
+async def get_attendance_history(attendance_id: str, current_user: User = Depends(get_current_user)):
+    """Get edit history for an attendance record"""
+    history = await db.attendance_history.find(
+        {"attendance_id": attendance_id, "company_id": current_user.company_id},
+        {"_id": 0}
+    ).sort("edited_at", -1).to_list(length=None)
+    
+    return history
 
 @api_router.delete("/attendance/{attendance_id}")
 async def delete_attendance(attendance_id: str, current_user: User = Depends(get_current_user)):
