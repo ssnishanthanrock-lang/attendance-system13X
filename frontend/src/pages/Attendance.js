@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { toast } from 'sonner';
 import { Calendar, Clock, CheckCircle, XCircle, Plus, Trash2, Archive, Edit, Users, User } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { canEditInImpersonation, isImpersonating } from '../utils/impersonation';
 
 export default function Attendance() {
