@@ -692,13 +692,14 @@ export default function Employees() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">New Salary</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Increase</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Effective From</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Reason</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Added By</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {increments.map((inc) => (
-                    <tr key={inc.id} className="hover:bg-gray-50">
+                    <tr key={inc.id} className={`hover:bg-gray-50 ${inc.status === 'pending' ? 'bg-yellow-50' : ''}`}>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {new Date(inc.created_at).toLocaleDateString()}
                       </td>
@@ -713,6 +714,15 @@ export default function Employees() {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {inc.effective_from}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          inc.status === 'active' 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}>
+                          {inc.status === 'active' ? '✓ Active' : '⏳ Pending'}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600 max-w-xs">
                         {inc.reason}
