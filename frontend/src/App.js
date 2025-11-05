@@ -128,7 +128,15 @@ function App() {
           <Route
             path="/payroll"
             element={
-              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
+                <Payroll />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/payroll/month/:month"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
                 <Payroll />
               </ProtectedRoute>
             }
