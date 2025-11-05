@@ -105,7 +105,7 @@ export default function Employees() {
   const handleEdit = (employee) => {
     setEditingEmployee(employee);
     setFormData({
-      employee_id: employee.employee_id,
+      employee_id: employee.employee_id || '',
       mobile: employee.mobile,
       name: employee.name,
       role: employee.role,
@@ -114,6 +114,10 @@ export default function Employees() {
       basic_salary: employee.basic_salary,
       allowances: employee.allowances,
       join_date: employee.join_date,
+      start_time: employee.start_time || '09:00',
+      finish_time: employee.finish_time || '17:00',
+      fixed_salary: employee.fixed_salary || false,
+      profile_picture: null
     });
     setDialogOpen(true);
   };
