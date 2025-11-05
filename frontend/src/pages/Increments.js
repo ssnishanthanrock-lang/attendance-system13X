@@ -124,6 +124,7 @@ export default function Increments() {
                         <SelectValue placeholder="Select employee" />
                       </SelectTrigger>
                       <SelectContent>
+                        <SelectItem value="none" disabled>Select an employee</SelectItem>
                         {employees.map((emp) => (
                           <SelectItem key={emp.id} value={emp.id}>
                             {emp.name} - Current: Rs. {emp.basic_salary.toLocaleString()}
