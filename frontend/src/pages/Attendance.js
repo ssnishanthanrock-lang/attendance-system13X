@@ -150,14 +150,6 @@ export default function Attendance() {
     }
   };
 
-  const calculateHours = (checkIn, checkOut) => {
-    if (!checkIn || !checkOut) return 'N/A';
-    const diff = new Date(checkOut) - new Date(checkIn);
-    const hours = Math.floor(diff / 1000 / 60 / 60);
-    const minutes = Math.floor((diff / 1000 / 60) % 60);
-    return `${hours}h ${minutes}m`;
-  };
-
   const isAdmin = user?.role === 'admin' || user?.role === 'manager';
 
   if (loading) {
