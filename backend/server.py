@@ -473,6 +473,97 @@ async def get_company_logs(limit: int = 100, current_user: User = Depends(get_cu
     
     return logs
 
+# ============= SETTINGS ENDPOINTS =============
+@api_router.get("/settings")
+async def get_settings(current_user: User = Depends(get_current_user)):
+    if current_user.role == "super_admin":
+        raise HTTPException(status_code=400, detail="Not applicable for super admin")
+    
+    settings = await db.settings.find_one({"company_id": current_user.company_id}, {"_id": 0})
+    
+    if not settings:
+        # Create default settings
+        default_settings = CompanySettings(company_id=current_user.company_id)
+        await db.settings.insert_one(default_settings.model_dump())
+        return default_settings
+    
+    return CompanySettings(**settings)
+
+@api_router.put("/settings")
+async def update_settings(updates: SettingsUpdate, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    update_data = {k: v for k, v in updates.model_dump().items() if v is not None}
+    update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
+    
+    result = await db.settings.update_one(
+        {"company_id": current_user.company_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Settings not found")
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_SETTINGS", "Updated company settings")
+    
+    return {"message": "Settings updated successfully"}
+
+@api_router.post("/settings/holidays")
+async def add_holiday(holiday: Holiday, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    result = await db.settings.update_one(
+        {"company_id": current_user.company_id},
+        {"$push": {"holidays": holiday.model_dump()}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Settings not found")
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "ADD_HOLIDAY", f"Added holiday: {holiday.name}")
+    
+    return {"message": "Holiday added successfully"}
+
+@api_router.delete("/settings/holidays/{date}")
+async def delete_holiday(date: str, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    result = await db.settings.update_one(
+        {"company_id": current_user.company_id},
+        {"$pull": {"holidays": {"date": date}}}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Holiday not found")
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_HOLIDAY", f"Removed holiday on {date}")
+    
+    return {"message": "Holiday removed successfully"}
+
+# ============= PROFILE PICTURE ENDPOINTS =============
+@api_router.post("/upload/profile-pic")
+async def upload_profile_pic(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    try:
+        # Read file and convert to base64
+        contents = await file.read()
+        base64_image = base64.b64encode(contents).decode('utf-8')
+        data_url = f"data:{file.content_type};base64,{base64_image}"
+        
+        # Update user profile picture
+        await db.users.update_one(
+            {"id": current_user.id},
+            {"$set": {"profile_pic": data_url}}
+        )
+        
+        await log_activity(current_user.company_id or "SUPER_ADMIN", current_user.id, current_user.name, "UPDATE_PROFILE_PIC", "Updated profile picture")
+        
+        return {"message": "Profile picture uploaded successfully", "profile_pic": data_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # Include router
 app.include_router(api_router)
 
