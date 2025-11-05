@@ -322,7 +322,7 @@ export default function CompanySettings() {
                 <label className="text-sm font-medium">Favicon</label>
                 {settings?.favicon && (
                   <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed">
-                    <img src={settings.favicon} alt="Favicon" className="max-h-16 object-contain" />
+                    <img src={settings.favicon} alt="Favicon" className="max-h-16 object-contain rounded-lg" style={{ borderRadius: '8px' }} />
                   </div>
                 )}
                 <Input
