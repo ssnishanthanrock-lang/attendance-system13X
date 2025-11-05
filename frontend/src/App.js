@@ -210,6 +210,38 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/invoices"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <Invoices />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/estimates"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <Estimates />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/invoice-customers"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <InvoiceCustomers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/invoice-products"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <InvoiceProducts />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
       <Toaster 
