@@ -285,15 +285,17 @@ export default function Employees() {
             Employee Management
           </h1>
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => window.location.href = '/deleted-employees'}
-              className="text-gray-600 hover:text-gray-800"
-              title="View Deleted Employees"
-            >
-              <Trash2 className="w-4 h-4" />
-            </Button>
+            {hasDeletedEmployees && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => window.location.href = '/deleted-employees'}
+                className="text-gray-600 hover:text-gray-800"
+                title="View Deleted Employees"
+              >
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            )}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button
