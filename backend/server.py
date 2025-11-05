@@ -1136,6 +1136,33 @@ async def upload_superadmin_branding(
         raise HTTPException(status_code=500, detail=str(e))
 
 # ============= PROFILE PICTURE ENDPOINTS =============
+@api_router.post("/employees/profile-picture")
+async def upload_employee_profile_pic(
+    file: UploadFile = File(...),
+    employee_id: str = Form(...),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    try:
+        # Read file and convert to base64
+        contents = await file.read()
+        base64_image = base64.b64encode(contents).decode('utf-8')
+        data_url = f"data:{file.content_type};base64,{base64_image}"
+        
+        # Update employee profile picture
+        await db.users.update_one(
+            {"id": employee_id, "company_id": current_user.company_id},
+            {"$set": {"profile_pic": data_url}}
+        )
+        
+        await log_activity(current_user.company_id, current_user.id, current_user.name, "UPLOAD_PROFILE_PIC", f"Uploaded profile picture for employee")
+        
+        return {"message": "Profile picture uploaded successfully", "profile_pic": data_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @api_router.post("/upload/profile-pic")
 async def upload_profile_pic(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
     try:
