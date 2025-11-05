@@ -141,6 +141,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/deleted-attendance"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <DeletedAttendance />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" closeButton duration={3000} />
