@@ -48,7 +48,17 @@ export default function SuperAdminCompanyDetail() {
         sms_gateway: response.data.sms_gateway || 'textit',
         sms_enabled: response.data.sms_enabled || false,
         sms_username: response.data.sms_username || '',
-        sms_password: response.data.sms_password || ''
+        sms_password: response.data.sms_password || '',
+        dialog_username: response.data.dialog_username || '',
+        dialog_password: response.data.dialog_password || '',
+        dialog_mask: response.data.dialog_mask || '',
+        hutch_client_id: response.data.hutch_client_id || '',
+        hutch_client_secret: response.data.hutch_client_secret || '',
+        hutch_access_token: response.data.hutch_access_token || '',
+        hutch_refresh_token: response.data.hutch_refresh_token || '',
+        mobitel_app_id: response.data.mobitel_app_id || '',
+        mobitel_app_key: response.data.mobitel_app_key || '',
+        mobitel_client_id: response.data.mobitel_client_id || ''
       });
     } catch (error) {
       toast.error('Failed to fetch company details');
