@@ -786,6 +786,7 @@ export default function Payroll() {
                   </CardContent>
                 </Card>
               </div>
+              </>
             )}
           </div>
         )}
