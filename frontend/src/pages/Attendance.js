@@ -709,7 +709,7 @@ export default function Attendance() {
                                                       : 'bg-red-100 text-red-700'
                                                   }`}
                                                 >
-                                                  {record.status}
+                                                  {record.status || 'N/A'}
                                                 </span>
                                                 {record.check_in && (
                                                   <span className="flex items-center gap-1">
