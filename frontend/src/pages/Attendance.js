@@ -54,26 +54,45 @@ export default function Attendance() {
     let newFilters = { employee_id: '', from_date: '', to_date: '' };
     let newViewMode = 'today';
     
-    if (date) {
-      // Single date from path parameter
+    // Priority 1: Employee + Date (single or range)
+    if (employeeId && date) {
+      // Employee + single date: /attendance/employee/{id}/date/{date}
       newFilters = {
-        employee_id: employeeId || '',
+        employee_id: employeeId,
+        from_date: date,
+        to_date: date,
+      };
+      newViewMode = 'filtered';
+      hasFilters = true;
+    } else if (employeeId && fromDate && toDate) {
+      // Employee + date range: /attendance/employee/{id}/from/{from}/to/{to}
+      newFilters = {
+        employee_id: employeeId,
+        from_date: fromDate,
+        to_date: toDate,
+      };
+      newViewMode = 'filtered';
+      hasFilters = true;
+    } else if (date) {
+      // Single date only: /attendance/date/{date}
+      newFilters = {
+        employee_id: '',
         from_date: date,
         to_date: date,
       };
       newViewMode = 'filtered';
       hasFilters = true;
     } else if (fromDate && toDate) {
-      // Date range from path parameters
+      // Date range only: /attendance/from/{from}/to/{to}
       newFilters = {
-        employee_id: employeeId || '',
+        employee_id: '',
         from_date: fromDate,
         to_date: toDate,
       };
       newViewMode = 'filtered';
       hasFilters = true;
     } else if (employeeId) {
-      // Only employee filter - default to current month
+      // Employee only: /attendance/employee/{id} - default to current month
       const today = new Date();
       const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
       const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
