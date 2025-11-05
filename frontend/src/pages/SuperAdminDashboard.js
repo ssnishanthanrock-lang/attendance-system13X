@@ -91,10 +91,16 @@ export default function SuperAdminDashboard() {
                 <p className="text-xs text-gray-500">IT Signature ERP</p>
               </div>
             </div>
-            <Button onClick={handleLogout} variant="outline" className="text-red-600">
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => navigate('/superadmin/admins')} variant="outline">
+                <Shield className="w-4 h-4 mr-2" />
+                Manage Admins
+              </Button>
+              <Button onClick={handleLogout} variant="outline" className="text-red-600">
+                <LogOut className="w-4 h-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </div>
