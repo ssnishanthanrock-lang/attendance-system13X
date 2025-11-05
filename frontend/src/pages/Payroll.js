@@ -18,7 +18,7 @@ export default function Payroll() {
   const [livePayroll, setLivePayroll] = useState(null);
   const liveIntervalRef = useRef(null);
   const [viewingSalarySlip, setViewingSalarySlip] = useState(null);
-  const [viewMode, setViewMode] = useState('card'); // 'card' or 'table'
+  const [viewMode, setViewMode] = useState('table'); // 'card' or 'table' - default to table
 
   // Determine view mode based on URL
   const isLiveView = !month; // If no month param, show live view
