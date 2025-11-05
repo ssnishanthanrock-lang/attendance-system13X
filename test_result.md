@@ -346,7 +346,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Payroll month-wise view and detailed breakdown endpoints"
+    - "Live payroll endpoint for current month"
     - "Payroll month-wise view with detailed employee breakdown"
   stuck_tasks: []
   test_all: false
