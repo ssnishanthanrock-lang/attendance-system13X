@@ -285,13 +285,7 @@ export default function SuperAdminCompanyDetail() {
 
         {/* SMS Configuration */}
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              SMS Gateway Configuration
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pt-6">
             <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
               <div>
                 <p className="font-medium">Enable SMS Features</p>
