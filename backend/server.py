@@ -591,6 +591,111 @@ async def get_superadmin_stats(current_user: User = Depends(get_current_user)):
         "company_stats": company_stats
     }
 
+@api_router.post("/superadmin/impersonate/{company_id}")
+async def impersonate_company(company_id: str, current_user: User = Depends(get_current_user)):
+    """Super admin impersonates a company to view/manage their portal"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Verify company exists
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    # Get super admin's full access permission
+    super_admin_user = await db.users.find_one({"id": current_user.id}, {"_id": 0})
+    can_edit = super_admin_user.get("can_full_access_companies", False)
+    
+    # Create impersonation token
+    token_data = {
+        "user_id": current_user.id,
+        "company_id": company_id,
+        "is_impersonating": True,
+        "can_edit": can_edit
+    }
+    token = create_access_token(token_data)
+    
+    # Log the impersonation
+    await log_activity(
+        company_id, 
+        current_user.id, 
+        current_user.name, 
+        "IMPERSONATE_START", 
+        f"Super admin {current_user.name} started viewing company portal (Access: {'Full' if can_edit else 'Read-only'})"
+    )
+    
+    return {
+        "token": token,
+        "company_name": company["name"],
+        "company_id": company_id,
+        "can_edit": can_edit,
+        "message": f"Now viewing {company['name']} portal"
+    }
+
+@api_router.post("/superadmin/exit-impersonation")
+async def exit_impersonation(current_user: User = Depends(get_current_user)):
+    """Exit impersonation and return to super admin view"""
+    if not hasattr(current_user, 'is_impersonating') or not current_user.is_impersonating:
+        raise HTTPException(status_code=400, detail="Not currently impersonating")
+    
+    # Get original super admin user
+    original_user_id = getattr(current_user, 'original_user_id', current_user.id)
+    original_user = await db.users.find_one({"id": original_user_id}, {"_id": 0})
+    
+    if not original_user:
+        raise HTTPException(status_code=404, detail="Original user not found")
+    
+    # Log the exit
+    await log_activity(
+        current_user.company_id,
+        original_user_id,
+        original_user["name"],
+        "IMPERSONATE_END",
+        f"Super admin {original_user['name']} exited company portal view"
+    )
+    
+    # Create regular super admin token
+    token_data = {"user_id": original_user_id}
+    token = create_access_token(token_data)
+    
+    return {
+        "token": token,
+        "message": "Returned to super admin view"
+    }
+
+@api_router.put("/superadmin/admins/{admin_id}")
+async def update_super_admin(admin_id: str, updates: dict, current_user: User = Depends(get_current_user)):
+    """Update super admin details including full access permission"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    admin = await db.users.find_one({"id": admin_id, "role": "super_admin"})
+    if not admin:
+        raise HTTPException(status_code=404, detail="Super admin not found")
+    
+    # Only update allowed fields
+    allowed_fields = ["name", "mobile", "can_full_access_companies"]
+    update_data = {k: v for k, v in updates.items() if k in allowed_fields}
+    
+    if "name" in update_data:
+        update_data["name"] = capitalize_name(update_data["name"])
+    
+    if update_data:
+        await db.users.update_one(
+            {"id": admin_id},
+            {"$set": update_data}
+        )
+    
+    # Log the update
+    details = f"Updated super admin: {admin['name']}"
+    if "can_full_access_companies" in update_data:
+        access_type = "Full Access" if update_data["can_full_access_companies"] else "Read-only"
+        details += f", Company View Permission: {access_type}"
+    
+    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "UPDATE_SUPER_ADMIN", details)
+    
+    return {"message": "Super admin updated successfully"}
+
 # Settings Model
 class CompanySettings(BaseModel):
     model_config = ConfigDict(extra="ignore")
