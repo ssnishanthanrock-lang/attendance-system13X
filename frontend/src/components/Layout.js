@@ -13,6 +13,7 @@ import {
   Menu,
   LogOut,
   Phone,
+  Settings,
 } from 'lucide-react';
 
 export default function Layout({ children }) {
