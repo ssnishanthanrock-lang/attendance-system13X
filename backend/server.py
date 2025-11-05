@@ -148,22 +148,111 @@ def create_access_token(data: dict):
     return encoded_jwt
 
 def send_sms(mobile: str, message: str, company_id: Optional[str] = None):
+    """Send SMS via configured gateway"""
     try:
         if company_id:
             company_doc = db.companies.find_one({"id": company_id})
-            if company_doc and company_doc.get("sms_enabled"):
+            if not company_doc or not company_doc.get("sms_enabled"):
+                return False
+            
+            gateway = company_doc.get("sms_gateway", "textit")
+            
+            if gateway == "textit":
                 username = company_doc.get("sms_username") or DEFAULT_SMS_USERNAME
                 password = company_doc.get("sms_password") or DEFAULT_SMS_PASSWORD
-            else:
-                return False
+                url = "https://www.textit.biz/sendmsg"
+                params = {"id": username, "pw": password, "to": mobile, "text": message}
+                response = requests.get(url, params=params, timeout=10)
+                return response.status_code == 200
+            
+            elif gateway == "dialog":
+                import hashlib
+                username = company_doc.get("dialog_username")
+                password = company_doc.get("dialog_password")
+                mask = company_doc.get("dialog_mask")
+                
+                if not all([username, password, mask]):
+                    logging.error("Dialog SMS: Missing credentials")
+                    return False
+                
+                digest = hashlib.md5(password.encode()).hexdigest()
+                url = "https://bulksms.dialog.lk/api/v2/send"
+                payload = {
+                    "user": username,
+                    "digest": digest,
+                    "mask": mask,
+                    "destination": mobile,
+                    "message": message
+                }
+                response = requests.post(url, json=payload, timeout=10)
+                return response.status_code == 200
+            
+            elif gateway == "hutch":
+                access_token = company_doc.get("hutch_access_token")
+                if not access_token:
+                    logging.error("Hutch SMS: Missing access token")
+                    return False
+                
+                url = "https://bsms.hutch.lk/api/sms/send"
+                headers = {"Authorization": f"Bearer {access_token}"}
+                payload = {
+                    "recipient": mobile,
+                    "message": message
+                }
+                response = requests.post(url, json=payload, headers=headers, timeout=10)
+                
+                # If token expired, try to refresh
+                if response.status_code == 401:
+                    refresh_token = company_doc.get("hutch_refresh_token")
+                    if refresh_token:
+                        refresh_url = "https://bsms.hutch.lk/api/token/accessToken"
+                        refresh_headers = {"Authorization": f"Bearer {refresh_token}"}
+                        refresh_response = requests.post(refresh_url, headers=refresh_headers, timeout=10)
+                        
+                        if refresh_response.status_code == 200:
+                            new_token = refresh_response.json().get("accessToken")
+                            # Update token in database
+                            db.companies.update_one(
+                                {"id": company_id},
+                                {"$set": {"hutch_access_token": new_token}}
+                            )
+                            # Retry send
+                            headers["Authorization"] = f"Bearer {new_token}"
+                            response = requests.post(url, json=payload, headers=headers, timeout=10)
+                
+                return response.status_code == 200
+            
+            elif gateway == "mobitel":
+                app_id = company_doc.get("mobitel_app_id")
+                app_key = company_doc.get("mobitel_app_key")
+                client_id = company_doc.get("mobitel_client_id")
+                
+                if not all([app_id, app_key, client_id]):
+                    logging.error("Mobitel SMS: Missing credentials")
+                    return False
+                
+                url = "https://apphub.mobitel.lk/mobext/mapi/mspacesms/send"
+                headers = {
+                    "x-ibm-client-id": client_id,
+                    "content-type": "application/json"
+                }
+                payload = {
+                    "recipientMask": mobile,
+                    "message": message,
+                    "characterEncoding": "ascii",
+                    "appID": app_id,
+                    "appKey": app_key
+                }
+                response = requests.post(url, json=payload, headers=headers, timeout=10)
+                return response.status_code == 200
+            
         else:
-            username = DEFAULT_SMS_USERNAME
-            password = DEFAULT_SMS_PASSWORD
-        
-        url = "https://www.textit.biz/sendmsg"
-        params = {"id": username, "pw": password, "to": mobile, "text": message}
-        response = requests.get(url, params=params, timeout=10)
-        return response.status_code == 200
+            # System-wide gateway (for LOGIN OTP)
+            url = "https://www.textit.biz/sendmsg"
+            params = {"id": DEFAULT_SMS_USERNAME, "pw": DEFAULT_SMS_PASSWORD, "to": mobile, "text": message}
+            response = requests.get(url, params=params, timeout=10)
+            return response.status_code == 200
+            
     except Exception as e:
         logging.error(f"SMS send error: {str(e)}")
         return False
