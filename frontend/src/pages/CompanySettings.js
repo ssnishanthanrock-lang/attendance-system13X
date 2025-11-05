@@ -284,6 +284,83 @@ export default function CompanySettings() {
             )}
           </CardContent>
         </Card>
+
+        {/* Logo & Branding */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              Logo & Branding
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Company Logo */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Company Logo</label>
+                {settings?.company_logo && (
+                  <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed">
+                    <img src={settings.company_logo} alt="Company Logo" className="max-h-24 object-contain" />
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      formData.append('type', 'logo');
+                      try {
+                        const response = await api.post('/company/branding', formData, {
+                          headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        toast.success('Logo uploaded successfully');
+                        fetchSettings();
+                      } catch (error) {
+                        toast.error('Failed to upload logo');
+                      }
+                    }
+                  }}
+                />
+                <p className="text-xs text-gray-500">Recommended: PNG/SVG, transparent background, 200x200px</p>
+              </div>
+
+              {/* Favicon */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Favicon</label>
+                {settings?.favicon && (
+                  <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed">
+                    <img src={settings.favicon} alt="Favicon" className="max-h-16 object-contain" />
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                      const formData = new FormData();
+                      formData.append('file', file);
+                      formData.append('type', 'favicon');
+                      try {
+                        const response = await api.post('/company/branding', formData, {
+                          headers: { 'Content-Type': 'multipart/form-data' }
+                        });
+                        toast.success('Favicon uploaded successfully');
+                        fetchSettings();
+                      } catch (error) {
+                        toast.error('Failed to upload favicon');
+                      }
+                    }
+                  }}
+                />
+                <p className="text-xs text-gray-500">Recommended: ICO/PNG, 32x32px or 64x64px</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );
