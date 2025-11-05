@@ -653,6 +653,44 @@ async def get_company_logs(limit: int = 100, current_user: User = Depends(get_cu
     
     return logs
 
+@api_router.get("/activity-logs")
+async def get_activity_logs(
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    action_type: Optional[str] = None,
+    search: Optional[str] = None,
+    limit: int = 100,
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role == "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin cannot access company logs directly. View via company portal.")
+    
+    query = {"company_id": current_user.company_id}
+    
+    # Filter by date range
+    if from_date and to_date:
+        query["timestamp"] = {"$gte": from_date, "$lte": to_date}
+    elif from_date:
+        query["timestamp"] = {"$gte": from_date}
+    elif to_date:
+        query["timestamp"] = {"$lte": to_date}
+    
+    # Filter by action type
+    if action_type:
+        query["action"] = {"$regex": action_type, "$options": "i"}
+    
+    # Search in user_name, action, or details
+    if search:
+        query["$or"] = [
+            {"user_name": {"$regex": search, "$options": "i"}},
+            {"action": {"$regex": search, "$options": "i"}},
+            {"details": {"$regex": search, "$options": "i"}}
+        ]
+    
+    logs = await db.activity_logs.find(query, {"_id": 0}).sort("timestamp", -1).limit(limit).to_list(limit)
+    
+    return logs
+
 # ============= DASHBOARD ENDPOINTS =============
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
