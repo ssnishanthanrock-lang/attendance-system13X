@@ -68,6 +68,26 @@ export default function Attendance() {
     fetchAttendance();
   };
 
+  const handleAddManual = async (e) => {
+    e.preventDefault();
+    try {
+      await api.post('/attendance', manualAttendance);
+      toast.success('Attendance added successfully');
+      setDialogOpen(false);
+      setManualAttendance({
+        employee_id: '',
+        date: new Date().toISOString().split('T')[0],
+        check_in: '09:00',
+        check_out: '17:00',
+        status: 'present',
+        leave_type: ''
+      });
+      fetchAttendance();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to add attendance');
+    }
+  };
+
   const formatTime = (isoString) => {
     if (!isoString) return 'N/A';
     return new Date(isoString).toLocaleTimeString('en-US', {
