@@ -122,10 +122,32 @@ export default function Attendance() {
 
   const formatTime = (isoString) => {
     if (!isoString) return 'N/A';
-    return new Date(isoString).toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    try {
+      const date = new Date(isoString);
+      if (isNaN(date.getTime())) return 'N/A';
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+    } catch (error) {
+      return 'N/A';
+    }
+  };
+
+  const calculateHours = (checkIn, checkOut) => {
+    if (!checkIn || !checkOut) return 'N/A';
+    try {
+      const start = new Date(checkIn);
+      const end = new Date(checkOut);
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) return 'N/A';
+      
+      const diffMs = end - start;
+      const hours = Math.floor(diffMs / (1000 * 60 * 60));
+      const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+      return `${hours}h ${minutes}m`;
+    } catch (error) {
+      return 'N/A';
+    }
   };
 
   const calculateHours = (checkIn, checkOut) => {
