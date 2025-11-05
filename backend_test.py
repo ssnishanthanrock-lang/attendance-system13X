@@ -802,6 +802,7 @@ class ERPTester:
             self.test_manual_attendance_addition()
             self.test_dashboard_stats_enhanced()
             self.test_activity_logs_endpoint()
+            self.test_payroll_data_integration()
             
             # Run existing comprehensive tests
             print("\n📋 COMPREHENSIVE TESTS")
