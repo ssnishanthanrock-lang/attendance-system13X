@@ -162,23 +162,23 @@ export default function Payroll() {
             <Card>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full min-w-max">
                     <thead className="bg-gray-50 border-b-2 border-gray-200">
                       <tr>
-                        <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700">Employee</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Basic Salary</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Allowances</th>
-                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Working Days</th>
-                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Present</th>
-                        <th className="px-4 py-3 text-center text-xs font-semibold text-gray-700">Leave</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Late (mins)</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Late Deduction</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Advances</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Other Deductions</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Loan Deduction</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Gross</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700">Total Deductions</th>
-                        <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 bg-green-50">Net Salary</th>
+                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 whitespace-nowrap sticky left-0 bg-gray-50 z-10">Employee</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Basic Salary</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Allowances</th>
+                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap">Work Days</th>
+                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap">Present</th>
+                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap">Leave</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Late (m)</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Late Loss</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Advances</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Other Ded.</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Loan Ded.</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Gross</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Total Ded.</th>
+                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap bg-green-50 sticky right-0 z-10">Net Salary</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
