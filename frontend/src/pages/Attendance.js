@@ -189,13 +189,27 @@ export default function Attendance() {
   };
 
   const handleFilter = () => {
-    // Update URL with filter parameters
-    const params = new URLSearchParams();
-    if (filters.employee_id) params.append('employee_id', filters.employee_id);
-    if (filters.from_date) params.append('from_date', filters.from_date);
-    if (filters.to_date) params.append('to_date', filters.to_date);
+    // Build URL path with filter parameters
+    let path = '/attendance';
     
-    navigate(`/attendance?${params.toString()}`, { replace: true });
+    if (filters.employee_id && filters.from_date && filters.to_date && filters.from_date === filters.to_date) {
+      // Employee + single date
+      path = `/attendance/employee/${filters.employee_id}/date/${filters.from_date}`;
+    } else if (filters.employee_id && filters.from_date && filters.to_date) {
+      // Employee + date range (need to add this route if needed)
+      path = `/attendance/employee/${filters.employee_id}`;
+    } else if (filters.from_date && filters.to_date && filters.from_date === filters.to_date) {
+      // Single date only
+      path = `/attendance/date/${filters.from_date}`;
+    } else if (filters.from_date && filters.to_date) {
+      // Date range
+      path = `/attendance/from/${filters.from_date}/to/${filters.to_date}`;
+    } else if (filters.employee_id) {
+      // Employee only
+      path = `/attendance/employee/${filters.employee_id}`;
+    }
+    
+    navigate(path, { replace: true });
     
     setLoading(true);
     fetchAttendance();
