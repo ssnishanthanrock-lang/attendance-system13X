@@ -903,3 +903,31 @@ agent_communication:
       
       FRONTEND IMPLEMENTATION STATUS: ✅ COMPLETE AND READY
       TESTING STATUS: ❌ BLOCKED BY AUTHENTICATION ISSUES
+
+  - agent: "main"
+    message: |
+      ✅ BUG FIXES COMPLETED - 3 Issues Resolved
+      
+      ISSUE 1: Duplicate "No attendance records found" message
+      - FIXED: Removed duplicate empty state message in Attendance.js (lines 991-996)
+      - Now only shows one message inside the table when no records exist
+      - File: /app/frontend/src/pages/Attendance.js
+      
+      ISSUE 2: Admin user calculated in salary but not showing in payroll
+      - ROOT CAUSE: Admin role was excluded from payroll employee list
+      - FIXED: Added "admin" to the role filter in live payroll endpoint (line 2257)
+      - Backend now includes: ["admin", "employee", "staff_member", "manager"]
+      - File: /app/backend/server.py (line 2257)
+      
+      ISSUE 3: Dashboard needs liveness icon like Payroll page
+      - FIXED: Added animated "LIVE" indicator badge to Dashboard Live Salary Tracker
+      - Implementation: Green pulsing badge with Radio icon (matching Payroll page)
+      - Added Radio icon import to Dashboard.js
+      - Badge shows: "LIVE" with animate-pulse effect
+      - Files: /app/frontend/src/pages/Dashboard.js
+      
+      TESTING NEEDED:
+      - Verify single "No attendance records" message in Attendance page
+      - Test that admin users now appear in payroll calculations
+      - Check Dashboard shows animated LIVE indicator on Live Salary Tracker card
+      - Verify the indicator matches Payroll page styling (green, pulsing, with Radio icon)
