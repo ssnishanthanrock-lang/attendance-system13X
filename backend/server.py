@@ -1018,6 +1018,83 @@ async def delete_employee(employee_id: str, current_user: User = Depends(get_cur
     
     return {"message": "Employee deleted successfully"}
 
+# ============= INCREMENT ENDPOINTS =============
+@api_router.post("/employees/{employee_id}/increments")
+async def add_increment(employee_id: str, increment_data: dict, current_user: User = Depends(get_current_user)):
+    """Add salary increment for an employee"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    # Get employee
+    employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    old_salary = employee.get("basic_salary", 0)
+    new_salary = increment_data["new_salary"]
+    increment_amount = new_salary - old_salary
+    
+    # Create increment record
+    increment = Increment(
+        company_id=current_user.company_id,
+        employee_id=employee_id,
+        employee_name=employee["name"],
+        old_salary=old_salary,
+        new_salary=new_salary,
+        increment_amount=increment_amount,
+        effective_from=increment_data["effective_from"],
+        reason=increment_data.get("reason", ""),
+        created_by=current_user.id,
+        created_by_name=current_user.name
+    )
+    
+    await db.increments.insert_one(increment.model_dump())
+    
+    # Update employee's basic salary
+    await db.users.update_one(
+        {"id": employee_id},
+        {"$set": {"basic_salary": new_salary}}
+    )
+    
+    # Log activity with detailed information
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "ADD_INCREMENT",
+        f"Added salary increment for {employee['name']}: Rs. {old_salary:,.2f} → Rs. {new_salary:,.2f} (Increase: Rs. {increment_amount:,.2f}). Effective from: {increment_data['effective_from']}. Reason: {increment_data.get('reason', 'N/A')}"
+    )
+    
+    return {"message": "Increment added successfully", "increment": increment}
+
+@api_router.get("/employees/{employee_id}/increments")
+async def get_employee_increments(employee_id: str, current_user: User = Depends(get_current_user)):
+    """Get all increments for an employee"""
+    # Verify employee belongs to current company
+    employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    increments = await db.increments.find(
+        {"employee_id": employee_id, "company_id": current_user.company_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(length=None)
+    
+    return increments
+
+@api_router.get("/increments")
+async def get_all_increments(current_user: User = Depends(get_current_user)):
+    """Get all increments for the company (admin view)"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    increments = await db.increments.find(
+        {"company_id": current_user.company_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(length=None)
+    
+    return increments
+
 # ============= ATTENDANCE ENDPOINTS =============
 @api_router.get("/attendance")
 async def get_attendance(
