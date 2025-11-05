@@ -599,8 +599,25 @@ export default function Attendance() {
                     attendance.map((record) => (
                       <tr key={record.id} className={`hover:bg-gray-50 transition-colors ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}>
                         <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                          <div className="flex items-center gap-2">
-                            {record.employee_name}
+                          <div className="flex items-center gap-3">
+                            {/* Profile Picture */}
+                            <div className="w-8 h-8 rounded-full flex-shrink-0">
+                              {record.profile_pic && record.profile_pic.trim() !== '' ? (
+                                <img 
+                                  src={record.profile_pic} 
+                                  alt={record.employee_name} 
+                                  className="w-8 h-8 rounded-full object-cover"
+                                  onError={(e) => {
+                                    e.target.outerHTML = '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                  <User className="w-4 h-4 text-white" />
+                                </div>
+                              )}
+                            </div>
+                            <span>{record.employee_name}</span>
                             {record.has_history && (
                               <button
                                 onClick={() => handleViewHistory(record)}
