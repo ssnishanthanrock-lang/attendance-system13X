@@ -358,26 +358,38 @@ export default function Employees() {
           {filteredEmployees.map((employee) => (
             <Card key={employee.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start gap-4 mb-4">
+                  {employee.profile_pic ? (
+                    <img 
+                      src={employee.profile_pic} 
+                      alt={employee.name} 
+                      className="w-16 h-16 rounded-full object-cover"
+                      style={{ borderRadius: '50%' }}
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-xl font-bold">
+                      {employee.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
                       {employee.name}
                     </h3>
-                    <p className="text-sm text-gray-600">{employee.employee_id}</p>
+                    <p className="text-sm text-gray-600">{employee.employee_id || 'No ID'}</p>
+                    <span
+                      className={`inline-block text-xs px-2 py-1 rounded-full mt-1 ${
+                        employee.role === 'admin'
+                          ? 'bg-red-100 text-red-700'
+                          : employee.role === 'manager'
+                          ? 'bg-blue-100 text-blue-700'
+                          : employee.role === 'employee'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}
+                    >
+                      {employee.role}
+                    </span>
                   </div>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      employee.role === 'admin'
-                        ? 'bg-red-100 text-red-700'
-                        : employee.role === 'manager'
-                        ? 'bg-blue-100 text-blue-700'
-                        : employee.role === 'employee'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {employee.role}
-                  </span>
                 </div>
 
                 <div className="space-y-2 mb-4">
