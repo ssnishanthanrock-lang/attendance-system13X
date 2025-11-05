@@ -9,6 +9,7 @@ import { Switch } from '../components/ui/switch';
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
 import { ArrowLeft, Save, Building2, MessageSquare } from 'lucide-react';
+import { capitalizeName } from '../utils/helpers';
 
 export default function SuperAdminCompanyDetail() {
   const { companyId } = useParams();
