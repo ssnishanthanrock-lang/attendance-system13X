@@ -100,8 +100,14 @@ export default function Attendance() {
       checkDeletedAttendance();
     }
     fetchCompanySettings();
-    fetchAttendance();
-  }, [filters]);
+  }, []);
+
+  // Separate effect to fetch attendance when filters change
+  useEffect(() => {
+    if (user) {
+      fetchAttendance();
+    }
+  }, [filters, viewMode]);
 
   const fetchEmployees = async () => {
     try {
