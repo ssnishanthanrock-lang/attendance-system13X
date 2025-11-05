@@ -26,6 +26,21 @@ export default function Layout({ children }) {
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
+    
+    // Try to get cached company info first
+    const cachedCompanyInfo = localStorage.getItem('companyInfo');
+    if (cachedCompanyInfo) {
+      const data = JSON.parse(cachedCompanyInfo);
+      setCompanyInfo(data);
+      if (data.name) {
+        document.title = `${data.name} - ERP System`;
+      }
+      if (data.favicon) {
+        updateFavicon(data.favicon);
+      }
+    }
+    
+    // Fetch fresh company info
     if (userData && userData.role !== 'super_admin') {
       fetchCompanyInfo();
     }
@@ -41,6 +56,9 @@ export default function Layout({ children }) {
       if (response.ok) {
         const data = await response.json();
         setCompanyInfo(data);
+        
+        // Cache company info
+        localStorage.setItem('companyInfo', JSON.stringify(data));
         
         // Update page title
         if (data.name) {
