@@ -188,6 +188,14 @@ export default function Attendance() {
   };
 
   const handleFilter = () => {
+    // Update URL with filter parameters
+    const params = new URLSearchParams();
+    if (filters.employee_id) params.append('employee_id', filters.employee_id);
+    if (filters.from_date) params.append('from_date', filters.from_date);
+    if (filters.to_date) params.append('to_date', filters.to_date);
+    
+    navigate(`/attendance?${params.toString()}`, { replace: true });
+    
     setLoading(true);
     fetchAttendance();
   };
