@@ -249,7 +249,7 @@ export default function Payroll() {
                           {payroll.employee_name}
                         </h3>
                         <p className="text-sm text-gray-600 mt-1">
-                          {payroll.month} {payroll.year}
+                          {payroll.month || 'N/A'}
                         </p>
                       </div>
                     </div>
