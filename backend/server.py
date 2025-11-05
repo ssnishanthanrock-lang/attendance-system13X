@@ -1552,6 +1552,176 @@ async def get_payroll(month: Optional[str] = None, employee_id: Optional[str] = 
     
     return payroll
 
+@api_router.get("/payroll/months")
+async def get_payroll_months(current_user: User = Depends(get_current_user)):
+    """Get all months with employee data and calculate totals"""
+    # Get all employees for company
+    employees = await db.users.find({
+        "company_id": current_user.company_id,
+        "role": {"$in": ["employee", "staff_member", "manager"]}
+    }).to_list(length=None)
+    
+    if not employees:
+        return []
+    
+    # Get distinct months from attendance records
+    pipeline = [
+        {"$match": {"company_id": current_user.company_id}},
+        {"$group": {"_id": {"$substr": ["$date", 0, 7]}}},
+        {"$sort": {"_id": -1}}
+    ]
+    
+    months_data = await db.attendance.aggregate(pipeline).to_list(length=None)
+    
+    # Also check current month even if no attendance yet
+    from datetime import datetime
+    current_month = datetime.now(timezone.utc).strftime("%Y-%m")
+    month_set = set([m["_id"] for m in months_data])
+    month_set.add(current_month)
+    
+    result = []
+    for month_str in sorted(month_set, reverse=True):
+        # Calculate total for this month
+        total_salary = 0
+        for emp in employees:
+            salary = await get_effective_salary(emp["id"], current_user.company_id, month_str)
+            total_salary += salary
+        
+        result.append({
+            "month": month_str,
+            "total_salary": total_salary,
+            "employee_count": len(employees)
+        })
+    
+    return result
+
+@api_router.get("/payroll/detailed/{month}")
+async def get_detailed_payroll(month: str, current_user: User = Depends(get_current_user)):
+    """Get detailed salary breakdown for all employees in a month"""
+    # Get company settings
+    settings = await db.settings.find_one({"company_id": current_user.company_id})
+    working_hours_per_day = 8
+    start_time = "09:00"
+    finish_time = "17:00"
+    
+    if settings:
+        start_time = settings.get("start_time", "09:00")
+        finish_time = settings.get("finish_time", "17:00")
+        try:
+            start_dt = datetime.strptime(start_time, "%H:%M")
+            finish_dt = datetime.strptime(finish_time, "%H:%M")
+            working_hours_per_day = (finish_dt - start_dt).total_seconds() / 3600
+        except:
+            pass
+    
+    # Get working days for the month
+    year, month_num = month.split("-")
+    working_days_data = settings.get("working_days", {}) if settings else {}
+    working_days = working_days_data.get(month, 26)  # default 26
+    
+    # Get all employees
+    employees = await db.users.find({
+        "company_id": current_user.company_id,
+        "role": {"$in": ["employee", "staff_member", "manager"]}
+    }).to_list(length=None)
+    
+    detailed_records = []
+    
+    for employee in employees:
+        # Get effective salary (considers increments)
+        basic_salary = await get_effective_salary(employee["id"], current_user.company_id, month)
+        
+        # Get attendance for this month
+        attendance_records = await db.attendance.find({
+            "employee_id": employee["id"],
+            "company_id": current_user.company_id,
+            "date": {"$regex": f"^{month}"}
+        }).to_list(length=None)
+        
+        # Calculate attendance metrics
+        present_days = len([a for a in attendance_records if a.get("status") == "present"])
+        leave_days = len([a for a in attendance_records if a.get("status") == "leave"])
+        half_days = len([a for a in attendance_records if a.get("status") == "half_day"])
+        
+        # Calculate late minutes and deduction
+        late_minutes = 0
+        late_deduction = 0
+        
+        if not employee.get("fixed_salary", False):  # Only if NOT fixed salary
+            # Calculate expected check-in time
+            expected_checkin = datetime.strptime(start_time, "%H:%M").time()
+            
+            for record in attendance_records:
+                if record.get("check_in") and record.get("status") == "present":
+                    try:
+                        checkin_dt = datetime.fromisoformat(record["check_in"])
+                        checkin_time = checkin_dt.time()
+                        
+                        # Compare times
+                        expected_minutes = expected_checkin.hour * 60 + expected_checkin.minute
+                        actual_minutes = checkin_time.hour * 60 + checkin_time.minute
+                        
+                        if actual_minutes > expected_minutes:
+                            late_minutes += (actual_minutes - expected_minutes)
+                    except:
+                        pass
+            
+            # Calculate late deduction
+            if late_minutes > 0 and working_days > 0:
+                salary_per_day = basic_salary / working_days
+                salary_per_hour = salary_per_day / working_hours_per_day
+                salary_per_minute = salary_per_hour / 60
+                late_deduction = late_minutes * salary_per_minute
+        
+        # Get advances for this month
+        advances = await db.advances.find({
+            "employee_id": employee["id"],
+            "company_id": current_user.company_id,
+            "status": "approved",
+            "request_date": {"$regex": f"^{month}"}
+        }).to_list(length=None)
+        
+        total_advances = sum([adv.get("amount", 0) for adv in advances])
+        
+        # Get other deductions
+        other_deductions = employee.get("deductions", 0)
+        
+        # Get allowances
+        allowances = employee.get("allowances", 0)
+        
+        # Calculate net salary
+        gross_salary = basic_salary + allowances
+        total_deductions = late_deduction + total_advances + other_deductions
+        net_salary = gross_salary - total_deductions
+        
+        detailed_records.append({
+            "employee_id": employee["id"],
+            "employee_name": employee["name"],
+            "basic_salary": round(basic_salary, 2),
+            "allowances": round(allowances, 2),
+            "working_days": working_days,
+            "present_days": present_days,
+            "leave_days": leave_days,
+            "half_days": half_days,
+            "late_minutes": late_minutes,
+            "late_deduction": round(late_deduction, 2),
+            "advances": round(total_advances, 2),
+            "other_deductions": round(other_deductions, 2),
+            "gross_salary": round(gross_salary, 2),
+            "total_deductions": round(total_deductions, 2),
+            "net_salary": round(net_salary, 2),
+            "fixed_salary": employee.get("fixed_salary", False),
+            "salary_per_minute": round((basic_salary / working_days / working_hours_per_day / 60), 2) if not employee.get("fixed_salary", False) else 0
+        })
+    
+    return {
+        "month": month,
+        "employees": detailed_records,
+        "total_gross": sum([r["gross_salary"] for r in detailed_records]),
+        "total_net": sum([r["net_salary"] for r in detailed_records]),
+        "total_deductions": sum([r["total_deductions"] for r in detailed_records])
+    }
+
 # ============= UTILITY FUNCTIONS =============
 def capitalize_name(name: str) -> str:
     """Capitalize first letter of each word in a name"""
