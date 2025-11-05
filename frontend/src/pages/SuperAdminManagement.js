@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
 import { ArrowLeft, Plus, Shield, Trash2 } from 'lucide-react';
+import { capitalizeName } from '../utils/helpers';
 
 export default function SuperAdminManagement() {
   const navigate = useNavigate();
