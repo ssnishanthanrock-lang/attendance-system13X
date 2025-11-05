@@ -529,31 +529,59 @@ export default function Employees() {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    data-testid={`edit-employee-${employee.id}`}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEdit(employee)}
-                    disabled={!canEdit}
-                    title={!canEdit ? "Read-only access" : ""}
-                    className="flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <Edit className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>
-                  {user?.role === 'admin' && (
+                <div className="space-y-2">
+                  <div className="flex gap-2">
                     <Button
-                      data-testid={`delete-employee-${employee.id}`}
+                      data-testid={`edit-employee-${employee.id}`}
                       variant="outline"
                       size="sm"
-                      onClick={() => handleDelete(employee.id)}
+                      onClick={() => handleEdit(employee)}
                       disabled={!canEdit}
                       title={!canEdit ? "Read-only access" : ""}
-                      className="border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Edit className="w-4 h-4 mr-1" />
+                      Edit
                     </Button>
+                    {user?.role === 'admin' && (
+                      <Button
+                        data-testid={`delete-employee-${employee.id}`}
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDelete(employee.id)}
+                        disabled={!canEdit}
+                        title={!canEdit ? "Read-only access" : ""}
+                        className="border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {/* Increment Buttons */}
+                  {user?.role === 'admin' && (
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenIncrementDialog(employee)}
+                        disabled={!canEdit}
+                        title={!canEdit ? "Read-only access" : "Add Salary Increment"}
+                        className="flex-1 border-green-200 text-green-600 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <TrendingUp className="w-4 h-4 mr-1" />
+                        Increment
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleOpenIncrementHistory(employee)}
+                        title="View Increment History"
+                        className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                      >
+                        <History className="w-4 h-4" />
+                      </Button>
+                    </div>
                   )}
                 </div>
               </CardContent>
