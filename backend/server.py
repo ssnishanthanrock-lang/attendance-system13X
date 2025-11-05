@@ -1997,25 +1997,6 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         # Get allowances
         allowances = employee.get("allowances", 0)
         
-        # Get allowed leaves (leaves marked as "allowed" don't count as deductions)
-        allowed_leaves = await db.leaves.count_documents({
-            "employee_id": employee["id"],
-            "company_id": current_user.company_id,
-            "status": "approved",
-            "is_allowed": True,
-            "from_date": {"$regex": f"^{month}"}
-        })
-        
-        # Get allowed half days
-        allowed_half_days = await db.leaves.count_documents({
-            "employee_id": employee["id"],
-            "company_id": current_user.company_id,
-            "status": "approved",
-            "leave_type": "half_day",
-            "is_allowed": True,
-            "from_date": {"$regex": f"^{month}"}
-        })
-        
         # Get extra payments for this month
         extra_payments = await db.extra_payments.find({
             "employee_id": employee["id"],
