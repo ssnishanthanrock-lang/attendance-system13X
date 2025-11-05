@@ -337,6 +337,13 @@ export default function Attendance() {
                           </div>
                         </>
                       )}
+                      {['allowed_leave', 'allowed_half_day'].includes(manualAttendance.status) && (
+                        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <p className="text-sm text-blue-800">
+                            <strong>{manualAttendance.status === 'allowed_leave' ? 'Allowed Leave' : 'Allowed Half Day'}:</strong> This will count as a working day for salary calculation. No check-in/out time needed.
+                          </p>
+                        </div>
+                      )}
                       {manualAttendance.status === 'leave' && (
                         <div className="space-y-2">
                           <label className="text-sm font-medium">Leave Type *</label>
