@@ -85,8 +85,8 @@ export default function Attendance() {
       return;
     }
     
-    if (manualAttendance.status === 'present' && (!manualAttendance.check_in || !manualAttendance.check_out)) {
-      toast.error('Please enter check-in and check-out times');
+    if (manualAttendance.status === 'present' && !manualAttendance.check_in) {
+      toast.error('Please enter check-in time');
       return;
     }
     
