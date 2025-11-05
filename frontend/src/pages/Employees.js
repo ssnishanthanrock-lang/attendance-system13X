@@ -692,7 +692,7 @@ export default function Employees() {
 
       {/* Increment History Dialog */}
       <Dialog open={incrementHistoryOpen} onOpenChange={setIncrementHistoryOpen}>
-        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-7xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Increment History</DialogTitle>
             <DialogDescription>
