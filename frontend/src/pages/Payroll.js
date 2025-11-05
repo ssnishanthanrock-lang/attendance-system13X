@@ -69,10 +69,13 @@ export default function Payroll() {
     e.preventDefault();
     setGenerating(true);
     try {
-      await api.post('/payroll/generate', null, {
-        params: generateForm,
-      });
-      toast.success('Payroll generated successfully');
+      // Convert month name to number and format as YYYY-MM
+      const monthIndex = months.indexOf(generateForm.month) + 1;
+      const monthStr = monthIndex.toString().padStart(2, '0');
+      const yearMonth = `${generateForm.year}-${monthStr}`;
+      
+      const response = await api.post('/payroll/generate', { month: yearMonth });
+      toast.success(response.data.message || 'Payroll generated successfully');
       setDialogOpen(false);
       fetchPayrolls();
     } catch (error) {
