@@ -939,6 +939,29 @@ async def delete_holiday(date: str, current_user: User = Depends(get_current_use
     
     return {"message": "Holiday removed successfully"}
 
+@api_router.get("/settings/working-days/{year}/{month}")
+async def get_working_days(year: int, month: int, current_user: User = Depends(get_current_user)):
+    if current_user.role == "super_admin":
+        raise HTTPException(status_code=400, detail="Not applicable for super admin")
+    
+    # Get company settings
+    settings = await db.settings.find_one({"company_id": current_user.company_id}, {"_id": 0})
+    
+    if not settings:
+        # Use default settings
+        holidays = []
+        saturday_enabled = True
+        saturday_type = "full"
+    else:
+        holidays = settings.get("holidays", [])
+        saturday_enabled = settings.get("saturday_enabled", True)
+        saturday_type = settings.get("saturday_type", "full")
+    
+    # Calculate working days
+    result = calculate_working_days(year, month, holidays, saturday_enabled, saturday_type)
+    
+    return result
+
 # ============= BRANDING ENDPOINTS =============
 @api_router.post("/company/branding")
 async def upload_branding(file: UploadFile = File(...), type: str = Form(...), current_user: User = Depends(get_current_user)):
