@@ -131,7 +131,7 @@ export default function Layout({ children }) {
           navigate(item.path);
           onClick?.();
         }}
-        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all ${
+        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all text-sm ${
           isActive
             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
             : 'text-gray-700 hover:bg-gray-100'
