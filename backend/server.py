@@ -2254,7 +2254,7 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
     else:
         employees = await db.users.find({
             "company_id": current_user.company_id,
-            "role": {"$in": ["employee", "staff_member", "manager"]}
+            "role": {"$in": ["admin", "employee", "staff_member", "manager"]}
         }).to_list(length=None)
     
     detailed_records = []
