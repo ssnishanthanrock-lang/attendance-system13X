@@ -1071,6 +1071,19 @@ async def add_increment(employee_id: str, increment_data: dict, current_user: Us
     new_salary = increment_data["new_salary"]
     increment_amount = new_salary - old_salary
     
+    # Check if effective date is current or future
+    from datetime import datetime
+    effective_month = increment_data["effective_from"]  # Format: "YYYY-MM"
+    current_month = datetime.now(timezone.utc).strftime("%Y-%m")
+    
+    # Determine status and whether to apply immediately
+    if effective_month <= current_month:
+        status = "active"
+        should_apply_now = True
+    else:
+        status = "pending"
+        should_apply_now = False
+    
     # Create increment record
     increment = Increment(
         company_id=current_user.company_id,
@@ -1081,17 +1094,22 @@ async def add_increment(employee_id: str, increment_data: dict, current_user: Us
         increment_amount=increment_amount,
         effective_from=increment_data["effective_from"],
         reason=increment_data.get("reason", ""),
+        status=status,
         created_by=current_user.id,
         created_by_name=current_user.name
     )
     
     await db.increments.insert_one(increment.model_dump())
     
-    # Update employee's basic salary
-    await db.users.update_one(
-        {"id": employee_id},
-        {"$set": {"basic_salary": new_salary}}
-    )
+    # Only update employee's basic salary if effective date is now or past
+    if should_apply_now:
+        await db.users.update_one(
+            {"id": employee_id},
+            {"$set": {"basic_salary": new_salary}}
+        )
+        status_text = "Applied immediately"
+    else:
+        status_text = f"Scheduled for {effective_month}"
     
     # Log activity with detailed information
     await log_activity(
@@ -1099,10 +1117,10 @@ async def add_increment(employee_id: str, increment_data: dict, current_user: Us
         current_user.id,
         current_user.name,
         "ADD_INCREMENT",
-        f"Added salary increment for {employee['name']}: Rs. {old_salary:,.2f} → Rs. {new_salary:,.2f} (Increase: Rs. {increment_amount:,.2f}). Effective from: {increment_data['effective_from']}. Reason: {increment_data.get('reason', 'N/A')}"
+        f"Added salary increment for {employee['name']}: Rs. {old_salary:,.2f} → Rs. {new_salary:,.2f} (Increase: Rs. {increment_amount:,.2f}). Effective from: {increment_data['effective_from']}. Status: {status_text}. Reason: {increment_data.get('reason', 'N/A')}"
     )
     
-    return {"message": "Increment added successfully", "increment": increment}
+    return {"message": "Increment added successfully", "increment": increment, "status": status}
 
 @api_router.get("/employees/{employee_id}/increments")
 async def get_employee_increments(employee_id: str, current_user: User = Depends(get_current_user)):
