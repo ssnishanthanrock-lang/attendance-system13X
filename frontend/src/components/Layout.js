@@ -41,10 +41,42 @@ export default function Layout({ children }) {
       if (response.ok) {
         const data = await response.json();
         setCompanyInfo(data);
+        
+        // Update page title
+        if (data.name) {
+          document.title = `${data.name} - ERP System`;
+        }
+        
+        // Update favicon if company has one
+        if (data.favicon) {
+          updateFavicon(data.favicon);
+        }
       }
     } catch (error) {
       console.error('Failed to fetch company info:', error);
     }
+  };
+
+  const updateFavicon = (faviconUrl) => {
+    // Remove existing favicon links
+    const existingLinks = document.querySelectorAll("link[rel*='icon']");
+    existingLinks.forEach(link => link.remove());
+
+    // Add new favicon with border radius styling
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.type = 'image/png';
+    link.href = faviconUrl;
+    document.head.appendChild(link);
+
+    // Add styles to favicon container if possible
+    const style = document.createElement('style');
+    style.textContent = `
+      link[rel*='icon'] {
+        border-radius: 4px;
+      }
+    `;
+    document.head.appendChild(style);
   };
 
   const handleLogout = () => {
