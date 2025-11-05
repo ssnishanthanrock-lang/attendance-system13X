@@ -473,7 +473,9 @@ export default function Employees() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleEdit(employee)}
-                    className="flex-1"
+                    disabled={!canEdit}
+                    title={!canEdit ? "Read-only access" : ""}
+                    className="flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Edit className="w-4 h-4 mr-1" />
                     Edit
@@ -484,7 +486,9 @@ export default function Employees() {
                       variant="outline"
                       size="sm"
                       onClick={() => handleDelete(employee.id)}
-                      className="border-red-200 text-red-600 hover:bg-red-50"
+                      disabled={!canEdit}
+                      title={!canEdit ? "Read-only access" : ""}
+                      className="border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
