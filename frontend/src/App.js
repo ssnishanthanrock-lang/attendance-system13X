@@ -142,7 +142,7 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" closeButton duration={3000} />
     </div>
   );
 }
