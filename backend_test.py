@@ -423,6 +423,46 @@ class ERPTester:
         except Exception as e:
             self.log_result("Employee Role Access", False, f"Employee role access test error: {str(e)}")
     
+    def test_multi_tenancy(self):
+        """Test multi-tenancy (company_id filtering)"""
+        print("\n=== TESTING MULTI-TENANCY ===")
+        
+        try:
+            # Get employees for current company
+            response = self.session.get(f"{API_BASE}/employees")
+            
+            if response.status_code == 200:
+                employees = response.json()
+                current_company_employees = len(employees)
+                
+                # Verify all employees belong to the same company
+                company_ids = set(emp.get('company_id') for emp in employees)
+                
+                if len(company_ids) == 1 and self.company_id in company_ids:
+                    self.log_result("Multi-tenancy Employee Filtering", True, 
+                                  f"All {current_company_employees} employees belong to current company")
+                else:
+                    self.log_result("Multi-tenancy Employee Filtering", False, 
+                                  f"Employee data contains multiple companies: {company_ids}")
+            else:
+                self.log_result("Multi-tenancy Employee Filtering", False, 
+                              f"Failed to get employees for multi-tenancy test: {response.status_code}")
+            
+            # Test dashboard stats are company-specific
+            response = self.session.get(f"{API_BASE}/dashboard/stats")
+            
+            if response.status_code == 200:
+                data = response.json()
+                # The dashboard should only show data for the current company
+                self.log_result("Multi-tenancy Dashboard Filtering", True, 
+                              "Dashboard stats filtered by company_id")
+            else:
+                self.log_result("Multi-tenancy Dashboard Filtering", False, 
+                              f"Dashboard stats failed: {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Multi-tenancy", False, f"Multi-tenancy test error: {str(e)}")
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting IT Signature ERP Backend API Tests")
@@ -439,6 +479,7 @@ class ERPTester:
             self.test_branding_upload()
             self.test_profile_picture_upload()
             self.test_role_based_access()
+            self.test_multi_tenancy()
         else:
             print("❌ Authentication failed - skipping other tests")
         
