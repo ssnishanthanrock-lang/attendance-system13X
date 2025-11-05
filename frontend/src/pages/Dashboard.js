@@ -456,8 +456,7 @@ export default function Dashboard() {
             {/* Attendance Chart */}
             <Card data-testid="attendance-chart-card">
               <CardHeader>
-                <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Attendance Summary</CardTitle>
-                <CardDescription>Last 7 days attendance trend</CardDescription>
+                <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Attendance Summary - Last 7 Days</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
