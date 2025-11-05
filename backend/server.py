@@ -961,7 +961,7 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
 
 # ============= EMPLOYEE ENDPOINTS =============
 @api_router.get("/employees")
-async def get_employees(current_user: User = Depends(get_current_user)):
+async def get_employees(include_pending_increments: bool = False, current_user: User = Depends(get_current_user)):
     if current_user.role == "super_admin":
         raise HTTPException(status_code=403, detail="Super admin cannot access company employees")
     
@@ -972,6 +972,20 @@ async def get_employees(current_user: User = Depends(get_current_user)):
         {"company_id": current_user.company_id, "role": {"$ne": "super_admin"}},
         {"_id": 0}
     ).to_list(1000)
+    
+    # Optionally include pending increments
+    if include_pending_increments:
+        pending_increments = await db.increments.find(
+            {"company_id": current_user.company_id, "status": "pending"},
+            {"_id": 0}
+        ).to_list(length=None)
+        
+        # Create a map of employee_id to pending increment
+        pending_map = {inc["employee_id"]: inc for inc in pending_increments}
+        
+        # Add pending increment to each employee
+        for emp in employees:
+            emp["pending_increment"] = pending_map.get(emp["id"])
     
     return employees
 
