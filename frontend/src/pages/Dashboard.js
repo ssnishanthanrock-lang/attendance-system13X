@@ -78,7 +78,6 @@ export default function Dashboard() {
               Dashboard
             </h1>
             <p className="text-gray-600 mt-1">Welcome back, {user?.name}</p>
-            <p className="text-xs text-gray-500 mt-1">IT Signature ERP</p>
           </div>
           {!isAdmin && stats?.today_attendance && (
             <div className="flex gap-2">
