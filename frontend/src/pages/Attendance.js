@@ -658,86 +658,113 @@ export default function Attendance() {
                                 <CardContent className="p-0">
                                   <div className="divide-y divide-gray-100">
                                     {records.map((record) => (
-                            <tr key={record.id} className={`hover:bg-gray-50 transition-colors ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}>
-                              <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                                <div className="flex items-center gap-3">
-                                  {/* Profile Picture */}
-                                  <div className="w-8 h-8 rounded-full flex-shrink-0">
-                                    {record.profile_pic && record.profile_pic.trim() !== '' ? (
-                                      <img 
-                                        src={record.profile_pic} 
-                                        alt={record.employee_name} 
-                                        className="w-8 h-8 rounded-full object-cover"
-                                        onError={(e) => {
-                                          e.target.outerHTML = '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
-                                        }}
-                                      />
-                                    ) : (
-                                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                                        <User className="w-4 h-4 text-white" />
+                                      <div 
+                                        key={record.id} 
+                                        className={`p-4 hover:bg-gray-50 transition-colors ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}
+                                      >
+                                        <div className="flex items-center justify-between gap-4">
+                                          {/* Employee Info */}
+                                          <div className="flex items-center gap-3 flex-1">
+                                            <div className="w-10 h-10 rounded-full flex-shrink-0">
+                                              {record.profile_pic && record.profile_pic.trim() !== '' ? (
+                                                <img 
+                                                  src={record.profile_pic} 
+                                                  alt={record.employee_name} 
+                                                  className="w-10 h-10 rounded-full object-cover"
+                                                  onError={(e) => {
+                                                    e.target.outerHTML = '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
+                                                  }}
+                                                />
+                                              ) : (
+                                                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                                  <User className="w-5 h-5 text-white" />
+                                                </div>
+                                              )}
+                                            </div>
+                                            <div className="flex-1">
+                                              <div className="flex items-center gap-2">
+                                                <p className="font-semibold text-gray-900">{record.employee_name}</p>
+                                                {record.has_history && (
+                                                  <button
+                                                    onClick={() => handleViewHistory(record)}
+                                                    className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors"
+                                                    title="View edit history"
+                                                  >
+                                                    <Clock className="w-3 h-3" />
+                                                    {record.history_count}
+                                                  </button>
+                                                )}
+                                              </div>
+                                              <div className="flex items-center gap-3 mt-1 text-sm text-gray-600">
+                                                <span
+                                                  className={`inline-block text-xs px-2 py-1 rounded-full font-medium ${
+                                                    record.status === 'present'
+                                                      ? 'bg-green-100 text-green-700'
+                                                      : record.status === 'leave'
+                                                      ? 'bg-yellow-100 text-yellow-700'
+                                                      : record.status === 'allowed_leave'
+                                                      ? 'bg-blue-100 text-blue-700'
+                                                      : record.status === 'allowed_half_day'
+                                                      ? 'bg-blue-100 text-blue-700'
+                                                      : 'bg-red-100 text-red-700'
+                                                  }`}
+                                                >
+                                                  {record.status}
+                                                </span>
+                                                {record.check_in && (
+                                                  <span className="flex items-center gap-1">
+                                                    <Clock className="w-3 h-3" />
+                                                    {new Date(record.check_in).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                                    {record.check_out && (
+                                                      <>
+                                                        <span className="mx-1">→</span>
+                                                        {new Date(record.check_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}
+                                                      </>
+                                                    )}
+                                                  </span>
+                                                )}
+                                                {record.check_in && record.check_out && (
+                                                  <span className="text-xs bg-gray-100 px-2 py-0.5 rounded">
+                                                    {calculateHours(record.check_in, record.check_out)}
+                                                  </span>
+                                                )}
+                                              </div>
+                                            </div>
+                                          </div>
+
+                                          {/* Actions */}
+                                          {canEdit && (
+                                            <div className="flex gap-1">
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleEditClick(record)}
+                                                title="Edit"
+                                                className="h-8 w-8 p-0"
+                                              >
+                                                <Edit className="w-4 h-4 text-blue-600" />
+                                              </Button>
+                                              <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={() => handleDelete(record.id)}
+                                                title="Delete"
+                                                className="h-8 w-8 p-0"
+                                              >
+                                                <Trash2 className="w-4 h-4 text-red-600" />
+                                              </Button>
+                                            </div>
+                                          )}
+                                        </div>
                                       </div>
-                                    )}
+                                    ))}
                                   </div>
-                                  <span>{record.employee_name}</span>
-                                  {record.has_history && (
-                                    <button
-                                      onClick={() => handleViewHistory(record)}
-                                      className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
-                                      title="Click to view edit history"
-                                    >
-                                      <Clock className="w-3 h-3" />
-                                      {record.history_count}
-                                    </button>
-                                  )}
-                                </div>
-                              </td>
-                              <td className="px-4 py-3 text-sm text-gray-600">{record.date}</td>
-                              <td className="px-4 py-3">
-                                <span
-                                  className={`inline-block text-xs px-2 py-1 rounded-full ${
-                                    record.status === 'present'
-                                      ? 'bg-green-100 text-green-700'
-                                      : record.status === 'leave'
-                                      ? 'bg-yellow-100 text-yellow-700'
-                                      : record.status === 'allowed_leave'
-                                      ? 'bg-blue-100 text-blue-700'
-                                      : record.status === 'allowed_half_day'
-                                      ? 'bg-blue-100 text-blue-700'
-                                      : 'bg-red-100 text-red-700'
-                                  }`}
-                                >
-                                  {record.status}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3 text-sm text-gray-600">{record.check_in ? new Date(record.check_in).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : '-'}</td>
-                              <td className="px-4 py-3 text-sm text-gray-600">{record.check_out ? new Date(record.check_out).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }) : '-'}</td>
-                              <td className="px-4 py-3 text-sm text-gray-600">{calculateHours(record.check_in, record.check_out)}</td>
-                              <td className="px-4 py-3 text-sm">
-                                {canEdit && (
-                                  <div className="flex gap-2">
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleEditClick(record)}
-                                      title="Edit Attendance"
-                                    >
-                                      <Edit className="w-4 h-4 text-blue-600" />
-                                    </Button>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      onClick={() => handleDelete(record.id)}
-                                      title="Delete Attendance"
-                                    >
-                                      <Trash2 className="w-4 h-4 text-red-600" />
-                                    </Button>
-                                  </div>
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </>
-                      ))
+                                </CardContent>
+                              </Card>
+                            ))}
+                        </div>
+                      </td>
+                    </tr>
                   ) : (
                     // Today view - normal list
                     attendance.map((record) => (
