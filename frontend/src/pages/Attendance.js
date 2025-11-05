@@ -541,6 +541,26 @@ export default function Attendance() {
                 </div>
               )}
               
+              {/* Edit History */}
+              {editHistory.length > 0 && (
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Edit History ({editHistory.length})
+                  </h4>
+                  <div className="max-h-40 overflow-y-auto space-y-2">
+                    {editHistory.map((history) => (
+                      <div key={history.id} className="bg-gray-50 p-2 rounded text-xs">
+                        <p className="font-medium text-gray-900">{history.changes}</p>
+                        <p className="text-gray-500 mt-1">
+                          By {history.edited_by} • {new Date(history.edited_at).toLocaleString()}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
               <div className="flex justify-end gap-2 pt-4">
                 <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>
                   Cancel
