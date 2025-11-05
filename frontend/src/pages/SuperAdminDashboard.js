@@ -73,14 +73,12 @@ export default function SuperAdminDashboard() {
       const response = await api.post(`/superadmin/impersonate/${company.company_id}`);
       localStorage.setItem('token', response.data.token);
       setImpersonationState(response.data.company_name, response.data.company_id, response.data.can_edit);
-      toast.success(`Now viewing ${response.data.company_name} portal`, {
-        style: { background: '#f59e0b', color: 'white' }
-      });
-      // Navigate to company dashboard
-      navigate('/');
-      window.location.reload(); // Refresh to update auth state
+      
+      // Force navigation to company dashboard
+      window.location.href = '/';
     } catch (error) {
-      toast.error('Failed to access company portal');
+      console.error('Impersonation error:', error);
+      toast.error(error.response?.data?.detail || 'Failed to access company portal');
     }
   };
 
