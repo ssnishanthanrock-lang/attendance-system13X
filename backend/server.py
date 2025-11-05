@@ -631,6 +631,52 @@ async def get_company_logs(limit: int = 100, current_user: User = Depends(get_cu
     
     return logs
 
+# ============= DASHBOARD ENDPOINTS =============
+@api_router.get("/dashboard/stats")
+async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
+    if current_user.role == "super_admin":
+        raise HTTPException(status_code=400, detail="Not applicable for super admin")
+    
+    if current_user.role in ["admin", "manager"]:
+        # Admin/Manager stats
+        total_employees = await db.users.count_documents({"company_id": current_user.company_id, "is_active": True})
+        total_attendance_today = await db.attendance.count_documents({"company_id": current_user.company_id, "date": datetime.now(timezone.utc).date().isoformat()})
+        pending_leaves = await db.leaves.count_documents({"company_id": current_user.company_id, "status": "pending"})
+        pending_advances = await db.advances.count_documents({"company_id": current_user.company_id, "status": "pending"})
+        
+        # Recent activities
+        recent_leaves = await db.leaves.find({"company_id": current_user.company_id}, {"_id": 0}).sort("applied_date", -1).limit(5).to_list(5)
+        recent_advances = await db.advances.find({"company_id": current_user.company_id}, {"_id": 0}).sort("request_date", -1).limit(5).to_list(5)
+        
+        return {
+            "total_employees": total_employees,
+            "attendance_today": total_attendance_today,
+            "pending_leaves": pending_leaves,
+            "pending_advances": pending_advances,
+            "recent_leaves": recent_leaves,
+            "recent_advances": recent_advances
+        }
+    else:
+        # Employee/Staff stats
+        my_attendance = await db.attendance.count_documents({"company_id": current_user.company_id, "employee_id": current_user.id})
+        my_leaves = await db.leaves.find({"company_id": current_user.company_id, "employee_id": current_user.id}, {"_id": 0}).to_list(100)
+        my_advances = await db.advances.find({"company_id": current_user.company_id, "employee_id": current_user.id}, {"_id": 0}).to_list(100)
+        my_payroll = await db.payroll.find({"company_id": current_user.company_id, "employee_id": current_user.id}, {"_id": 0}).sort("generated_at", -1).limit(1).to_list(1)
+        
+        # Check today's attendance
+        today = datetime.now(timezone.utc).date().isoformat()
+        today_attendance = await db.attendance.find_one({"company_id": current_user.company_id, "employee_id": current_user.id, "date": today}, {"_id": 0})
+        
+        return {
+            "total_attendance_days": my_attendance,
+            "total_leaves": len(my_leaves),
+            "approved_leaves": len([l for l in my_leaves if l["status"] == "approved"]),
+            "total_advances": len(my_advances),
+            "approved_advances": sum(a["amount"] for a in my_advances if a["status"] == "approved"),
+            "latest_payroll": my_payroll[0] if my_payroll else None,
+            "today_attendance": today_attendance
+        }
+
 # ============= SETTINGS ENDPOINTS =============
 @api_router.get("/settings")
 async def get_settings(current_user: User = Depends(get_current_user)):
