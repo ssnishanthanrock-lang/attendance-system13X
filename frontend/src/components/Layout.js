@@ -114,6 +114,7 @@ export default function Layout({ children }) {
     { path: '/advances', label: 'Advances', icon: Wallet, roles: ['admin', 'manager', 'employee'] },
     { path: '/increments', label: 'Increments', icon: TrendingUp, roles: ['admin', 'manager', 'employee'] },
     { path: '/payroll', label: 'Payroll', icon: DollarSign, roles: ['admin', 'manager', 'employee', 'staff_member'] },
+    { path: '/activity-logs', label: 'Activity Logs', icon: FileText, roles: ['admin', 'manager'] },
     { path: '/settings', label: 'Settings', icon: Settings, roles: ['admin', 'manager'] },
   ];
 
