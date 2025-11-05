@@ -999,6 +999,44 @@ async def upload_branding(file: UploadFile = File(...), type: str = Form(...), c
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@api_router.post("/superadmin/branding")
+async def upload_superadmin_branding(
+    file: UploadFile = File(...), 
+    type: str = Form(...), 
+    company_id: str = Form(...),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    if type not in ["logo", "favicon"]:
+        raise HTTPException(status_code=400, detail="Invalid type. Must be 'logo' or 'favicon'")
+    
+    try:
+        # Verify company exists
+        company = await db.companies.find_one({"id": company_id})
+        if not company:
+            raise HTTPException(status_code=404, detail="Company not found")
+        
+        # Read file and convert to base64
+        contents = await file.read()
+        base64_image = base64.b64encode(contents).decode('utf-8')
+        data_url = f"data:{file.content_type};base64,{base64_image}"
+        
+        # Update settings with the uploaded image
+        field_name = "company_logo" if type == "logo" else "favicon"
+        await db.settings.update_one(
+            {"company_id": company_id},
+            {"$set": {field_name: data_url}},
+            upsert=True
+        )
+        
+        await log_activity("SUPER_ADMIN", current_user.id, current_user.name, f"UPLOAD_{type.upper()}", f"Uploaded {type} for company {company['name']}")
+        
+        return {"message": f"{type.capitalize()} uploaded successfully for {company['name']}", field_name: data_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ============= PROFILE PICTURE ENDPOINTS =============
 @api_router.post("/upload/profile-pic")
 async def upload_profile_pic(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
