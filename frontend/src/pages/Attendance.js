@@ -61,6 +61,16 @@ export default function Attendance() {
     }
   };
 
+  const fetchCompanySettings = async () => {
+    try {
+      const response = await api.get('/company/settings');
+      setCompanySettings(response.data);
+    } catch (error) {
+      // Silently fail - not critical
+      console.error('Failed to fetch company settings:', error);
+    }
+  };
+
   const fetchAttendance = async () => {
     try {
       const params = new URLSearchParams();
