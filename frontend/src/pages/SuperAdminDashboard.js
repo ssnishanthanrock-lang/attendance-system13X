@@ -8,6 +8,7 @@ import { Input } from '../components/ui/input';
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
 import { Building2, Users, TrendingUp, LogOut, Plus, CheckCircle, XCircle, Clock, Settings, Shield } from 'lucide-react';
+import { capitalizeName } from '../utils/helpers';
 
 export default function SuperAdminDashboard() {
   const navigate = useNavigate();
