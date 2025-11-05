@@ -240,6 +240,15 @@ export default function SuperAdminDashboard() {
                     </div>
                   </div>
                   <div className="flex lg:flex-col gap-2">
+                    <Button 
+                      size="sm" 
+                      onClick={() => handleViewPortal(company)}
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white"
+                      title="View company portal"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View Portal
+                    </Button>
                     {company.status === 'pending' && (
                       <Button size="sm" onClick={() => handleStatusChange(company.company_id, 'active')} className="bg-green-600">
                         <CheckCircle className="w-4 h-4 mr-1" />
