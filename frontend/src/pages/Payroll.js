@@ -47,25 +47,6 @@ export default function Payroll() {
     }
   };
 
-  const handleGeneratePayroll = async (e) => {
-    e.preventDefault();
-    setGenerating(true);
-    try {
-      const monthIndex = monthNames.indexOf(generateForm.month) + 1;
-      const monthStr = monthIndex.toString().padStart(2, '0');
-      const yearMonth = `${generateForm.year}-${monthStr}`;
-      
-      const response = await api.post('/payroll/generate', { month: yearMonth });
-      toast.success(response.data.message || 'Payroll generated successfully');
-      setDialogOpen(false);
-      fetchMonths();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to generate payroll');
-    } finally {
-      setGenerating(false);
-    }
-  };
-
   const handleMonthClick = (month) => {
     fetchDetailedPayroll(month);
   };
