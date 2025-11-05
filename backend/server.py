@@ -157,6 +157,7 @@ class Increment(BaseModel):
     increment_amount: float
     effective_from: str  # Format: "YYYY-MM"
     reason: str
+    status: str = "pending"  # pending, active
     created_by: str
     created_by_name: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
