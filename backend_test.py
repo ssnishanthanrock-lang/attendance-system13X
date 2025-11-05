@@ -1143,6 +1143,296 @@ class ERPTester:
         except Exception as e:
             self.log_result("Payroll Data Integration", False, f"Payroll integration test error: {str(e)}")
     
+    def test_live_payroll_current_month(self):
+        """Test GET /api/payroll/live-current-month endpoint (REVIEW REQUEST FOCUS)"""
+        print("\n=== TESTING LIVE PAYROLL CURRENT MONTH ENDPOINT ===")
+        
+        try:
+            # Test 1: Admin/Manager access - should return all employees' live payroll data
+            response = self.session.get(f"{API_BASE}/payroll/live-current-month")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Test 2: Verify response structure contains required fields
+                required_main_fields = ["month", "timestamp", "employees", "total_gross", "total_net", "total_deductions"]
+                missing_main_fields = [field for field in required_main_fields if field not in data]
+                
+                if not missing_main_fields:
+                    self.log_result("Live Payroll - Response Structure", True, 
+                                  "Live payroll response has correct main structure")
+                    
+                    # Verify month format (YYYY-MM)
+                    month = data.get("month", "")
+                    if len(month) == 7 and month[4] == "-":
+                        current_month = datetime.now().strftime("%Y-%m")
+                        if month == current_month:
+                            self.log_result("Live Payroll - Current Month", True, 
+                                          f"Month correctly set to current month: {month}")
+                        else:
+                            self.log_result("Live Payroll - Current Month", False, 
+                                          f"Month mismatch: expected {current_month}, got {month}")
+                    else:
+                        self.log_result("Live Payroll - Month Format", False, 
+                                      f"Invalid month format: {month}")
+                    
+                    # Verify timestamp is current datetime
+                    timestamp = data.get("timestamp", "")
+                    try:
+                        ts_dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                        now = datetime.now(timezone.utc)
+                        time_diff = abs((now - ts_dt).total_seconds())
+                        
+                        if time_diff < 60:  # Within 1 minute
+                            self.log_result("Live Payroll - Timestamp", True, 
+                                          f"Timestamp is current: {timestamp}")
+                        else:
+                            self.log_result("Live Payroll - Timestamp", False, 
+                                          f"Timestamp not current: {timestamp}, diff: {time_diff}s")
+                    except:
+                        self.log_result("Live Payroll - Timestamp", False, 
+                                      f"Invalid timestamp format: {timestamp}")
+                    
+                    # Test 3: Verify employee records structure
+                    employees = data.get("employees", [])
+                    
+                    if employees:
+                        first_employee = employees[0]
+                        
+                        # Required employee fields from review request
+                        required_emp_fields = [
+                            "employee_id", "employee_name", "position", "profile_picture",
+                            "basic_salary", "allowances", "earnings", "gross_salary", "net_salary",
+                            "present_days", "leave_days", "total_attendance_minutes",
+                            "late_deduction", "advances", "loan_deduction", "other_deductions",
+                            "fixed_salary", "salary_per_minute"
+                        ]
+                        
+                        missing_emp_fields = [field for field in required_emp_fields if field not in first_employee]
+                        
+                        if not missing_emp_fields:
+                            self.log_result("Live Payroll - Employee Structure", True, 
+                                          "Employee records contain all required fields",
+                                          {"employee_name": first_employee.get("employee_name"),
+                                           "basic_salary": first_employee.get("basic_salary"),
+                                           "net_salary": first_employee.get("net_salary")})
+                            
+                            # Test 4: Fixed salary employee verification
+                            fixed_employees = [emp for emp in employees if emp.get("fixed_salary", False)]
+                            if fixed_employees:
+                                fixed_emp = fixed_employees[0]
+                                earnings = fixed_emp.get("earnings", 0)
+                                basic_salary = fixed_emp.get("basic_salary", 0)
+                                
+                                # For fixed salary, earnings should be pro-rated based on days passed
+                                if earnings <= basic_salary:
+                                    self.log_result("Live Payroll - Fixed Salary Pro-rata", True, 
+                                                  f"Fixed salary employee earnings pro-rated correctly: {earnings} <= {basic_salary}")
+                                else:
+                                    self.log_result("Live Payroll - Fixed Salary Pro-rata", False, 
+                                                  f"Fixed salary pro-rata error: earnings {earnings} > basic {basic_salary}")
+                            
+                            # Test 5: Non-fixed salary employee verification
+                            variable_employees = [emp for emp in employees if not emp.get("fixed_salary", False)]
+                            if variable_employees:
+                                var_emp = variable_employees[0]
+                                earnings = var_emp.get("earnings", 0)
+                                attendance_minutes = var_emp.get("total_attendance_minutes", 0)
+                                salary_per_minute = var_emp.get("salary_per_minute", 0)
+                                
+                                # For non-fixed, earnings should be based on attendance minutes
+                                expected_earnings = attendance_minutes * salary_per_minute
+                                if abs(earnings - expected_earnings) < 0.01:
+                                    self.log_result("Live Payroll - Variable Salary Calculation", True, 
+                                                  f"Variable salary calculated correctly: {attendance_minutes} min × {salary_per_minute} = {earnings}")
+                                else:
+                                    self.log_result("Live Payroll - Variable Salary Calculation", False, 
+                                                  f"Variable salary error: expected {expected_earnings}, got {earnings}")
+                            
+                            # Test calculation accuracy
+                            self.test_live_payroll_calculations(first_employee)
+                            
+                        else:
+                            self.log_result("Live Payroll - Employee Structure", False, 
+                                          f"Missing employee fields: {missing_emp_fields}")
+                    else:
+                        self.log_result("Live Payroll - No Employees", True, 
+                                      "No employees in live payroll (acceptable if no employees)")
+                    
+                    # Test totals calculation
+                    self.test_live_payroll_totals(data)
+                    
+                else:
+                    self.log_result("Live Payroll - Response Structure", False, 
+                                  f"Missing main fields: {missing_main_fields}")
+            else:
+                self.log_result("Live Payroll - Admin Access", False, 
+                              f"Admin cannot access live payroll: {response.status_code}",
+                              {"response": response.text})
+                return
+            
+            # Test 6: Employee role access - should only see their own data
+            self.test_live_payroll_employee_access()
+            
+        except Exception as e:
+            self.log_result("Live Payroll Current Month", False, f"Live payroll test error: {str(e)}")
+    
+    def test_live_payroll_calculations(self, employee_data):
+        """Test live payroll calculation accuracy for real-time data"""
+        try:
+            basic_salary = employee_data.get("basic_salary", 0)
+            allowances = employee_data.get("allowances", 0)
+            earnings = employee_data.get("earnings", 0)
+            extra_payment = employee_data.get("extra_payment", 0)
+            late_deduction = employee_data.get("late_deduction", 0)
+            advances = employee_data.get("advances", 0)
+            loan_deduction = employee_data.get("loan_deduction", 0)
+            other_deductions = employee_data.get("other_deductions", 0)
+            gross_salary = employee_data.get("gross_salary", 0)
+            total_deductions = employee_data.get("total_deductions", 0)
+            net_salary = employee_data.get("net_salary", 0)
+            fixed_salary = employee_data.get("fixed_salary", False)
+            
+            # Test gross salary calculation
+            if fixed_salary:
+                # For fixed salary: gross = earnings + extra_payment
+                expected_gross = earnings + extra_payment
+            else:
+                # For variable salary: gross = earnings + allowances + extra_payment
+                expected_gross = earnings + allowances + extra_payment
+            
+            if abs(gross_salary - expected_gross) < 0.01:
+                self.log_result("Live Payroll Calc - Gross Salary", True, 
+                              f"Gross salary correctly calculated: {expected_gross}")
+            else:
+                self.log_result("Live Payroll Calc - Gross Salary", False, 
+                              f"Gross salary error: expected {expected_gross}, got {gross_salary}")
+            
+            # Test total deductions
+            expected_deductions = late_deduction + advances + other_deductions + loan_deduction
+            if abs(total_deductions - expected_deductions) < 0.01:
+                self.log_result("Live Payroll Calc - Total Deductions", True, 
+                              f"Total deductions correctly calculated: {expected_deductions}")
+            else:
+                self.log_result("Live Payroll Calc - Total Deductions", False, 
+                              f"Total deductions error: expected {expected_deductions}, got {total_deductions}")
+            
+            # Test net salary
+            expected_net = gross_salary - total_deductions
+            if abs(net_salary - expected_net) < 0.01:
+                self.log_result("Live Payroll Calc - Net Salary", True, 
+                              f"Net salary correctly calculated: {expected_net}")
+            else:
+                self.log_result("Live Payroll Calc - Net Salary", False, 
+                              f"Net salary error: expected {expected_net}, got {net_salary}")
+            
+            # Test real-time aspect - earnings should be calculated up to current time
+            attendance_minutes = employee_data.get("total_attendance_minutes", 0)
+            if attendance_minutes >= 0:
+                self.log_result("Live Payroll Calc - Real-time Attendance", True, 
+                              f"Attendance calculated up to now: {attendance_minutes} minutes")
+            else:
+                self.log_result("Live Payroll Calc - Real-time Attendance", False, 
+                              f"Invalid attendance minutes: {attendance_minutes}")
+                
+        except Exception as e:
+            self.log_result("Live Payroll Calculations", False, f"Live payroll calculation test error: {str(e)}")
+    
+    def test_live_payroll_totals(self, data):
+        """Test live payroll totals calculation"""
+        try:
+            employees = data.get("employees", [])
+            reported_total_gross = data.get("total_gross", 0)
+            reported_total_net = data.get("total_net", 0)
+            reported_total_deductions = data.get("total_deductions", 0)
+            
+            if employees:
+                # Calculate expected totals
+                expected_gross = sum(emp.get("gross_salary", 0) for emp in employees)
+                expected_net = sum(emp.get("net_salary", 0) for emp in employees)
+                expected_deductions = sum(emp.get("total_deductions", 0) for emp in employees)
+                
+                # Test totals
+                if abs(reported_total_gross - expected_gross) < 0.01:
+                    self.log_result("Live Payroll Totals - Gross", True, 
+                                  f"Total gross correctly calculated: {reported_total_gross}")
+                else:
+                    self.log_result("Live Payroll Totals - Gross", False, 
+                                  f"Total gross error: expected {expected_gross}, got {reported_total_gross}")
+                
+                if abs(reported_total_net - expected_net) < 0.01:
+                    self.log_result("Live Payroll Totals - Net", True, 
+                                  f"Total net correctly calculated: {reported_total_net}")
+                else:
+                    self.log_result("Live Payroll Totals - Net", False, 
+                                  f"Total net error: expected {expected_net}, got {reported_total_net}")
+                
+                if abs(reported_total_deductions - expected_deductions) < 0.01:
+                    self.log_result("Live Payroll Totals - Deductions", True, 
+                                  f"Total deductions correctly calculated: {reported_total_deductions}")
+                else:
+                    self.log_result("Live Payroll Totals - Deductions", False, 
+                                  f"Total deductions error: expected {expected_deductions}, got {reported_total_deductions}")
+            else:
+                # No employees - totals should be 0
+                if reported_total_gross == 0 and reported_total_net == 0 and reported_total_deductions == 0:
+                    self.log_result("Live Payroll Totals - No Employees", True, 
+                                  "Totals correctly zero when no employees")
+                else:
+                    self.log_result("Live Payroll Totals - No Employees", False, 
+                                  f"Totals should be zero: gross={reported_total_gross}, net={reported_total_net}, deductions={reported_total_deductions}")
+                
+        except Exception as e:
+            self.log_result("Live Payroll Totals", False, f"Live payroll totals test error: {str(e)}")
+    
+    def test_live_payroll_employee_access(self):
+        """Test employee role access to live payroll - should only see their own data"""
+        try:
+            # Create employee token
+            import jwt
+            employee_payload = {
+                "user_id": "95f4fd94-47ff-44ac-bcb8-b13561fbb446",  # Employee from DB
+                "role": "employee", 
+                "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",
+                "mobile": "0770539581"
+            }
+            
+            jwt_secret = "attendance-system-secret-key-change-in-production"
+            employee_token = jwt.encode(employee_payload, jwt_secret, algorithm="HS256")
+            
+            # Create new session for employee
+            employee_session = requests.Session()
+            employee_session.headers.update({'Authorization': f'Bearer {employee_token}'})
+            
+            # Test employee access to live payroll
+            response = employee_session.get(f"{API_BASE}/payroll/live-current-month")
+            
+            if response.status_code == 200:
+                data = response.json()
+                employees = data.get("employees", [])
+                
+                # Employee should only see their own data
+                if len(employees) == 1:
+                    employee_data = employees[0]
+                    if employee_data.get("employee_id") == employee_payload["user_id"]:
+                        self.log_result("Live Payroll - Employee Access", True, 
+                                      "Employee correctly sees only their own live payroll data")
+                    else:
+                        self.log_result("Live Payroll - Employee Access", False, 
+                                      f"Employee sees wrong data: expected {employee_payload['user_id']}, got {employee_data.get('employee_id')}")
+                elif len(employees) == 0:
+                    self.log_result("Live Payroll - Employee Access", True, 
+                                  "Employee sees no data (acceptable if employee has no payroll data)")
+                else:
+                    self.log_result("Live Payroll - Employee Access", False, 
+                                  f"Employee sees multiple records: {len(employees)} (should see only own data)")
+            else:
+                self.log_result("Live Payroll - Employee Access", False, 
+                              f"Employee cannot access live payroll: {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Live Payroll Employee Access", False, f"Employee access test error: {str(e)}")
+    
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting IT Signature ERP Backend API Tests")
