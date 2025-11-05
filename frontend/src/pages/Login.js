@@ -162,7 +162,7 @@ export default function Login() {
                     <Phone className="w-4 h-4 text-blue-600" />
                     Mobile Number
                   </label>
-                  <div className="relative">
+                  <div className="relative -mx-6 px-6 py-6 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 rounded-xl">
                     <div className="flex items-center justify-center gap-2 py-4">
                       {[0, 1, 2].map((group) => (
                         <div key={group} className="flex gap-2">
