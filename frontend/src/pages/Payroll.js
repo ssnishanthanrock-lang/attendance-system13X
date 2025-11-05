@@ -63,14 +63,14 @@ export default function Payroll() {
     setGenerating(true);
     try {
       // Convert month name to number and format as YYYY-MM
-      const monthIndex = months.indexOf(generateForm.month) + 1;
+      const monthIndex = monthNames.indexOf(generateForm.month) + 1;
       const monthStr = monthIndex.toString().padStart(2, '0');
       const yearMonth = `${generateForm.year}-${monthStr}`;
       
       const response = await api.post('/payroll/generate', { month: yearMonth });
       toast.success(response.data.message || 'Payroll generated successfully');
       setDialogOpen(false);
-      fetchPayrolls();
+      fetchMonths();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to generate payroll');
     } finally {
@@ -78,9 +78,19 @@ export default function Payroll() {
     }
   };
 
-  const handleFilter = () => {
-    setLoading(true);
-    fetchPayrolls();
+  const handleMonthClick = (month) => {
+    fetchDetailedPayroll(month);
+  };
+
+  const handleBackToMonths = () => {
+    setSelectedMonth(null);
+    setDetailedPayroll(null);
+  };
+
+  const formatMonthName = (monthStr) => {
+    const [year, month] = monthStr.split('-');
+    const monthName = monthNames[parseInt(month) - 1];
+    return `${monthName} ${year}`;
   };
 
   const isAdmin = user?.role === 'admin' || user?.role === 'manager';
