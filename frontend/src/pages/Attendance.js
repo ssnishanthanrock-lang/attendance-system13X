@@ -157,17 +157,23 @@ export default function Attendance() {
     }
   };
 
-  const formatTime = (isoString) => {
-    if (!isoString) return 'N/A';
+  const formatTime = (isoString, forInput = false) => {
+    if (!isoString) return forInput ? '' : 'N/A';
     try {
       const date = new Date(isoString);
-      if (isNaN(date.getTime())) return 'N/A';
+      if (isNaN(date.getTime())) return forInput ? '' : 'N/A';
+      
+      if (forInput) {
+        // Return HH:MM format for input fields
+        return date.toTimeString().slice(0, 5);
+      }
+      
       return date.toLocaleTimeString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
       });
     } catch (error) {
-      return 'N/A';
+      return forInput ? '' : 'N/A';
     }
   };
 
