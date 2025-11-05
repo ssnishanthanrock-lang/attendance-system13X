@@ -323,24 +323,44 @@ export default function Payroll() {
         {/* Detailed Payroll Sheet - Spreadsheet Style */}
         {month && detailedPayroll && (
           <div className="space-y-4">
-            {/* Header with Back Button */}
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={handleBackToLive}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-              <div>
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  {formatMonthName(month).monthName} Salary Sheet - {formatMonthName(month).year}
-                </h1>
-                <p className="text-sm text-gray-600">
-                  Working Days - {detailedPayroll.employees[0]?.working_days || 26}
-                </p>
+            {/* Header with Back Button and View Toggle */}
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={handleBackToLive}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </Button>
+                <div>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                    {formatMonthName(month).monthName} Salary Sheet - {formatMonthName(month).year}
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    Working Days - {detailedPayroll.employees[0]?.working_days || 26}
+                  </p>
+                </div>
+              </div>
+              
+              {/* View Toggle */}
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setViewMode('card')}
+                  variant={viewMode === 'card' ? 'default' : 'outline'}
+                  size="sm"
+                >
+                  Card View
+                </Button>
+                <Button
+                  onClick={() => setViewMode('table')}
+                  variant={viewMode === 'table' ? 'default' : 'outline'}
+                  size="sm"
+                >
+                  Table View
+                </Button>
               </div>
             </div>
 
