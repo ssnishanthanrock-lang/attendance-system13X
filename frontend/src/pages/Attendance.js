@@ -146,21 +146,21 @@ export default function Attendance() {
   };
 
 
-  const fetchAttendance = async () => {
+  const fetchAttendanceWithParams = async (filterParams, mode) => {
     try {
       const params = new URLSearchParams();
       const today = new Date().toISOString().split('T')[0];
       
       // If filters are set (from URL or manual), use them
-      if (filters.from_date || filters.to_date || filters.employee_id) {
-        if (filters.employee_id) params.append('employee_id', filters.employee_id);
-        if (filters.from_date) params.append('from_date', filters.from_date);
-        if (filters.to_date) params.append('to_date', filters.to_date);
-      } else if (viewMode === 'today') {
+      if (filterParams.from_date || filterParams.to_date || filterParams.employee_id) {
+        if (filterParams.employee_id) params.append('employee_id', filterParams.employee_id);
+        if (filterParams.from_date) params.append('from_date', filterParams.from_date);
+        if (filterParams.to_date) params.append('to_date', filterParams.to_date);
+      } else if (mode === 'today') {
         // No filters, today view
         params.append('from_date', today);
         params.append('to_date', today);
-      } else if (viewMode === 'last7days') {
+      } else if (mode === 'last7days') {
         // No filters, last 7 days view
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -172,10 +172,10 @@ export default function Attendance() {
       setAttendance(response.data);
       
       // Only auto-switch to last 7 days if no filters and in today mode with no data
-      if (viewMode === 'today' && !filters.from_date && !filters.to_date && response.data.length === 0) {
+      if (mode === 'today' && !filterParams.from_date && !filterParams.to_date && response.data.length === 0) {
         setViewMode('last7days');
         fetchLast7DaysSummary();
-      } else if (viewMode === 'today' && !filters.from_date && !filters.to_date) {
+      } else if (mode === 'today' && !filterParams.from_date && !filterParams.to_date) {
         setTodayAttendanceCount(response.data.length);
         if (user?.role === 'admin' || user?.role === 'manager') {
           const empResponse = await api.get('/employees');
@@ -187,6 +187,10 @@ export default function Attendance() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchAttendance = async () => {
+    return fetchAttendanceWithParams(filters, viewMode);
   };
 
   const fetchLast7DaysSummary = async () => {
