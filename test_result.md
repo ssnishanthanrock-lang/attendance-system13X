@@ -695,3 +695,35 @@ agent_communication:
       - All backend APIs now working at 100% success rate
       
       Backend implementation is production-ready with all priority endpoints tested and verified.
+
+  
+  - agent: "main"
+    message: |
+      ✅ PHASE 1 COMPLETED - Payroll Table Column Reordering & Calculation Fix
+      
+      WHAT WAS DONE:
+      1. ✅ Fixed column ordering in Payroll.js table body:
+         - Moved "Extra Payment" column from incorrect position (in Attendance section) to correct position (after Late Salary, before Deductions)
+         - Updated table structure to match header: Employee → Salary → Attendance → Extra Payment → Deductions → Net
+      
+      2. ✅ Updated footer totals to match new column order:
+         - Reordered total calculations to align with body columns
+         - Maintained accurate summation for all fields
+      
+      3. ✅ Verified backend calculation fix (already implemented):
+         - Fixed salary employees: allowances no longer double-counted in net salary
+         - Backend correctly calculates: earnings = basic_salary + allowances, gross = earnings + extra_payment
+         - Non-fixed salary employees: earnings based on minutes, gross = earnings + allowances + extra_payment
+      
+      CURRENT TABLE STRUCTURE:
+      | No | Employee Name | Basic Salary | Day Salary | Minute Salary | Allowances | Gross | 
+      | Present | Leave | Allowed Leaves | Allowed Half | Late Salary | Extra Payment | 
+      | Advance | Loan | Other | Net |
+      
+      NEXT STEPS - PHASE 2:
+      Ready to implement pending features in priority order:
+      a) Payroll Live Count - Real-time salary calculation for current month
+      b) Manual Attendance Check-out Restriction - Only allow check-out after finish time
+      c) Activity Logs Performance - Pagination (already implemented, needs verification)
+      d) Company Dashboard Salary Summary - Investigation needed
+      e) Logo/Favicon Processing - Advanced adjustments
