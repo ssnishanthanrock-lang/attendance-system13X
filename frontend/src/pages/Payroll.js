@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { api } from '../App';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, User } from 'lucide-react';
+import { ArrowLeft, User, Radio } from 'lucide-react';
 
 export default function Payroll() {
   const [months, setMonths] = useState([]);
@@ -12,12 +12,41 @@ export default function Payroll() {
   const [detailedPayroll, setDetailedPayroll] = useState(null);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState(null);
+  const [isLiveView, setIsLiveView] = useState(false);
+  const [livePayroll, setLivePayroll] = useState(null);
+  const liveIntervalRef = useRef(null);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     fetchMonths();
   }, []);
+
+  // Live payroll update effect
+  useEffect(() => {
+    if (isLiveView) {
+      // Fetch immediately
+      fetchLivePayroll();
+      
+      // Set up interval to fetch every second
+      liveIntervalRef.current = setInterval(() => {
+        fetchLivePayroll();
+      }, 1000);
+    } else {
+      // Clear interval when exiting live view
+      if (liveIntervalRef.current) {
+        clearInterval(liveIntervalRef.current);
+        liveIntervalRef.current = null;
+      }
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (liveIntervalRef.current) {
+        clearInterval(liveIntervalRef.current);
+      }
+    };
+  }, [isLiveView]);
 
   const fetchMonths = async () => {
     try {
