@@ -174,7 +174,7 @@ export default function Login() {
                                 key={position}
                                 className="flex items-center justify-center transition-all duration-200"
                               >
-                                <span className={`text-4xl sm:text-5xl font-bold transition-all duration-300 ${
+                                <span className={`text-3xl sm:text-4xl font-bold transition-all duration-300 ${
                                   digit
                                     ? 'text-white scale-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'
                                     : position === mobile.length
