@@ -127,14 +127,23 @@ export default function Payroll() {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        {!selectedMonth && (
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-            Payroll Management
-          </h1>
+        {!selectedMonth && !isLiveView && (
+          <div className="flex items-center justify-between">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+              Payroll Management
+            </h1>
+            <Button
+              onClick={handleLiveViewToggle}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+            >
+              <Radio className="w-4 h-4" />
+              Live Current Month
+            </Button>
+          </div>
         )}
 
         {/* Month List View */}
-        {!selectedMonth && (
+        {!selectedMonth && !isLiveView && (
           <>
             {months.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
