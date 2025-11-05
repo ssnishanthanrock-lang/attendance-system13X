@@ -746,6 +746,362 @@ class ERPTester:
         except Exception as e:
             self.log_result("Activity Logs Endpoint", False, f"Activity logs test error: {str(e)}")
     
+    def test_payroll_months_endpoint(self):
+        """Test GET /api/payroll/months endpoint (HIGH PRIORITY)"""
+        print("\n=== TESTING PAYROLL MONTHS ENDPOINT ===")
+        
+        try:
+            response = self.session.get(f"{API_BASE}/payroll/months")
+            
+            if response.status_code == 200:
+                months_data = response.json()
+                
+                if isinstance(months_data, list):
+                    self.log_result("Payroll Months - Response Format", True, 
+                                  f"Successfully retrieved {len(months_data)} months")
+                    
+                    if months_data:
+                        # Check structure of first month
+                        first_month = months_data[0]
+                        required_fields = ["month", "total_salary", "employee_count"]
+                        missing_fields = [field for field in required_fields if field not in first_month]
+                        
+                        if not missing_fields:
+                            self.log_result("Payroll Months - Structure", True, 
+                                          "Month data has correct structure",
+                                          {"sample_month": first_month.get("month"),
+                                           "total_salary": first_month.get("total_salary"),
+                                           "employee_count": first_month.get("employee_count")})
+                            
+                            # Verify months are sorted in descending order (newest first)
+                            if len(months_data) > 1:
+                                months_sorted = all(months_data[i]["month"] >= months_data[i+1]["month"] 
+                                                  for i in range(len(months_data)-1))
+                                if months_sorted:
+                                    self.log_result("Payroll Months - Sorting", True, 
+                                                  "Months correctly sorted in descending order")
+                                else:
+                                    self.log_result("Payroll Months - Sorting", False, 
+                                                  "Months not sorted in descending order")
+                            
+                            # Check if current month is included
+                            current_month = datetime.now().strftime("%Y-%m")
+                            current_month_included = any(m["month"] == current_month for m in months_data)
+                            if current_month_included:
+                                self.log_result("Payroll Months - Current Month", True, 
+                                              "Current month included in results")
+                            else:
+                                self.log_result("Payroll Months - Current Month", True, 
+                                              "Current month not included (acceptable if no employees)")
+                        else:
+                            self.log_result("Payroll Months - Structure", False, 
+                                          f"Missing required fields: {missing_fields}")
+                    else:
+                        self.log_result("Payroll Months - Empty Result", True, 
+                                      "No months returned (acceptable if no employees)")
+                else:
+                    self.log_result("Payroll Months - Response Format", False, 
+                                  f"Expected array, got {type(months_data)}")
+            else:
+                self.log_result("Payroll Months - Request", False, 
+                              f"Request failed: {response.status_code}",
+                              {"response": response.text})
+                
+        except Exception as e:
+            self.log_result("Payroll Months Endpoint", False, f"Payroll months test error: {str(e)}")
+    
+    def test_payroll_detailed_endpoint(self):
+        """Test GET /api/payroll/detailed/{month} endpoint (HIGH PRIORITY)"""
+        print("\n=== TESTING PAYROLL DETAILED ENDPOINT ===")
+        
+        try:
+            # First get available months
+            months_response = self.session.get(f"{API_BASE}/payroll/months")
+            
+            if months_response.status_code != 200:
+                self.log_result("Payroll Detailed - Get Months", False, 
+                              "Cannot get months for detailed test")
+                return
+            
+            months_data = months_response.json()
+            
+            # Test with current month if no months available
+            test_month = datetime.now().strftime("%Y-%m")
+            if months_data and len(months_data) > 0:
+                test_month = months_data[0]["month"]
+            
+            # Test detailed payroll for the month
+            response = self.session.get(f"{API_BASE}/payroll/detailed/{test_month}")
+            
+            if response.status_code == 200:
+                detailed_data = response.json()
+                
+                # Check main structure
+                required_main_fields = ["month", "employees", "total_gross", "total_net", "total_deductions"]
+                missing_main_fields = [field for field in required_main_fields if field not in detailed_data]
+                
+                if not missing_main_fields:
+                    self.log_result("Payroll Detailed - Main Structure", True, 
+                                  f"Detailed payroll structure correct for month {test_month}")
+                    
+                    employees = detailed_data.get("employees", [])
+                    
+                    if employees:
+                        # Check employee structure
+                        first_employee = employees[0]
+                        required_emp_fields = [
+                            "employee_id", "employee_name", "basic_salary", "allowances",
+                            "working_days", "present_days", "leave_days", "half_days",
+                            "late_minutes", "late_deduction", "advances", "other_deductions",
+                            "gross_salary", "total_deductions", "net_salary", "fixed_salary",
+                            "salary_per_minute"
+                        ]
+                        
+                        missing_emp_fields = [field for field in required_emp_fields if field not in first_employee]
+                        
+                        if not missing_emp_fields:
+                            self.log_result("Payroll Detailed - Employee Structure", True, 
+                                          "Employee payroll structure complete",
+                                          {"employee_name": first_employee.get("employee_name"),
+                                           "basic_salary": first_employee.get("basic_salary"),
+                                           "net_salary": first_employee.get("net_salary")})
+                            
+                            # Test calculation accuracy
+                            self.test_payroll_calculations(first_employee)
+                            
+                            # Test salary_per_minute logic
+                            fixed_salary = first_employee.get("fixed_salary", False)
+                            salary_per_minute = first_employee.get("salary_per_minute", 0)
+                            
+                            if fixed_salary and salary_per_minute == 0:
+                                self.log_result("Payroll Detailed - Fixed Salary Logic", True, 
+                                              "Fixed salary employees correctly have salary_per_minute = 0")
+                            elif not fixed_salary and salary_per_minute > 0:
+                                self.log_result("Payroll Detailed - Variable Salary Logic", True, 
+                                              f"Variable salary employee has salary_per_minute = {salary_per_minute}")
+                            else:
+                                self.log_result("Payroll Detailed - Salary Logic", False, 
+                                              f"Salary logic error: fixed={fixed_salary}, per_minute={salary_per_minute}")
+                        else:
+                            self.log_result("Payroll Detailed - Employee Structure", False, 
+                                          f"Missing employee fields: {missing_emp_fields}")
+                    else:
+                        self.log_result("Payroll Detailed - No Employees", True, 
+                                      "No employees in detailed payroll (acceptable if no employees)")
+                    
+                    # Test totals calculation
+                    self.test_payroll_totals(detailed_data)
+                    
+                else:
+                    self.log_result("Payroll Detailed - Main Structure", False, 
+                                  f"Missing main fields: {missing_main_fields}")
+            else:
+                self.log_result("Payroll Detailed - Request", False, 
+                              f"Request failed: {response.status_code}",
+                              {"response": response.text})
+                
+        except Exception as e:
+            self.log_result("Payroll Detailed Endpoint", False, f"Payroll detailed test error: {str(e)}")
+    
+    def test_payroll_calculations(self, employee_data):
+        """Test payroll calculation accuracy for an employee"""
+        try:
+            basic_salary = employee_data.get("basic_salary", 0)
+            allowances = employee_data.get("allowances", 0)
+            late_deduction = employee_data.get("late_deduction", 0)
+            advances = employee_data.get("advances", 0)
+            other_deductions = employee_data.get("other_deductions", 0)
+            gross_salary = employee_data.get("gross_salary", 0)
+            total_deductions = employee_data.get("total_deductions", 0)
+            net_salary = employee_data.get("net_salary", 0)
+            
+            # Test gross salary calculation: gross = basic + allowances
+            expected_gross = basic_salary + allowances
+            if abs(gross_salary - expected_gross) < 0.01:  # Allow for rounding
+                self.log_result("Payroll Calculations - Gross Salary", True, 
+                              f"Gross salary correctly calculated: {basic_salary} + {allowances} = {gross_salary}")
+            else:
+                self.log_result("Payroll Calculations - Gross Salary", False, 
+                              f"Gross salary error: expected {expected_gross}, got {gross_salary}")
+            
+            # Test total deductions: late + advances + other
+            expected_deductions = late_deduction + advances + other_deductions
+            if abs(total_deductions - expected_deductions) < 0.01:
+                self.log_result("Payroll Calculations - Total Deductions", True, 
+                              f"Total deductions correctly calculated: {late_deduction} + {advances} + {other_deductions} = {total_deductions}")
+            else:
+                self.log_result("Payroll Calculations - Total Deductions", False, 
+                              f"Total deductions error: expected {expected_deductions}, got {total_deductions}")
+            
+            # Test net salary: gross - total_deductions
+            expected_net = gross_salary - total_deductions
+            if abs(net_salary - expected_net) < 0.01:
+                self.log_result("Payroll Calculations - Net Salary", True, 
+                              f"Net salary correctly calculated: {gross_salary} - {total_deductions} = {net_salary}")
+            else:
+                self.log_result("Payroll Calculations - Net Salary", False, 
+                              f"Net salary error: expected {expected_net}, got {net_salary}")
+                
+        except Exception as e:
+            self.log_result("Payroll Calculations", False, f"Calculation test error: {str(e)}")
+    
+    def test_payroll_totals(self, detailed_data):
+        """Test payroll totals calculation"""
+        try:
+            employees = detailed_data.get("employees", [])
+            reported_total_gross = detailed_data.get("total_gross", 0)
+            reported_total_net = detailed_data.get("total_net", 0)
+            reported_total_deductions = detailed_data.get("total_deductions", 0)
+            
+            if employees:
+                # Calculate expected totals
+                expected_gross = sum(emp.get("gross_salary", 0) for emp in employees)
+                expected_net = sum(emp.get("net_salary", 0) for emp in employees)
+                expected_deductions = sum(emp.get("total_deductions", 0) for emp in employees)
+                
+                # Test totals
+                if abs(reported_total_gross - expected_gross) < 0.01:
+                    self.log_result("Payroll Totals - Gross", True, 
+                                  f"Total gross correctly calculated: {reported_total_gross}")
+                else:
+                    self.log_result("Payroll Totals - Gross", False, 
+                                  f"Total gross error: expected {expected_gross}, got {reported_total_gross}")
+                
+                if abs(reported_total_net - expected_net) < 0.01:
+                    self.log_result("Payroll Totals - Net", True, 
+                                  f"Total net correctly calculated: {reported_total_net}")
+                else:
+                    self.log_result("Payroll Totals - Net", False, 
+                                  f"Total net error: expected {expected_net}, got {reported_total_net}")
+                
+                if abs(reported_total_deductions - expected_deductions) < 0.01:
+                    self.log_result("Payroll Totals - Deductions", True, 
+                                  f"Total deductions correctly calculated: {reported_total_deductions}")
+                else:
+                    self.log_result("Payroll Totals - Deductions", False, 
+                                  f"Total deductions error: expected {expected_deductions}, got {reported_total_deductions}")
+            else:
+                # No employees - totals should be 0
+                if reported_total_gross == 0 and reported_total_net == 0 and reported_total_deductions == 0:
+                    self.log_result("Payroll Totals - No Employees", True, 
+                                  "Totals correctly zero when no employees")
+                else:
+                    self.log_result("Payroll Totals - No Employees", False, 
+                                  f"Totals should be zero: gross={reported_total_gross}, net={reported_total_net}, deductions={reported_total_deductions}")
+                
+        except Exception as e:
+            self.log_result("Payroll Totals", False, f"Totals test error: {str(e)}")
+    
+    def test_payroll_generate_endpoint(self):
+        """Test POST /api/payroll/generate endpoint (Existing - Verify Still Works)"""
+        print("\n=== TESTING PAYROLL GENERATE ENDPOINT ===")
+        
+        try:
+            # Test generating payroll for current month
+            current_month = datetime.now().strftime("%Y-%m")
+            
+            generate_data = {
+                "month": current_month
+            }
+            
+            response = self.session.post(f"{API_BASE}/payroll/generate", json=generate_data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                
+                # Check response structure
+                if "message" in result and "employee_count" in result:
+                    employee_count = result.get("employee_count", 0)
+                    self.log_result("Payroll Generate - Success", True, 
+                                  f"Payroll generated successfully for {employee_count} employees",
+                                  {"month": current_month, "message": result.get("message")})
+                else:
+                    self.log_result("Payroll Generate - Response Structure", False, 
+                                  "Missing expected fields in generate response")
+            else:
+                self.log_result("Payroll Generate - Request", False, 
+                              f"Generate request failed: {response.status_code}",
+                              {"response": response.text})
+                
+        except Exception as e:
+            self.log_result("Payroll Generate Endpoint", False, f"Payroll generate test error: {str(e)}")
+    
+    def test_payroll_edge_cases(self):
+        """Test payroll endpoints with edge cases"""
+        print("\n=== TESTING PAYROLL EDGE CASES ===")
+        
+        try:
+            # Test with invalid month format
+            invalid_response = self.session.get(f"{API_BASE}/payroll/detailed/invalid-month")
+            
+            if invalid_response.status_code in [400, 404]:
+                self.log_result("Payroll Edge Cases - Invalid Month", True, 
+                              "Invalid month format correctly handled")
+            else:
+                self.log_result("Payroll Edge Cases - Invalid Month", False, 
+                              f"Invalid month not properly handled: {invalid_response.status_code}")
+            
+            # Test with future month
+            future_month = "2030-12"
+            future_response = self.session.get(f"{API_BASE}/payroll/detailed/{future_month}")
+            
+            if future_response.status_code == 200:
+                future_data = future_response.json()
+                # Should return empty or zero data for future months
+                self.log_result("Payroll Edge Cases - Future Month", True, 
+                              "Future month handled correctly (returns data structure)")
+            else:
+                self.log_result("Payroll Edge Cases - Future Month", False, 
+                              f"Future month not handled: {future_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Payroll Edge Cases", False, f"Edge cases test error: {str(e)}")
+    
+    def test_payroll_role_access(self):
+        """Test role-based access for payroll endpoints"""
+        print("\n=== TESTING PAYROLL ROLE ACCESS ===")
+        
+        try:
+            # Test employee access to payroll endpoints
+            import jwt
+            employee_payload = {
+                "user_id": "95f4fd94-47ff-44ac-bcb8-b13561fbb446",  # Employee from DB
+                "role": "employee", 
+                "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",
+                "mobile": "0770539581"
+            }
+            
+            jwt_secret = "attendance-system-secret-key-change-in-production"
+            employee_token = jwt.encode(employee_payload, jwt_secret, algorithm="HS256")
+            
+            # Create new session for employee
+            employee_session = requests.Session()
+            employee_session.headers.update({'Authorization': f'Bearer {employee_token}'})
+            
+            # Test employee access to GET endpoints (should work for their own data)
+            months_response = employee_session.get(f"{API_BASE}/payroll/months")
+            
+            if months_response.status_code == 200:
+                self.log_result("Payroll Role Access - Employee GET Months", True, 
+                              "Employee can access payroll months")
+            else:
+                self.log_result("Payroll Role Access - Employee GET Months", False, 
+                              f"Employee cannot access payroll months: {months_response.status_code}")
+            
+            # Test employee access to detailed endpoint
+            current_month = datetime.now().strftime("%Y-%m")
+            detailed_response = employee_session.get(f"{API_BASE}/payroll/detailed/{current_month}")
+            
+            if detailed_response.status_code == 200:
+                self.log_result("Payroll Role Access - Employee GET Detailed", True, 
+                              "Employee can access detailed payroll")
+            else:
+                self.log_result("Payroll Role Access - Employee GET Detailed", False, 
+                              f"Employee cannot access detailed payroll: {detailed_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Payroll Role Access", False, f"Role access test error: {str(e)}")
+    
     def test_payroll_data_integration(self):
         """Test if payroll data exists and affects salary summary"""
         print("\n=== TESTING PAYROLL DATA INTEGRATION ===")
