@@ -199,68 +199,85 @@ export default function Payroll() {
 
                     {/* Body */}
                     <tbody>
-                      {detailedPayroll.employees.map((emp, index) => (
-                        <tr key={emp.employee_id} className="hover:bg-gray-50">
-                          <td className="border border-gray-300 px-2 py-3 text-center text-sm">{index + 1}</td>
-                          <td className="border border-gray-300 px-3 py-3">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                                {emp.profile_picture ? (
-                                  <img src={emp.profile_picture} alt={emp.employee_name} className="w-8 h-8 rounded-full" />
-                                ) : (
-                                  <User className="w-4 h-4 text-white" />
-                                )}
+                      {detailedPayroll.employees.map((emp, index) => {
+                        const daySalary = emp.working_days > 0 ? (emp.basic_salary / emp.working_days) : 0;
+                        const perMinuteSalary = emp.salary_per_minute || 0;
+                        
+                        return (
+                          <tr key={emp.employee_id} className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm">{index + 1}</td>
+                            <td className="border border-gray-300 px-3 py-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                  {emp.profile_picture ? (
+                                    <img src={emp.profile_picture} alt={emp.employee_name} className="w-8 h-8 rounded-full object-cover" />
+                                  ) : (
+                                    <User className="w-4 h-4 text-white" />
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-sm whitespace-nowrap">{emp.employee_name}</p>
+                                  {emp.position && (
+                                    <span className="text-xs text-gray-500">{emp.position}</span>
+                                  )}
+                                  {emp.fixed_salary && (
+                                    <span className="text-xs text-blue-600 ml-1">(Fixed)</span>
+                                  )}
+                                </div>
                               </div>
-                              <div>
-                                <p className="font-semibold text-sm whitespace-nowrap">{emp.employee_name}</p>
-                                {emp.fixed_salary && (
-                                  <span className="text-xs text-blue-600">Fixed</span>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="border border-gray-300 px-2 py-3 text-sm text-center whitespace-nowrap">
-                            {emp.position || 'Staff'}
-                          </td>
-                          
-                          <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
-                            {emp.basic_salary.toLocaleString()}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
-                            {emp.allowances.toLocaleString()}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
-                            {emp.gross_salary.toLocaleString()}
-                          </td>
-                          
-                          <td className="border border-gray-300 px-2 py-3 text-center text-sm font-semibold text-green-600 bg-green-50">
-                            {emp.present_days}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-3 text-center text-sm text-orange-600 bg-green-50">
-                            {emp.leave_days}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-3 text-center text-sm text-red-600 bg-green-50">
-                            {emp.late_minutes}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-green-50">
-                            {emp.late_deduction.toLocaleString()}
-                          </td>
-                          
-                          <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
-                            {emp.advances.toLocaleString()}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
-                            {(emp.loan_deduction || 0).toLocaleString()}
-                          </td>
-                          <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
-                            {emp.other_deductions.toLocaleString()}
-                          </td>
-                          
-                          <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-100">
-                            {emp.net_salary.toLocaleString()}
-                          </td>
-                        </tr>
-                      ))}
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
+                              {emp.basic_salary.toLocaleString()}
+                            </td>
+                            <td 
+                              className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50 cursor-help" 
+                              title={`Per minute: Rs ${perMinuteSalary.toFixed(2)}`}
+                            >
+                              {daySalary.toLocaleString(undefined, {maximumFractionDigits: 2})}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
+                              {emp.allowances.toLocaleString()}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
+                              {emp.gross_salary.toLocaleString()}
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm font-semibold text-green-600 bg-green-50">
+                              {emp.present_days}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-orange-600 bg-green-50">
+                              {emp.leave_days}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-blue-600 bg-green-50">
+                              {emp.allowed_leaves || 0}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-blue-600 bg-green-50">
+                              {emp.allowed_half_days || 0}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-green-50">
+                              {emp.late_deduction.toLocaleString()}
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                              {emp.advances.toLocaleString()}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                              {(emp.loan_deduction || 0).toLocaleString()}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600 bg-red-50">
+                              {(emp.extra_payment || 0).toLocaleString()}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                              {emp.other_deductions.toLocaleString()}
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-100">
+                              {emp.net_salary.toLocaleString()}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
 
                     {/* Footer Totals */}
