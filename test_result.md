@@ -203,6 +203,57 @@ frontend:
         agent: "testing"
         comment: "✅ TESTED: Employee ID successfully hidden from both desktop and mobile sidebars. Desktop sidebar shows 'Test Admin' and 'Admin' (2 lines only). Mobile sidebar shows 'Test Adminadmin' (name and role only). No employee ID visible in user info sections."
   
+  - task: "Attendance View Deleted icon button"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Attendance.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Changed 'View Deleted' button to Archive icon only, positioned in header next to Add Manual Attendance button"
+  
+  - task: "Activity Logs pagination"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/ActivityLogs.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented pagination with 50 records per page, Load More button, loading state, and record count display"
+  
+  - task: "Manual attendance form error handling"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Attendance.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "User reported 'Failed to add attendance' appearing even when attendance is added"
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed response handling - removed unnecessary status check. In axios, successful responses are automatically in try block, so no need for conditional check"
+  
+  - task: "Filter card titles standardization"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Attendance.js, ActivityLogs.js, Payroll.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Changed all filter card titles from 'Filter X' to just 'Filters' across Attendance, Activity Logs, and Payroll pages"
+  
   - task: "Make dashboard stats clickable"
     implemented: true
     working: true
