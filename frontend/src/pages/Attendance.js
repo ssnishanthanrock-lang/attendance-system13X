@@ -204,6 +204,17 @@ export default function Attendance() {
   };
 
   const handleFilter = () => {
+    // Validation: If from_date is set, to_date must also be set
+    if (filters.from_date && !filters.to_date) {
+      toast.error('Please select "To Date" as well');
+      return;
+    }
+    
+    if (!filters.from_date && filters.to_date) {
+      toast.error('Please select "From Date" as well');
+      return;
+    }
+    
     // Build URL path with filter parameters
     let path = '/attendance';
     
