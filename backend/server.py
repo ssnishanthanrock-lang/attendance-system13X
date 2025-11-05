@@ -2129,6 +2129,221 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         "total_deductions": sum([r["total_deductions"] for r in detailed_records])
     }
 
+
+@api_router.get("/payroll/live-current-month")
+async def get_live_current_month_payroll(current_user: User = Depends(get_current_user)):
+    """Get real-time payroll calculation for current month up to this second"""
+    now = datetime.now(timezone.utc)
+    current_month = now.strftime("%Y-%m")
+    
+    # Get company settings
+    settings = await db.settings.find_one({"company_id": current_user.company_id})
+    working_hours_per_day = 8
+    start_time = "09:00"
+    finish_time = "17:00"
+    
+    if settings:
+        start_time = settings.get("start_time", "09:00")
+        finish_time = settings.get("finish_time", "17:00")
+        try:
+            start_dt = datetime.strptime(start_time, "%H:%M")
+            finish_dt = datetime.strptime(finish_time, "%H:%M")
+            working_hours_per_day = (finish_dt - start_dt).total_seconds() / 3600
+        except:
+            pass
+    
+    # Get working days for current month
+    year, month_num = current_month.split("-")
+    working_days_data = settings.get("working_days", {}) if settings else {}
+    working_days = working_days_data.get(current_month, 26)
+    
+    # Get all employees (only if employee role, show own data; if admin/manager, show all)
+    if current_user.role == "employee":
+        employees = await db.users.find({
+            "id": current_user.id,
+            "company_id": current_user.company_id
+        }).to_list(length=None)
+    else:
+        employees = await db.users.find({
+            "company_id": current_user.company_id,
+            "role": {"$in": ["employee", "staff_member", "manager"]}
+        }).to_list(length=None)
+    
+    detailed_records = []
+    
+    for employee in employees:
+        # Get effective salary
+        basic_salary = await get_effective_salary(employee["id"], current_user.company_id, current_month)
+        
+        # Get attendance for current month
+        attendance_records = await db.attendance.find({
+            "employee_id": employee["id"],
+            "company_id": current_user.company_id,
+            "date": {"$regex": f"^{current_month}"}
+        }).to_list(length=None)
+        
+        # Calculate attendance metrics
+        present_days = len([a for a in attendance_records if a.get("status") == "present"])
+        leave_days = len([a for a in attendance_records if a.get("status") == "leave"])
+        half_days = len([a for a in attendance_records if a.get("status") == "half_day"])
+        allowed_leaves = len([a for a in attendance_records if a.get("status") == "allowed_leave"])
+        allowed_half_days = len([a for a in attendance_records if a.get("status") == "allowed_half_day"])
+        
+        # Calculate total attendance minutes UP TO NOW
+        total_attendance_minutes = 0
+        today_str = now.strftime("%Y-%m-%d")
+        
+        for record in attendance_records:
+            record_date = record.get("date", "")
+            
+            # For completed days (check-in and check-out both present)
+            if record.get("check_in") and record.get("check_out"):
+                try:
+                    checkin_dt = datetime.fromisoformat(record["check_in"])
+                    checkout_dt = datetime.fromisoformat(record["check_out"])
+                    duration = checkout_dt - checkin_dt
+                    total_attendance_minutes += int(duration.total_seconds() / 60)
+                except:
+                    pass
+            # For today's ongoing attendance (checked in but not out yet)
+            elif record_date == today_str and record.get("check_in") and not record.get("check_out"):
+                try:
+                    checkin_dt = datetime.fromisoformat(record["check_in"])
+                    # Calculate up to current time
+                    duration = now - checkin_dt
+                    total_attendance_minutes += int(duration.total_seconds() / 60)
+                except:
+                    pass
+        
+        # Add allowed leaves (count as worked time)
+        minutes_per_day = working_hours_per_day * 60
+        total_attendance_minutes += (allowed_leaves * minutes_per_day)
+        total_attendance_minutes += (allowed_half_days * minutes_per_day * 0.5)
+        
+        # Calculate late minutes and deduction
+        late_minutes = 0
+        late_deduction = 0
+        
+        if not employee.get("fixed_salary", False):
+            expected_checkin = datetime.strptime(start_time, "%H:%M").time()
+            
+            for record in attendance_records:
+                if record.get("check_in") and record.get("status") == "present":
+                    try:
+                        checkin_dt = datetime.fromisoformat(record["check_in"])
+                        checkin_time = checkin_dt.time()
+                        
+                        expected_minutes = expected_checkin.hour * 60 + expected_checkin.minute
+                        actual_minutes = checkin_time.hour * 60 + checkin_time.minute
+                        
+                        if actual_minutes > expected_minutes:
+                            late_minutes += (actual_minutes - expected_minutes)
+                    except:
+                        pass
+            
+            if late_minutes > 0 and working_days > 0:
+                salary_per_day = basic_salary / working_days
+                salary_per_hour = salary_per_day / working_hours_per_day
+                salary_per_minute = salary_per_hour / 60
+                late_deduction = late_minutes * salary_per_minute
+        
+        # Get advances for current month
+        advances = await db.advances.find({
+            "employee_id": employee["id"],
+            "company_id": current_user.company_id,
+            "status": "approved",
+            "request_date": {"$regex": f"^{current_month}"}
+        }).to_list(length=None)
+        
+        total_advances = sum([adv.get("amount", 0) for adv in advances])
+        
+        # Get other deductions
+        other_deductions = employee.get("deductions", 0)
+        
+        # Get allowances
+        allowances = employee.get("allowances", 0)
+        
+        # Get extra payments
+        extra_payments = await db.extra_payments.find({
+            "employee_id": employee["id"],
+            "company_id": current_user.company_id,
+            "month": current_month
+        }).to_list(length=None)
+        
+        total_extra_payment = sum([ep.get("amount", 0) for ep in extra_payments])
+        
+        # Get active loans
+        active_loans = await db.loans.find({
+            "employee_id": employee["id"],
+            "company_id": current_user.company_id,
+            "status": "active"
+        }).to_list(length=None)
+        
+        loan_deduction = 0
+        for loan in active_loans:
+            loan_start_month = loan.get("start_month", current_month)
+            if loan_start_month <= current_month:
+                loan_deduction += loan.get("monthly_deduction", 0)
+        
+        # Calculate earnings based on salary type
+        salary_per_minute = (basic_salary / working_days / working_hours_per_day / 60) if working_days > 0 else 0
+        
+        if employee.get("fixed_salary", False):
+            # Fixed salary: proportional to days passed in month
+            days_in_month = (datetime(int(year), int(month_num) + 1, 1) - datetime(int(year), int(month_num), 1)).days if int(month_num) < 12 else 31
+            current_day = now.day
+            # Pro-rata calculation: (basic_salary / days_in_month) * current_day
+            earnings_so_far = (basic_salary / days_in_month) * current_day
+            # Add allowances pro-rata as well
+            earnings = earnings_so_far + ((allowances / days_in_month) * current_day)
+            gross_salary = earnings + total_extra_payment
+        else:
+            # Non-fixed: based on actual minutes worked so far
+            earnings = total_attendance_minutes * salary_per_minute
+            gross_salary = earnings + allowances + total_extra_payment
+        
+        # Calculate net salary
+        total_deductions = late_deduction + total_advances + other_deductions + loan_deduction
+        net_salary = gross_salary - total_deductions
+        
+        detailed_records.append({
+            "employee_id": employee["id"],
+            "employee_name": employee["name"],
+            "position": employee.get("position", "Staff"),
+            "profile_picture": employee.get("profile_pic"),
+            "basic_salary": round(basic_salary, 2),
+            "allowances": round(allowances, 2),
+            "earnings": round(earnings, 2),
+            "working_days": working_days,
+            "present_days": present_days,
+            "leave_days": leave_days,
+            "half_days": half_days,
+            "allowed_leaves": allowed_leaves,
+            "allowed_half_days": allowed_half_days,
+            "total_attendance_minutes": total_attendance_minutes,
+            "late_minutes": late_minutes,
+            "late_deduction": round(late_deduction, 2),
+            "advances": round(total_advances, 2),
+            "other_deductions": round(other_deductions, 2),
+            "loan_deduction": round(loan_deduction, 2),
+            "extra_payment": round(total_extra_payment, 2),
+            "gross_salary": round(gross_salary, 2),
+            "total_deductions": round(total_deductions, 2),
+            "net_salary": round(net_salary, 2),
+            "fixed_salary": employee.get("fixed_salary", False),
+            "salary_per_minute": round(salary_per_minute, 2)
+        })
+    
+    return {
+        "month": current_month,
+        "timestamp": now.isoformat(),
+        "employees": detailed_records,
+        "total_gross": round(sum([r["gross_salary"] for r in detailed_records]), 2),
+        "total_net": round(sum([r["net_salary"] for r in detailed_records]), 2),
+        "total_deductions": round(sum([r["total_deductions"] for r in detailed_records]), 2)
+    }
+
+
 # ============= UTILITY FUNCTIONS =============
 def capitalize_name(name: str) -> str:
     """Capitalize first letter of each word in a name"""
