@@ -138,14 +138,16 @@ export default function Payroll() {
             </Button>
 
             {/* Salary Sheet Header */}
-            <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-6 rounded-lg text-center">
-              <h1 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                Month of {formatMonthName(selectedMonth).monthName} Salary Sheet - {formatMonthName(selectedMonth).year}
-              </h1>
-              <p className="text-sm mt-2 text-gray-300">
-                Working Days - {detailedPayroll.employees[0]?.working_days || 26}
-              </p>
-            </div>
+            <Card className="border-2 border-gray-200">
+              <CardContent className="p-6 text-center">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                  Month of {formatMonthName(selectedMonth).monthName} Salary Sheet - {formatMonthName(selectedMonth).year}
+                </h1>
+                <p className="text-sm mt-2 text-gray-600">
+                  Working Days - {detailedPayroll.employees[0]?.working_days || 26}
+                </p>
+              </CardContent>
+            </Card>
 
             {/* Payroll Table */}
             <Card>
