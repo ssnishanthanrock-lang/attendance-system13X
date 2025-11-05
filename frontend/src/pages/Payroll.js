@@ -287,7 +287,7 @@ export default function Payroll() {
                   Monthly Salary History
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {months.map((monthData) => (
+                  {months.filter(m => m.month !== livePayroll.month).map((monthData) => (
                     <Card
                       key={monthData.month}
                       className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
