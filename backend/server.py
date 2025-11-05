@@ -1177,7 +1177,7 @@ async def upload_branding(file: UploadFile = File(...), type: str = Form(...), c
             upsert=True
         )
         
-        await log_activity(current_user.company_id, current_user.id, current_user.name, f"UPLOAD_{type.upper()}", f"Uploaded company {type}")
+        await log_activity(current_user.company_id, current_user.id, current_user.name, f"UPLOAD_{type.upper()}", f"Uploaded company {type}, File: {file.filename}, Size: {len(contents)} bytes, Type: {file.content_type}")
         
         return {"message": f"{type.capitalize()} uploaded successfully", field_name: data_url}
     except Exception as e:
