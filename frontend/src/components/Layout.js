@@ -13,6 +13,8 @@ import {
   LogOut,
   Phone,
   Settings,
+  ChevronDown,
+  ChevronRight,
 } from 'lucide-react';
 import ImpersonationBanner from './ImpersonationBanner';
 import { getImpersonationState, clearImpersonationState } from '../utils/impersonation';
