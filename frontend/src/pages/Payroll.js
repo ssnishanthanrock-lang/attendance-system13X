@@ -141,7 +141,7 @@ export default function Payroll() {
             <Card className="border-2 border-gray-200">
               <CardContent className="p-6 text-center">
                 <h1 className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  Month of {formatMonthName(selectedMonth).monthName} Salary Sheet - {formatMonthName(selectedMonth).year}
+                  {formatMonthName(selectedMonth).monthName} Salary Sheet - {formatMonthName(selectedMonth).year}
                 </h1>
                 <p className="text-sm mt-2 text-gray-600">
                   Working Days - {detailedPayroll.employees[0]?.working_days || 26}
