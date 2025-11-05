@@ -888,14 +888,24 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
         raise HTTPException(status_code=400, detail="Attendance already exists for this date")
     
     # Create attendance record
+    # Combine date with times to create ISO datetime strings
+    check_in_datetime = None
+    check_out_datetime = None
+    
+    if attendance_data.get("check_in"):
+        check_in_datetime = f"{attendance_data['date']}T{attendance_data['check_in']}:00"
+    
+    if attendance_data.get("check_out"):
+        check_out_datetime = f"{attendance_data['date']}T{attendance_data['check_out']}:00"
+    
     new_attendance = {
         "id": str(uuid.uuid4()),
         "company_id": current_user.company_id,
         "employee_id": attendance_data["employee_id"],
-        "employee_name": employee["name"],
+        "employee_name": capitalize_name(employee["name"]),
         "date": attendance_data["date"],
-        "check_in": attendance_data.get("check_in"),
-        "check_out": attendance_data.get("check_out"),
+        "check_in": check_in_datetime,
+        "check_out": check_out_datetime,
         "status": attendance_data.get("status", "present"),
         "leave_type": attendance_data.get("leave_type"),
         "created_by": current_user.id,
@@ -903,7 +913,7 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
     }
     
     await db.attendance.insert_one(new_attendance)
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "ADD_ATTENDANCE", f"Added manual attendance for {employee['name']}")
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "ADD_ATTENDANCE", f"Added manual attendance for {capitalize_name(employee['name'])}")
     
     return {"message": "Attendance added successfully", "attendance": new_attendance}
 
