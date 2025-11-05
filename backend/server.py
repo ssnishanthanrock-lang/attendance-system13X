@@ -936,22 +936,24 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         
         attendance_summary = []
         for date in last_7_days:
-            # Get employees who had joined by this date
+            # Get employees who had joined by this specific date
             employees_by_date = [
-                emp["id"] for emp in active_employees 
+                emp for emp in all_active_employees 
                 if not emp.get("joining_date") or emp.get("joining_date", "") <= date
             ]
+            employee_ids_by_date = [emp["id"] for emp in employees_by_date]
             
+            # Count attendance only for employees who had joined by this date
             count = await db.attendance.count_documents({
                 "company_id": current_user.company_id,
                 "date": date,
-                "employee_id": {"$in": employees_by_date}
+                "employee_id": {"$in": employee_ids_by_date}
             })
             
             attendance_summary.append({
                 "date": date,
                 "count": count,
-                "total_employees": len(employees_by_date)
+                "total_employees": len(employee_ids_by_date)
             })
         
         return {
