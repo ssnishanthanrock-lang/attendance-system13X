@@ -708,62 +708,6 @@ export default function Attendance() {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Change Status Dialog */}
-      <Dialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Change Attendance Status</DialogTitle>
-            <DialogDescription>
-              Update the status for {changingStatusRecord?.employee_name} on {changingStatusRecord?.date}
-            </DialogDescription>
-          </DialogHeader>
-          
-          {changingStatusRecord && (
-            <div className="space-y-4">
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">Current Status:</p>
-                <p className="text-base font-semibold text-gray-900 capitalize">{changingStatusRecord.status.replace('_', ' ')}</p>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">New Status *</label>
-                <Select value={newStatus} onValueChange={setNewStatus}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="present">Present</SelectItem>
-                    <SelectItem value="leave">Leave</SelectItem>
-                    <SelectItem value="half_day">Half Day</SelectItem>
-                    <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
-                    <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-xs text-blue-800">
-                  <strong>Note:</strong> Status changes will be tracked in the edit history. This change will affect salary calculations for this attendance record.
-                </p>
-              </div>
-              
-              <div className="flex justify-end gap-2 pt-4">
-                <Button type="button" variant="outline" onClick={() => setStatusDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={handleStatusUpdate}
-                  disabled={newStatus === changingStatusRecord.status}
-                  className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
-                >
-                  Update Status
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
     </Layout>
   );
 }
