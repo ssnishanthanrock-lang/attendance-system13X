@@ -294,14 +294,14 @@ export default function Estimates() {
                     <div className="col-span-3">
                       <label className="block text-xs font-medium mb-1">Product</label>
                       <Select
-                        value={item.product_id}
-                        onValueChange={(value) => updateEstimateItem(index, 'product_id', value)}
+                        value={item.product_id || "custom"}
+                        onValueChange={(value) => updateEstimateItem(index, 'product_id', value === "custom" ? "" : value)}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Custom Item</SelectItem>
+                          <SelectItem value="custom">Custom Item</SelectItem>
                           {products.map(product => (
                             <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
                           ))}
