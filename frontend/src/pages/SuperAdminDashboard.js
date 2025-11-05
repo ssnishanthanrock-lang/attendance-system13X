@@ -14,6 +14,7 @@ export default function SuperAdminDashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('all'); // all, active, pending, suspended
   const [formData, setFormData] = useState({
     name: '',
     admin_name: '',
