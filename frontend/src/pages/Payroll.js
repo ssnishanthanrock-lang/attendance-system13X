@@ -379,11 +379,20 @@ export default function Payroll() {
                   Back
                 </Button>
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                    {formatMonthName(month).monthName} Salary Sheet - {formatMonthName(month).year}
-                  </h1>
+                  <div className="flex items-center gap-3">
+                    <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                      {formatMonthName(month).monthName} Salary Sheet - {formatMonthName(month).year}
+                    </h1>
+                    {month === new Date().toISOString().slice(0, 7) && (
+                      <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold animate-pulse">
+                        <Radio className="w-3 h-3" />
+                        LIVE
+                      </div>
+                    )}
+                  </div>
                   <p className="text-sm text-gray-600">
                     Working Days - {detailedPayroll.employees[0]?.working_days || 26}
+                    {month === new Date().toISOString().slice(0, 7) && ' • Updates every second'}
                   </p>
                 </div>
               </div>
