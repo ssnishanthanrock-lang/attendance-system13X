@@ -953,7 +953,9 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
             "total_advances": len(my_advances),
             "approved_advances": sum(a["amount"] for a in my_advances if a["status"] == "approved"),
             "latest_payroll": my_payroll[0] if my_payroll else None,
-            "today_attendance": today_attendance
+            "today_attendance": today_attendance,
+            "my_leaves": sorted(my_leaves, key=lambda x: x.get("request_date", ""), reverse=True),
+            "my_advances": sorted(my_advances, key=lambda x: x.get("request_date", ""), reverse=True)
         }
 
 # ============= EMPLOYEE ENDPOINTS =============
