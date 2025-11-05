@@ -202,9 +202,9 @@ export default function Login() {
                       autoFocus
                     />
                   </div>
-                  <div className="flex items-center justify-between text-xs">
-                    <p className="text-gray-500">Enter your 10-digit mobile number</p>
-                    <p className={`font-semibold transition-colors ${mobile.length === 10 ? 'text-green-600' : 'text-gray-400'}`}>
+                  <div className="flex items-center justify-between text-xs mt-2">
+                    <p className="text-white/70">Enter your 10-digit mobile number</p>
+                    <p className={`font-semibold transition-colors ${mobile.length === 10 ? 'text-green-400' : 'text-white/50'}`}>
                       {mobile.length}/10
                     </p>
                   </div>
