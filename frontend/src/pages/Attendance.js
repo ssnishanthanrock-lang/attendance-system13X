@@ -148,6 +148,7 @@ export default function Attendance() {
       check_in: record.check_in ? formatTime(record.check_in, true) : '',
       check_out: record.check_out ? formatTime(record.check_out, true) : '',
       status: record.status,
+      original_status: record.status, // Store original to detect changes
       leave_type: record.leave_type || ''
     });
     await fetchEditHistory(record.id);
