@@ -917,6 +917,21 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
     
     return {"message": "Attendance added successfully", "attendance": new_attendance}
 
+@api_router.delete("/attendance/{attendance_id}")
+async def delete_attendance(attendance_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Check if attendance exists and belongs to same company
+    attendance = await db.attendance.find_one({"id": attendance_id, "company_id": current_user.company_id})
+    if not attendance:
+        raise HTTPException(status_code=404, detail="Attendance record not found")
+    
+    await db.attendance.delete_one({"id": attendance_id})
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_ATTENDANCE", f"Deleted attendance for {attendance.get('employee_name', 'employee')}")
+    
+    return {"message": "Attendance deleted successfully"}
+
 # ============= UTILITY FUNCTIONS =============
 def capitalize_name(name: str) -> str:
     """Capitalize first letter of each word in a name"""
