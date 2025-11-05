@@ -734,27 +734,28 @@ export default function Payroll() {
               </CardContent>
             </Card>
 
-            {/* Summary Cards at Bottom */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card className="bg-blue-50 border-blue-200">
-                <CardContent className="p-4 text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
-                  <p className="text-2xl font-bold text-blue-700">Rs {detailedPayroll.total_gross.toLocaleString()}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-red-50 border-red-200">
-                <CardContent className="p-4 text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
-                  <p className="text-2xl font-bold text-red-700">Rs {detailedPayroll.total_deductions.toLocaleString()}</p>
-                </CardContent>
-              </Card>
-              <Card className="bg-green-50 border-green-200">
-                <CardContent className="p-4 text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
-                  <p className="text-2xl font-bold text-green-700">Rs {detailedPayroll.total_net.toLocaleString()}</p>
-                </CardContent>
-              </Card>
-            </div>
+              {/* Summary Cards at Bottom - Only for Table View */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="bg-blue-50 border-blue-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
+                    <p className="text-2xl font-bold text-blue-700">Rs {detailedPayroll.total_gross.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-red-50 border-red-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                    <p className="text-2xl font-bold text-red-700">Rs {detailedPayroll.total_deductions.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-green-50 border-green-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
+                    <p className="text-2xl font-bold text-green-700">Rs {detailedPayroll.total_net.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         )}
       </div>
