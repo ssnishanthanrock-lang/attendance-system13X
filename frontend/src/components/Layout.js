@@ -21,11 +21,31 @@ export default function Layout({ children }) {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [companyInfo, setCompanyInfo] = useState(null);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
+    if (userData && userData.role !== 'super_admin') {
+      fetchCompanyInfo();
+    }
   }, []);
+
+  const fetchCompanyInfo = async () => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/company/info`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setCompanyInfo(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch company info:', error);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
