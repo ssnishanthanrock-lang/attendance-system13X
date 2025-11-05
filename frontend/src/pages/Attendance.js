@@ -99,6 +99,13 @@ export default function Attendance() {
       return;
     }
     
+    // For allowed leave/half day, no check-in time needed
+    if (['allowed_leave', 'allowed_half_day'].includes(manualAttendance.status)) {
+      // Clear check-in/out times as they're not needed
+      manualAttendance.check_in = '';
+      manualAttendance.check_out = '';
+    }
+    
     try {
       await api.post('/attendance', manualAttendance);
       toast.success('Attendance added successfully');
