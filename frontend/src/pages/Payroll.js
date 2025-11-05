@@ -7,11 +7,12 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { toast } from 'sonner';
-import { DollarSign, Download, Plus } from 'lucide-react';
+import { Calendar, Download, Plus, ArrowLeft, Users, IndianRupee } from 'lucide-react';
 
 export default function Payroll() {
-  const [payrolls, setPayrolls] = useState([]);
-  const [employees, setEmployees] = useState([]);
+  const [months, setMonths] = useState([]);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [detailedPayroll, setDetailedPayroll] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -20,13 +21,8 @@ export default function Payroll() {
     month: new Date().toLocaleString('default', { month: 'long' }),
     year: new Date().getFullYear(),
   });
-  const [filters, setFilters] = useState({
-    employee_id: '',
-    month: '',
-    year: '',
-  });
 
-  const months = [
+  const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
