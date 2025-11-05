@@ -68,20 +68,6 @@ export default function Attendance() {
 
       const response = await api.get(`/attendance?${params.toString()}`);
       setAttendance(response.data);
-      
-      // Fetch history count for each attendance record
-      const counts = {};
-      for (const record of response.data) {
-        try {
-          const histResponse = await api.get(`/attendance/${record.id}/history`);
-          if (histResponse.data && histResponse.data.length > 0) {
-            counts[record.id] = histResponse.data.length;
-          }
-        } catch (err) {
-          // No history
-        }
-      }
-      setHistoryCount(counts);
     } catch (error) {
       toast.error('Failed to fetch attendance');
     } finally {
