@@ -558,26 +558,57 @@ export default function Attendance() {
           </DialogHeader>
           {editingAttendance && (
             <form onSubmit={handleUpdateAttendance} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Check In Time *</label>
-                  <Input
-                    type="time"
-                    value={editingAttendance.check_in}
-                    onChange={(e) => setEditingAttendance({...editingAttendance, check_in: e.target.value})}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Check Out Time</label>
-                  <Input
-                    type="time"
-                    value={editingAttendance.check_out}
-                    onChange={(e) => setEditingAttendance({...editingAttendance, check_out: e.target.value})}
-                    placeholder="Optional"
-                  />
-                </div>
+              {/* Status Field */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Status *</label>
+                <Select 
+                  value={editingAttendance.status} 
+                  onValueChange={(value) => setEditingAttendance({...editingAttendance, status: value})}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="present">Present</SelectItem>
+                    <SelectItem value="leave">Leave</SelectItem>
+                    <SelectItem value="half_day">Half Day</SelectItem>
+                    <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
+                    <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+
+              {/* Show check-in/out only for Present status */}
+              {editingAttendance.status === 'present' && (
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Check In Time *</label>
+                    <Input
+                      type="time"
+                      value={editingAttendance.check_in}
+                      onChange={(e) => setEditingAttendance({...editingAttendance, check_in: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Check Out Time</label>
+                    <Input
+                      type="time"
+                      value={editingAttendance.check_out}
+                      onChange={(e) => setEditingAttendance({...editingAttendance, check_out: e.target.value})}
+                      placeholder="Optional"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {['allowed_leave', 'allowed_half_day'].includes(editingAttendance.status) && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>{editingAttendance.status === 'allowed_leave' ? 'Allowed Leave' : 'Allowed Half Day'}:</strong> This will count as a working day for salary calculation.
+                  </p>
+                </div>
+              )}
               
               {!editingAttendance.check_out && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
