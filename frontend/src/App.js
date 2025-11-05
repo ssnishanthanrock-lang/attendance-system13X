@@ -51,6 +51,16 @@ function App() {
               <SuperAdminDashboard />
             </PrivateRoute>
           } />
+          <Route path="/superadmin/companies/:companyId" element={
+            <PrivateRoute>
+              <SuperAdminCompanyDetail />
+            </PrivateRoute>
+          } />
+          <Route path="/superadmin/admins" element={
+            <PrivateRoute>
+              <SuperAdminManagement />
+            </PrivateRoute>
+          } />
           <Route path="/onboarding" element={
             <PrivateRoute>
               <CompanyOnboarding />
