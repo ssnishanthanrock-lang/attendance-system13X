@@ -361,9 +361,15 @@ export default function Attendance() {
   };
 
   const formatDateForDisplay = (dateStr) => {
-    const date = new Date(dateStr);
-    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
-    return date.toLocaleDateString('en-US', options);
+    if (!dateStr) return 'Invalid Date';
+    try {
+      const date = new Date(dateStr);
+      if (isNaN(date.getTime())) return 'Invalid Date';
+      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    } catch (error) {
+      return 'Invalid Date';
+    }
   };
 
 
