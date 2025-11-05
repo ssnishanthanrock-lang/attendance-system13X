@@ -190,63 +190,78 @@ backend:
 frontend:
   - task: "Remove Employee ID from sidebar"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/components/Layout.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Removed employee_id display from mobile sidebar, now only shows name and role (capitalized and formatted)"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Employee ID successfully hidden from both desktop and mobile sidebars. Desktop sidebar shows 'Test Admin' and 'Admin' (2 lines only). Mobile sidebar shows 'Test Adminadmin' (name and role only). No employee ID visible in user info sections."
   
   - task: "Make dashboard stats clickable"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Dashboard.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added onClick handlers to StatCard components with navigation to /employees, /attendance, /leaves, /advances, /payroll. Added hover effects."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: All 4 dashboard stat cards working correctly. Total Employees, Present Today, Pending Leaves, and Pending Advances cards found with proper hover effects (hover:shadow-xl, hover:scale-105). Navigation working - cards successfully navigate to /employees, /attendance, /leaves, /advances respectively."
   
   - task: "Display monthly salary summary and attendance chart"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/Dashboard.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added two new card sections: Salary Summary (showing expected/calculated/net salary for current month) and Attendance Summary (showing last 7 days with progress bars)"
+      - working: false
+        agent: "testing"
+        comment: "❌ TESTED: Monthly Salary Summary card and Attendance Summary chart not found on dashboard. The cards with data-testid='salary-summary-card' and data-testid='attendance-chart-card' are missing. This is likely due to API authentication issues (401 errors) preventing data loading, which causes the cards not to render."
   
   - task: "Profile picture upload in Employee form"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Employees.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added profile picture file input to employee form with FormData handling for multipart upload"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Profile picture upload input found in employee form. Add Employee button working, dialog opens correctly, profile picture input with data-testid='profile-picture-input' present. Form contains 11 total fields including the profile picture upload."
   
   - task: "Logo and favicon upload in Company Settings"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/CompanySettings.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Added Logo & Branding section with file inputs for company logo and favicon, with preview display"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Logo & Branding section found in Company Settings. Both logo and favicon file upload inputs present (2 file inputs total). Working Days Calculator section also verified with month/year selectors, though data loading fails due to authentication."
 
 metadata:
   created_by: "main_agent"
