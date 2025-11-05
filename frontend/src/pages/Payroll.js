@@ -80,77 +80,21 @@ export default function Payroll() {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex items-center gap-3">
-            {selectedMonth && (
-              <Button
-                onClick={handleBackToMonths}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
-            )}
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-              {selectedMonth ? formatMonthName(selectedMonth) : 'Payroll Management'}
-            </h1>
-          </div>
-          {isAdmin && (
-            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Generate Payroll
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Generate Monthly Payroll</DialogTitle>
-                  <DialogDescription>Generate payroll for all active employees</DialogDescription>
-                </DialogHeader>
-                <form onSubmit={handleGeneratePayroll} className="space-y-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Month *</label>
-                    <Select value={generateForm.month} onValueChange={(value) => setGenerateForm({ ...generateForm, month: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {monthNames.map((month) => (
-                          <SelectItem key={month} value={month}>
-                            {month}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Year *</label>
-                    <Input
-                      type="number"
-                      value={generateForm.year}
-                      onChange={(e) => setGenerateForm({ ...generateForm, year: parseInt(e.target.value) })}
-                      required
-                    />
-                  </div>
-                  <div className="flex justify-end gap-2 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={generating}
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                    >
-                      {generating ? 'Generating...' : 'Generate'}
-                    </Button>
-                  </div>
-                </form>
-              </DialogContent>
-            </Dialog>
+        <div className="flex items-center gap-3">
+          {selectedMonth && (
+            <Button
+              onClick={handleBackToMonths}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
           )}
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+            {selectedMonth ? formatMonthName(selectedMonth) : 'Payroll Management'}
+          </h1>
         </div>
 
         {/* Month List View */}
