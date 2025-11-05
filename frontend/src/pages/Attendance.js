@@ -537,6 +537,38 @@ export default function Attendance() {
           </CardContent>
         </Card>
 
+        {/* Banner for Last 7 Days View */}
+        {viewMode === 'last7days' && (
+          <Card className="bg-gradient-to-r from-amber-50 to-orange-50 border-amber-200">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-amber-900 mb-1">
+                    📅 Showing Last 7 Days Attendance
+                  </p>
+                  <p className="text-xs text-amber-700">
+                    No attendance recorded for today. Showing recent activity instead.
+                  </p>
+                  <p className="text-sm font-bold text-amber-900 mt-2">
+                    Summary: {todayAttendanceCount} attended from {activeEmployeesCount} active employees
+                  </p>
+                </div>
+                <Button
+                  onClick={() => {
+                    setViewMode('today');
+                    fetchAttendance();
+                  }}
+                  variant="outline"
+                  size="sm"
+                  className="border-amber-300 text-amber-700 hover:bg-amber-100"
+                >
+                  Back to Today
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Attendance Records Table */}
         <Card>
           <CardHeader>
