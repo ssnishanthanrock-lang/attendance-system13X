@@ -186,6 +186,30 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Profile picture upload endpoint working correctly. POST /api/upload/profile-pic accepts file uploads, converts to base64, and stores in users collection. All users can upload their own profile pictures."
+  
+  - task: "Manual attendance addition endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Manual attendance addition (POST /api/attendance) working correctly. Validates employee_id, prevents duplicates for same date, handles check_in/check_out times properly, creates attendance records in database. Fixed ObjectId serialization issue in response. All validation and error handling working as expected."
+  
+  - task: "Activity logs endpoint with pagination"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Activity logs endpoint (GET /api/activity-logs) working perfectly. Pagination with custom limit parameter working (default 100, tested with 50). Date range filtering (from_date, to_date) functional. Search functionality working across user_name, action, and details fields. All logs properly filtered by company_id for multi-tenancy."
 
 frontend:
   - task: "Remove Employee ID from sidebar"
