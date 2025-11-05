@@ -170,7 +170,7 @@ export default function Payroll() {
         {/* Filters */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Filter Payroll</CardTitle>
+            <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Filters</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
