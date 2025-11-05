@@ -411,7 +411,7 @@ export default function Attendance() {
                     </tr>
                   ) : (
                     attendance.map((record) => (
-                      <tr key={record.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={record.id} className={`hover:bg-gray-50 transition-colors ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}>
                         <td className="px-4 py-3 text-sm font-medium text-gray-900">{record.employee_name}</td>
                         <td className="px-4 py-3 text-sm text-gray-600">{record.date}</td>
                         <td className="px-4 py-3">
