@@ -204,7 +204,9 @@ export default function Employees() {
               <Button
                 data-testid="add-employee-button"
                 onClick={resetForm}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                disabled={!canEdit}
+                title={!canEdit ? "Read-only access - Cannot add employees" : ""}
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Employee
