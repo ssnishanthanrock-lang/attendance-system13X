@@ -1106,6 +1106,35 @@ async def delete_employee(employee_id: str, current_user: User = Depends(get_cur
     
     return {"message": "Employee deleted successfully"}
 
+
+@api_router.patch("/employees/{employee_id}/reactivate")
+async def reactivate_employee(employee_id: str, current_user: User = Depends(get_current_user)):
+    """Reactivate a deleted/inactive employee (set status = 1)"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Check if employee exists and belongs to the same company
+    employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Reactivate employee - set status to 1 (active)
+    await db.users.update_one(
+        {"id": employee_id},
+        {"$set": {"status": 1, "is_active": True}}
+    )
+    
+    await log_activity(
+        current_user.company_id, 
+        current_user.id, 
+        current_user.name, 
+        "REACTIVATE_EMPLOYEE", 
+        f"Reactivated employee: {employee['name']}, ID: {employee.get('employee_id', 'N/A')}, Role: {employee.get('role', 'N/A')}"
+    )
+    
+    return {"message": "Employee reactivated successfully"}
+
+
 # ============= INCREMENT ENDPOINTS =============
 @api_router.post("/employees/{employee_id}/increments")
 async def add_increment(employee_id: str, increment_data: dict, current_user: User = Depends(get_current_user)):
