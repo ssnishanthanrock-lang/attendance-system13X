@@ -1127,7 +1127,8 @@ async def delete_holiday(date: str, current_user: User = Depends(get_current_use
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Holiday not found")
     
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_HOLIDAY", f"Removed holiday on {date}")
+    holiday_name = next((h['name'] for h in holidays if h['date'] == date), 'Unknown')
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_HOLIDAY", f"Removed holiday: {holiday_name} on {date}")
     
     return {"message": "Holiday removed successfully"}
 
