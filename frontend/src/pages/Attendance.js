@@ -115,7 +115,16 @@ export default function Attendance() {
     }
   };
 
-  const handleEdit = (record) => {
+  const fetchEditHistory = async (attendanceId) => {
+    try {
+      const response = await api.get(`/attendance/${attendanceId}/history`);
+      setEditHistory(response.data);
+    } catch (error) {
+      setEditHistory([]);
+    }
+  };
+
+  const handleEdit = async (record) => {
     setEditingAttendance({
       id: record.id,
       employee_name: record.employee_name,
@@ -125,6 +134,7 @@ export default function Attendance() {
       status: record.status,
       leave_type: record.leave_type || ''
     });
+    await fetchEditHistory(record.id);
     setEditDialogOpen(true);
   };
 
