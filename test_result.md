@@ -322,16 +322,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Dashboard stats endpoint for company portal"
-    - "Monthly salary summary and attendance chart data"
-    - "Employee CRUD endpoints"
-    - "Remove Employee ID from sidebar"
-    - "Make dashboard stats clickable"
-    - "Display monthly salary summary and attendance chart"
-    - "Profile picture upload in Employee form"
-    - "Logo and favicon upload in Company Settings"
-  stuck_tasks: []
-  test_all: true
+    - "Attendance View Deleted icon button"
+    - "Activity Logs pagination"
+    - "Manual attendance form error handling"
+    - "Filter card titles standardization"
+    - "Dashboard salary summary calculation"
+  stuck_tasks:
+    - "Manual attendance form error handling"
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
