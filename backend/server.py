@@ -507,27 +507,29 @@ async def get_super_admins(current_user: User = Depends(get_current_user)):
     return admins
 
 @api_router.post("/superadmin/admins")
-async def create_super_admin(admin_data: UserCreate, current_user: User = Depends(get_current_user)):
+async def create_super_admin(admin_data: dict, current_user: User = Depends(get_current_user)):
     if current_user.role != "super_admin":
         raise HTTPException(status_code=403, detail="Super admin access required")
     
     # Check if mobile already exists
-    existing = await db.users.find_one({"mobile": admin_data.mobile})
+    existing = await db.users.find_one({"mobile": admin_data["mobile"]})
     if existing:
         raise HTTPException(status_code=400, detail="Mobile number already registered")
     
     # Create super admin
     new_admin = User(
         company_id=None,
-        employee_id=admin_data.employee_id,
-        mobile=admin_data.mobile,
-        name=admin_data.name,
+        employee_id=admin_data.get("employee_id"),
+        mobile=admin_data["mobile"],
+        name=capitalize_name(admin_data["name"]),
         role="super_admin",
-        join_date=datetime.now(timezone.utc).date().isoformat()
+        join_date=datetime.now(timezone.utc).date().isoformat(),
+        can_full_access_companies=admin_data.get("can_full_access_companies", False)
     )
     
+    access_type = "Full Access" if admin_data.get("can_full_access_companies", False) else "Read-only"
     await db.users.insert_one(new_admin.model_dump())
-    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "CREATE_SUPER_ADMIN", f"Created super admin: {admin_data.name}")
+    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "CREATE_SUPER_ADMIN", f"Created super admin: {capitalize_name(admin_data['name'])} with {access_type} permission for company views")
     
     return new_admin
 
