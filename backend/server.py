@@ -1092,7 +1092,8 @@ async def update_settings(updates: SettingsUpdate, current_user: User = Depends(
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Settings not found")
     
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_SETTINGS", "Updated company settings")
+    settings_changes = ', '.join([f'{k}: {v}' for k, v in update_data.items() if k not in ['updated_at', '_id']])
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_SETTINGS", f"Updated settings: {settings_changes}")
     
     return {"message": "Settings updated successfully"}
 
