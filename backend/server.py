@@ -412,7 +412,7 @@ async def get_all_companies(current_user: User = Depends(get_current_user)):
     companies = await db.companies.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     return companies
 
-@api_router.get("/superadmin/companies/{company_id}", response_model=Company)
+@api_router.get("/superadmin/companies/{company_id}")
 async def get_company(company_id: str, current_user: User = Depends(get_current_user)):
     if current_user.role != "super_admin":
         raise HTTPException(status_code=403, detail="Super admin access required")
@@ -421,7 +421,15 @@ async def get_company(company_id: str, current_user: User = Depends(get_current_
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     
-    return Company(**company)
+    # Get settings to include logo and favicon
+    settings = await db.settings.find_one({"company_id": company_id}, {"_id": 0})
+    
+    company_data = Company(**company).model_dump()
+    if settings:
+        company_data["logo"] = settings.get("company_logo")
+        company_data["favicon"] = settings.get("favicon")
+    
+    return company_data
 
 @api_router.put("/superadmin/companies/{company_id}/status")
 async def update_company_status(company_id: str, status: str, current_user: User = Depends(get_current_user)):
