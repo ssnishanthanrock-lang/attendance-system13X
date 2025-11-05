@@ -231,37 +231,37 @@ export default function Payroll() {
                     </tbody>
                     <tfoot className="bg-gray-100 border-t-2 border-gray-300">
                       <tr className="font-bold">
-                        <td className="px-4 py-4 text-gray-900">TOTAL</td>
-                        <td className="px-4 py-4 text-right text-gray-900">
-                          Rs {detailedPayroll.employees.reduce((sum, emp) => sum + emp.basic_salary, 0).toLocaleString()}
+                        <td className="px-3 py-3 text-sm text-gray-900 sticky left-0 bg-gray-100 whitespace-nowrap">TOTAL</td>
+                        <td className="px-3 py-3 text-right text-sm text-gray-900 whitespace-nowrap">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.basic_salary, 0).toLocaleString()}
                         </td>
-                        <td className="px-4 py-4 text-right text-gray-900">
-                          Rs {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
+                        <td className="px-3 py-3 text-right text-sm text-gray-900 whitespace-nowrap">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
                         </td>
-                        <td className="px-4 py-4"></td>
-                        <td className="px-4 py-4"></td>
-                        <td className="px-4 py-4"></td>
-                        <td className="px-4 py-4"></td>
-                        <td className="px-4 py-4 text-right text-red-600">
-                          Rs {detailedPayroll.employees.reduce((sum, emp) => sum + emp.late_deduction, 0).toLocaleString()}
+                        <td className="px-3 py-3"></td>
+                        <td className="px-3 py-3"></td>
+                        <td className="px-3 py-3"></td>
+                        <td className="px-3 py-3"></td>
+                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.late_deduction, 0).toLocaleString()}
                         </td>
-                        <td className="px-4 py-4 text-right text-red-600">
-                          Rs {detailedPayroll.employees.reduce((sum, emp) => sum + emp.advances, 0).toLocaleString()}
+                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.advances, 0).toLocaleString()}
                         </td>
-                        <td className="px-4 py-4 text-right text-red-600">
-                          Rs {detailedPayroll.employees.reduce((sum, emp) => sum + emp.other_deductions, 0).toLocaleString()}
+                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.other_deductions, 0).toLocaleString()}
                         </td>
-                        <td className="px-4 py-4 text-right text-red-600">
-                          Rs {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.loan_deduction || 0), 0).toLocaleString()}
+                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.loan_deduction || 0), 0).toLocaleString()}
                         </td>
-                        <td className="px-4 py-4 text-right text-gray-900">
-                          Rs {detailedPayroll.total_gross.toLocaleString()}
+                        <td className="px-3 py-3 text-right text-sm text-gray-900 whitespace-nowrap">
+                          {detailedPayroll.total_gross.toLocaleString()}
                         </td>
-                        <td className="px-4 py-4 text-right text-red-600">
-                          Rs {detailedPayroll.total_deductions.toLocaleString()}
+                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
+                          {detailedPayroll.total_deductions.toLocaleString()}
                         </td>
-                        <td className="px-4 py-4 text-right text-green-600 bg-green-100">
-                          Rs {detailedPayroll.total_net.toLocaleString()}
+                        <td className="px-3 py-3 text-right text-sm text-green-600 bg-green-100 sticky right-0 whitespace-nowrap">
+                          {detailedPayroll.total_net.toLocaleString()}
                         </td>
                       </tr>
                     </tfoot>
