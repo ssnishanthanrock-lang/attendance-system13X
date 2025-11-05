@@ -171,7 +171,10 @@ export default function SuperAdminDashboard() {
 
         {/* Companies List */}
         <div className="space-y-4">
-          {stats?.company_stats?.map((company) => (
+          {stats?.company_stats?.filter((company) => {
+            if (statusFilter === 'all') return true;
+            return company.status === statusFilter;
+          }).map((company) => (
             <Card key={company.company_id}>
               <CardContent className="p-6">
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
