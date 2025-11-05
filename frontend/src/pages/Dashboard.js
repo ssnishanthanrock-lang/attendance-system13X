@@ -454,8 +454,7 @@ export default function Dashboard() {
                     </CardContent>
                   </Card>
                 </CardContent>
-              </Card>
-            )}
+            </Card>
 
             {/* Attendance Chart */}
             <Card data-testid="attendance-chart-card">
