@@ -173,12 +173,23 @@ export default function Layout({ children }) {
             <SheetContent side="right" className="w-80 p-0">
               <div className="flex flex-col h-full">
                 <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
-                  <img 
-                    src="https://cfms.lk/img/itsignature_logo_blue_only.png" 
-                    alt="IT Signature Logo" 
-                    className="h-10 w-auto mb-2 brightness-0 invert"
-                  />
-                  <h2 className="text-lg font-bold text-white text-center" style={{ fontFamily: 'Work Sans, sans-serif' }}>IT Signature ERP</h2>
+                  {companyInfo?.logo ? (
+                    <img 
+                      src={companyInfo.logo} 
+                      alt={`${companyInfo.name} Logo`} 
+                      className="h-10 w-auto mb-2 brightness-0 invert object-contain rounded-lg"
+                      style={{ borderRadius: '6px' }}
+                    />
+                  ) : (
+                    <div className="h-10 w-10 bg-white/20 rounded-full flex items-center justify-center mb-2">
+                      <span className="text-xl font-bold text-white">
+                        {companyInfo?.name?.split(' ').map(w => w[0]).join('').slice(0, 2) || 'IT'}
+                      </span>
+                    </div>
+                  )}
+                  <h2 className="text-lg font-bold text-white text-center" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                    {companyInfo?.name || 'IT Signature ERP'}
+                  </h2>
                 </div>
 
                 <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
