@@ -595,6 +595,143 @@ export default function Employees() {
           </div>
         )}
       </div>
+
+      {/* Add Increment Dialog */}
+      <Dialog open={incrementDialogOpen} onOpenChange={setIncrementDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Add Salary Increment</DialogTitle>
+            <DialogDescription>
+              Increase salary for {selectedEmployeeForIncrement?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleAddIncrement} className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Current Salary</label>
+              <Input
+                value={`Rs. ${selectedEmployeeForIncrement?.basic_salary?.toLocaleString() || 0}`}
+                disabled
+                className="bg-gray-50"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Effective From (Month) *</label>
+              <Input
+                type="month"
+                value={incrementForm.effective_from}
+                onChange={(e) => setIncrementForm({...incrementForm, effective_from: e.target.value})}
+                required
+              />
+              <p className="text-xs text-gray-500">Salary will be effective from this month onwards</p>
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">New Salary *</label>
+              <Input
+                type="number"
+                value={incrementForm.new_salary}
+                onChange={(e) => setIncrementForm({...incrementForm, new_salary: parseFloat(e.target.value) || 0})}
+                placeholder="Enter new salary"
+                required
+                min={selectedEmployeeForIncrement?.basic_salary || 0}
+              />
+              {incrementForm.new_salary > (selectedEmployeeForIncrement?.basic_salary || 0) && (
+                <p className="text-sm text-green-600 font-medium">
+                  Increase: Rs. {(incrementForm.new_salary - (selectedEmployeeForIncrement?.basic_salary || 0)).toLocaleString()}
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Reason *</label>
+              <Textarea
+                value={incrementForm.reason}
+                onChange={(e) => setIncrementForm({...incrementForm, reason: e.target.value})}
+                placeholder="e.g., Annual performance review, Promotion, Market adjustment"
+                required
+                rows={3}
+              />
+            </div>
+            
+            <div className="flex justify-end gap-2 pt-4">
+              <Button type="button" variant="outline" onClick={() => setIncrementDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" className="bg-gradient-to-r from-green-600 to-emerald-600">
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Add Increment
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Increment History Dialog */}
+      <Dialog open={incrementHistoryOpen} onOpenChange={setIncrementHistoryOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Increment History</DialogTitle>
+            <DialogDescription>
+              Salary increment history for {selectedEmployeeForIncrement?.name}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {increments.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <TrendingUp className="w-12 h-12 mx-auto mb-2 opacity-30" />
+              <p>No increment history found</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b-2 border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Date</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Old Salary</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">New Salary</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Increase</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Effective From</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Reason</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Added By</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {increments.map((inc) => (
+                    <tr key={inc.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {new Date(inc.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        Rs. {inc.old_salary.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+                        Rs. {inc.new_salary.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-green-600 font-semibold">
+                        +Rs. {inc.increment_amount.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {inc.effective_from}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 max-w-xs">
+                        {inc.reason}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {inc.created_by_name}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          
+          <div className="flex justify-end pt-4">
+            <Button onClick={() => setIncrementHistoryOpen(false)}>Close</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
