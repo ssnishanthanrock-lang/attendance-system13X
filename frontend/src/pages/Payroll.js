@@ -259,6 +259,10 @@ export default function Payroll() {
                               {earnings.toLocaleString(undefined, {maximumFractionDigits: 2})}
                             </td>
                             
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600 bg-blue-50">
+                              {(emp.extra_payment || 0).toLocaleString()}
+                            </td>
+                            
                             <td className="border border-gray-300 px-2 py-3 text-center text-sm font-semibold text-green-600 bg-green-50">
                               {emp.present_days}
                             </td>
