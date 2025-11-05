@@ -144,7 +144,7 @@ export default function Login() {
         </div>
 
         <Card className="shadow-2xl border-0 animate-slide-in backdrop-blur-lg bg-white/90" data-testid="login-card">
-          <CardHeader className="space-y-1 pb-4">
+          <CardHeader className="space-y-1 pb-4 pt-6 px-6">
             <CardTitle className="text-2xl font-semibold" style={{ fontFamily: 'Work Sans, sans-serif' }}>
               {otpSent ? 'Enter OTP' : 'Welcome Back'}
             </CardTitle>
@@ -154,7 +154,7 @@ export default function Login() {
                 : 'Enter your mobile number to receive OTP'}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-6 pb-6">
             {!otpSent ? (
               <form onSubmit={handleSendOTP} className="space-y-4">
                 <div className="space-y-3">
