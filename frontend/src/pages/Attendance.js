@@ -90,20 +90,18 @@ export default function Attendance() {
     }
     
     try {
-      const response = await api.post('/attendance', manualAttendance);
-      if (response.data && response.status === 200) {
-        toast.success('Attendance added successfully');
-        setDialogOpen(false);
-        setManualAttendance({
-          employee_id: '',
-          date: new Date().toISOString().split('T')[0],
-          check_in: '09:00',
-          check_out: '17:00',
-          status: 'present',
-          leave_type: ''
-        });
-        fetchAttendance();
-      }
+      await api.post('/attendance', manualAttendance);
+      toast.success('Attendance added successfully');
+      setDialogOpen(false);
+      setManualAttendance({
+        employee_id: '',
+        date: new Date().toISOString().split('T')[0],
+        check_in: '09:00',
+        check_out: '17:00',
+        status: 'present',
+        leave_type: ''
+      });
+      fetchAttendance();
     } catch (error) {
       console.error('Attendance error:', error);
       toast.error(error.response?.data?.detail || 'Failed to add attendance');
