@@ -170,7 +170,7 @@ export default function Login() {
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       maxLength={10}
-                      className="pl-12 h-14 text-xl font-semibold tracking-wider border-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                      className="pl-12 h-14 text-2xl font-semibold tracking-wider border-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                       required
                       autoFocus
                     />
