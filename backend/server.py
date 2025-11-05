@@ -594,7 +594,15 @@ async def get_company_info(current_user: User = Depends(get_current_user)):
     if not company:
         raise HTTPException(status_code=404, detail="Company not found")
     
-    return Company(**company)
+    # Get settings to include logo and favicon
+    settings = await db.settings.find_one({"company_id": current_user.company_id}, {"_id": 0})
+    
+    company_data = Company(**company).model_dump()
+    if settings:
+        company_data["logo"] = settings.get("company_logo")
+        company_data["favicon"] = settings.get("favicon")
+    
+    return company_data
 
 @api_router.put("/company/info")
 async def update_company_info(info: CompanyInfoUpdate, current_user: User = Depends(get_current_user)):
