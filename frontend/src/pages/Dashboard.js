@@ -5,7 +5,7 @@ import Layout from '../components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
-import { Users, Calendar, FileText, DollarSign, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Users, Calendar, FileText, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, Radio } from 'lucide-react';
 
 export default function Dashboard() {
   const navigate = useNavigate();
