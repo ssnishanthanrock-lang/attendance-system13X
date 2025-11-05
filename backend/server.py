@@ -475,7 +475,7 @@ async def create_company(company: CompanyCreate, current_user: User = Depends(ge
     await db.users.insert_one(admin_user.model_dump())
     
     # Send SMS
-    message = f"Welcome to IT Signature ERP! Your company '{company.name}' has been created. Login with mobile {company.admin_mobile}. URL: https://employee-pulse-13.preview.emergentagent.com"
+    message = f"Welcome to IT Signature ERP! Your company '{company.name}' has been created. Login with mobile {company.admin_mobile}. URL: https://attendplus-21.preview.emergentagent.com"
     send_sms(company.admin_mobile, message)
     
     await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "CREATE_COMPANY", f"Created company: {company.name}")
