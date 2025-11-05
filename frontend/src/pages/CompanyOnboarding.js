@@ -78,6 +78,7 @@ export default function CompanyOnboarding() {
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  onBlur={(e) => setFormData({ ...formData, name: capitalizeName(e.target.value) })}
                   required
                 />
               </div>
