@@ -393,6 +393,7 @@ export default function Payroll() {
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Other</th>
                         
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-100">Net</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-gray-100">Action</th>
                       </tr>
                     </thead>
 
