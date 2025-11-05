@@ -1,10 +1,11 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import base64
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
@@ -33,23 +34,66 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 JWT_SECRET = os.environ.get('JWT_SECRET', 'your-secret-key-change-in-production')
 JWT_ALGORITHM = "HS256"
 
-# Textit.biz SMS Configuration
-TEXTIT_USERNAME = os.environ.get('TEXTIT_USERNAME', '942021070701')
-TEXTIT_PASSWORD = os.environ.get('TEXTIT_PASSWORD', '7470')
+# SMS Configuration
+DEFAULT_SMS_USERNAME = os.environ.get('TEXTIT_USERNAME', '942021070701')
+DEFAULT_SMS_PASSWORD = os.environ.get('TEXTIT_PASSWORD', '7470')
 
-# Models
+# ============= MODELS =============
+class Company(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    admin_name: str
+    admin_mobile: str
+    email: Optional[str] = None
+    address: Optional[str] = None
+    contact_number: Optional[str] = None
+    status: str = "pending"  # pending, active, suspended
+    sms_gateway: str = "textit"
+    sms_enabled: bool = False
+    sms_username: Optional[str] = None
+    sms_password: Optional[str] = None
+    company_info_completed: bool = False
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    last_login: Optional[str] = None
+
+class CompanyCreate(BaseModel):
+    name: str
+    admin_name: str
+    admin_mobile: str
+    email: Optional[str] = None
+
+class CompanyInfoUpdate(BaseModel):
+    name: str
+    address: str
+    contact_number: str
+    email: str
+
+class SMSSettings(BaseModel):
+    sms_gateway: str  # textit, dialog, hutch, mobitel, disabled
+    sms_enabled: bool
+    sms_username: Optional[str] = None
+    sms_password: Optional[str] = None
+    sms_api_key: Optional[str] = None
+
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: Optional[str] = None
     employee_id: str
     mobile: str
     name: str
-    role: str  # admin, manager, employee, staff_member
+    role: str  # super_admin, admin, manager, employee, staff_member
     department: Optional[str] = None
     position: Optional[str] = None
     basic_salary: float = 0.0
     allowances: float = 0.0
     join_date: str
+    profile_pic: Optional[str] = None
+    custom_start_time: Optional[str] = None
+    custom_end_time: Optional[str] = None
+    ot_allowed: bool = False
+    sms_notifications: bool = False
     is_active: bool = True
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -70,101 +114,19 @@ class OTPRequest(BaseModel):
 class OTPVerify(BaseModel):
     mobile: str
     otp: str
+    login_as: Optional[str] = None
 
-class Attendance(BaseModel):
+class ActivityLog(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    employee_id: str
-    employee_name: str
-    date: str
-    check_in: Optional[str] = None
-    check_out: Optional[str] = None
-    status: str = "present"  # present, absent, half_day
-    notes: Optional[str] = None
-    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    company_id: str
+    user_id: str
+    user_name: str
+    action: str
+    description: str
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
-class AttendanceCheckIn(BaseModel):
-    notes: Optional[str] = None
-
-class AttendanceCheckOut(BaseModel):
-    notes: Optional[str] = None
-
-class Leave(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    employee_id: str
-    employee_name: str
-    leave_type: str  # annual, casual, sick, no_pay
-    from_date: str
-    to_date: str
-    reason: str
-    status: str = "pending"  # pending, approved, rejected
-    applied_date: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    approved_by: Optional[str] = None
-
-class LeaveCreate(BaseModel):
-    leave_type: str
-    from_date: str
-    to_date: str
-    reason: str
-
-class LeaveUpdate(BaseModel):
-    status: str
-
-class Advance(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    employee_id: str
-    employee_name: str
-    amount: float
-    reason: str
-    request_date: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-    status: str = "pending"  # pending, approved, rejected
-    approved_by: Optional[str] = None
-    repayment_months: int = 1
-
-class AdvanceCreate(BaseModel):
-    amount: float
-    reason: str
-    repayment_months: int = 1
-
-class AdvanceUpdate(BaseModel):
-    status: str
-
-class Increment(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    employee_id: str
-    employee_name: str
-    previous_salary: float
-    new_salary: float
-    increment_amount: float
-    effective_date: str
-    reason: str
-    created_by: str
-    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-
-class IncrementCreate(BaseModel):
-    employee_id: str
-    new_salary: float
-    effective_date: str
-    reason: str
-
-class Payroll(BaseModel):
-    model_config = ConfigDict(extra="ignore")
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    employee_id: str
-    employee_name: str
-    month: str
-    year: int
-    basic_salary: float
-    allowances: float
-    deductions: float
-    advances: float
-    net_salary: float
-    generated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
-
-# Helper Functions
+# ============= HELPER FUNCTIONS =============
 def create_access_token(data: dict):
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + timedelta(days=7)
@@ -172,16 +134,21 @@ def create_access_token(data: dict):
     encoded_jwt = jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
     return encoded_jwt
 
-def send_sms_textit(mobile: str, message: str):
-    """Send SMS via textit.biz HTTP API"""
+def send_sms(mobile: str, message: str, company_id: Optional[str] = None):
     try:
+        if company_id:
+            company_doc = db.companies.find_one({"id": company_id})
+            if company_doc and company_doc.get("sms_enabled"):
+                username = company_doc.get("sms_username") or DEFAULT_SMS_USERNAME
+                password = company_doc.get("sms_password") or DEFAULT_SMS_PASSWORD
+            else:
+                return False
+        else:
+            username = DEFAULT_SMS_USERNAME
+            password = DEFAULT_SMS_PASSWORD
+        
         url = "https://www.textit.biz/sendmsg"
-        params = {
-            "id": TEXTIT_USERNAME,
-            "pw": TEXTIT_PASSWORD,
-            "to": mobile,
-            "text": message
-        }
+        params = {"id": username, "pw": password, "to": mobile, "text": message}
         response = requests.get(url, params=params, timeout=10)
         return response.status_code == 200
     except Exception as e:
@@ -205,22 +172,28 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-# Auth Endpoints
+async def log_activity(company_id: str, user_id: str, user_name: str, action: str, description: str):
+    log = ActivityLog(
+        company_id=company_id,
+        user_id=user_id,
+        user_name=user_name,
+        action=action,
+        description=description
+    )
+    await db.activity_logs.insert_one(log.model_dump())
+
+# ============= AUTH ENDPOINTS =============
 @api_router.post("/auth/send-otp")
 async def send_otp(request: OTPRequest):
-    # Validate mobile number (10 digits for Sri Lanka)
     if len(request.mobile) != 10 or not request.mobile.isdigit():
-        raise HTTPException(status_code=400, detail="Invalid mobile number. Must be 10 digits.")
+        raise HTTPException(status_code=400, detail="Invalid mobile number")
     
-    # Check if user exists
     user = await db.users.find_one({"mobile": request.mobile}, {"_id": 0})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Generate OTP
     otp_code = str(random.randint(100000, 999999))
     
-    # Store OTP in database
     otp_doc = {
         "mobile": request.mobile,
         "otp": otp_code,
@@ -230,15 +203,14 @@ async def send_otp(request: OTPRequest):
     }
     await db.otps.insert_one(otp_doc)
     
-    # Send SMS
-    message = f"Your OTP for Employee Attendance System is: {otp_code}. Valid for 5 minutes."
-    sms_sent = send_sms_textit(request.mobile, message)
+    message = f"Your OTP for IT Signature ERP is: {otp_code}. Valid for 5 minutes."
+    company_id = user.get("company_id") if user.get("role") != "super_admin" else None
+    sms_sent = send_sms(request.mobile, message, company_id)
     
     return {"message": "OTP sent successfully", "sms_sent": sms_sent}
 
 @api_router.post("/auth/verify-otp")
 async def verify_otp(request: OTPVerify):
-    # Find OTP
     otp_doc = await db.otps.find_one(
         {"mobile": request.mobile, "otp": request.otp, "verified": False},
         {"_id": 0},
@@ -248,420 +220,229 @@ async def verify_otp(request: OTPVerify):
     if not otp_doc:
         raise HTTPException(status_code=400, detail="Invalid OTP")
     
-    # Check expiration
     expires_at = datetime.fromisoformat(otp_doc["expires_at"])
     if datetime.now(timezone.utc) > expires_at:
         raise HTTPException(status_code=400, detail="OTP expired")
     
-    # Mark OTP as verified
     await db.otps.update_one(
         {"mobile": request.mobile, "otp": request.otp},
         {"$set": {"verified": True}}
     )
     
-    # Get user
-    user = await db.users.find_one({"mobile": request.mobile}, {"_id": 0})
-    if not user:
+    # Check for multiple roles
+    users = await db.users.find({"mobile": request.mobile}, {"_id": 0}).to_list(10)
+    if not users:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Create token
-    token = create_access_token({"user_id": user["id"], "role": user["role"]})
+    has_super_admin = any(u["role"] == "super_admin" for u in users)
+    has_company_role = any(u["role"] != "super_admin" for u in users)
     
-    return {"token": token, "user": user}
+    if has_super_admin and has_company_role and not request.login_as:
+        return {
+            "require_selection": True,
+            "message": "This number has multiple access levels",
+            "options": [{"value": "super_admin", "label": "Super Admin"}, {"value": "company", "label": "Company Portal"}]
+        }
+    
+    # Select user
+    if request.login_as == "super_admin":
+        user = next((u for u in users if u["role"] == "super_admin"), None)
+    elif request.login_as == "company" or not has_super_admin:
+        user = next((u for u in users if u["role"] != "super_admin"), None)
+    else:
+        user = users[0]
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User access not found")
+    
+    # Update last login
+    if user.get("company_id"):
+        await db.companies.update_one(
+            {"id": user["company_id"]},
+            {"$set": {"last_login": datetime.now(timezone.utc).isoformat()}}
+        )
+    
+    token = create_access_token({"user_id": user["id"], "role": user["role"], "company_id": user.get("company_id")})
+    
+    return {"token": token, "user": user, "require_selection": False}
 
 @api_router.get("/auth/me")
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
-# Employee Endpoints
-@api_router.post("/employees", response_model=User)
-async def create_employee(employee: UserCreate, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "manager"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
+# ============= SUPER ADMIN ENDPOINTS =============
+@api_router.post("/superadmin/companies", response_model=Company)
+async def create_company(company: CompanyCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
     
-    # Check if employee_id or mobile already exists
-    existing = await db.users.find_one(
-        {"$or": [{"employee_id": employee.employee_id}, {"mobile": employee.mobile}]}
+    existing = await db.companies.find_one({"admin_mobile": company.admin_mobile})
+    if existing:
+        raise HTTPException(status_code=400, detail="Mobile number already registered")
+    
+    company_obj = Company(**company.model_dump())
+    await db.companies.insert_one(company_obj.model_dump())
+    
+    # Create admin user
+    admin_user = User(
+        company_id=company_obj.id,
+        employee_id=f"ADMIN-{company_obj.id[:8]}",
+        mobile=company.admin_mobile,
+        name=company.admin_name,
+        role="admin",
+        join_date=datetime.now(timezone.utc).date().isoformat()
     )
-    if existing:
-        raise HTTPException(status_code=400, detail="Employee ID or mobile already exists")
+    await db.users.insert_one(admin_user.model_dump())
     
-    user_obj = User(**employee.model_dump())
-    doc = user_obj.model_dump()
-    await db.users.insert_one(doc)
-    return user_obj
+    # Send SMS
+    message = f"Welcome to IT Signature ERP! Your company '{company.name}' has been created. Login with mobile {company.admin_mobile}. URL: https://employee-pulse-12.preview.emergentagent.com"
+    send_sms(company.admin_mobile, message)
+    
+    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "CREATE_COMPANY", f"Created company: {company.name}")
+    
+    return company_obj
 
-@api_router.get("/employees", response_model=List[User])
-async def get_employees(current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "manager"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
+@api_router.get("/superadmin/companies", response_model=List[Company])
+async def get_all_companies(current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
     
-    users = await db.users.find({}, {"_id": 0}).to_list(1000)
-    return users
+    companies = await db.companies.find({}, {"_id": 0}).sort("created_at", -1).to_list(1000)
+    return companies
 
-@api_router.get("/employees/{employee_id}", response_model=User)
-async def get_employee(employee_id: str, current_user: User = Depends(get_current_user)):
-    user = await db.users.find_one({"id": employee_id}, {"_id": 0})
-    if not user:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    return User(**user)
+@api_router.get("/superadmin/companies/{company_id}", response_model=Company)
+async def get_company(company_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    return Company(**company)
 
-@api_router.put("/employees/{employee_id}", response_model=User)
-async def update_employee(employee_id: str, employee_update: UserCreate, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "manager"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
+@api_router.put("/superadmin/companies/{company_id}/status")
+async def update_company_status(company_id: str, status: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
     
-    user = await db.users.find_one({"id": employee_id})
-    if not user:
-        raise HTTPException(status_code=404, detail="Employee not found")
+    if status not in ["active", "suspended", "pending"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
     
-    update_data = employee_update.model_dump()
-    await db.users.update_one({"id": employee_id}, {"$set": update_data})
-    
-    updated_user = await db.users.find_one({"id": employee_id}, {"_id": 0})
-    return User(**updated_user)
-
-@api_router.delete("/employees/{employee_id}")
-async def delete_employee(employee_id: str, current_user: User = Depends(get_current_user)):
-    if current_user.role != "admin":
-        raise HTTPException(status_code=403, detail="Only admin can delete employees")
-    
-    result = await db.users.delete_one({"id": employee_id})
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    
-    return {"message": "Employee deleted successfully"}
-
-# Attendance Endpoints
-@api_router.post("/attendance/checkin")
-async def check_in(checkin_data: AttendanceCheckIn, current_user: User = Depends(get_current_user)):
-    today = datetime.now(timezone.utc).date().isoformat()
-    
-    # Check if already checked in today
-    existing = await db.attendance.find_one({
-        "employee_id": current_user.id,
-        "date": today
-    })
-    
-    if existing:
-        raise HTTPException(status_code=400, detail="Already checked in today")
-    
-    attendance = Attendance(
-        employee_id=current_user.id,
-        employee_name=current_user.name,
-        date=today,
-        check_in=datetime.now(timezone.utc).isoformat(),
-        notes=checkin_data.notes
+    result = await db.companies.update_one(
+        {"id": company_id},
+        {"$set": {"status": status}}
     )
     
-    doc = attendance.model_dump()
-    await db.attendance.insert_one(doc)
-    return attendance
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0})
+    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "UPDATE_STATUS", f"Changed {company['name']} status to {status}")
+    
+    return {"message": f"Company status updated to {status}"}
 
-@api_router.post("/attendance/checkout")
-async def check_out(checkout_data: AttendanceCheckOut, current_user: User = Depends(get_current_user)):
-    today = datetime.now(timezone.utc).date().isoformat()
+@api_router.put("/superadmin/companies/{company_id}/sms")
+async def update_company_sms(company_id: str, sms_settings: SMSSettings, current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
     
-    # Find today's attendance
-    attendance = await db.attendance.find_one({
-        "employee_id": current_user.id,
-        "date": today
-    })
+    result = await db.companies.update_one(
+        {"id": company_id},
+        {"$set": sms_settings.model_dump()}
+    )
     
-    if not attendance:
-        raise HTTPException(status_code=400, detail="No check-in found for today")
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Company not found")
     
-    if attendance.get("check_out"):
-        raise HTTPException(status_code=400, detail="Already checked out today")
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0})
+    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "UPDATE_SMS", f"Updated SMS settings for {company['name']}")
     
-    # Update check out time
-    await db.attendance.update_one(
-        {"employee_id": current_user.id, "date": today},
+    return {"message": "SMS settings updated"}
+
+@api_router.get("/superadmin/dashboard/stats")
+async def get_superadmin_stats(current_user: User = Depends(get_current_user)):
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    total_companies = await db.companies.count_documents({})
+    active_companies = await db.companies.count_documents({"status": "active"})
+    pending_companies = await db.companies.count_documents({"status": "pending"})
+    total_employees = await db.users.count_documents({"role": {"$ne": "super_admin"}})
+    
+    # Get companies with stats
+    companies = await db.companies.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+    company_stats = []
+    
+    for company in companies:
+        emp_count = await db.users.count_documents({"company_id": company["id"]})
+        
+        company_stats.append({
+            "company_id": company["id"],
+            "name": company["name"],
+            "admin_name": company["admin_name"],
+            "admin_mobile": company["admin_mobile"],
+            "status": company["status"],
+            "employee_count": emp_count,
+            "last_login": company.get("last_login"),
+            "sms_enabled": company.get("sms_enabled", False),
+            "created_at": company["created_at"]
+        })
+    
+    return {
+        "total_companies": total_companies,
+        "active_companies": active_companies,
+        "pending_companies": pending_companies,
+        "total_employees": total_employees,
+        "company_stats": company_stats
+    }
+
+# ============= COMPANY ENDPOINTS =============
+@api_router.get("/company/info")
+async def get_company_info(current_user: User = Depends(get_current_user)):
+    if current_user.role == "super_admin":
+        raise HTTPException(status_code=400, detail="Not applicable for super admin")
+    
+    company = await db.companies.find_one({"id": current_user.company_id}, {"_id": 0})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    return Company(**company)
+
+@api_router.put("/company/info")
+async def update_company_info(info: CompanyInfoUpdate, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    result = await db.companies.update_one(
+        {"id": current_user.company_id},
         {"$set": {
-            "check_out": datetime.now(timezone.utc).isoformat(),
-            "notes": checkout_data.notes if checkout_data.notes else attendance.get("notes")
+            "name": info.name,
+            "address": info.address,
+            "contact_number": info.contact_number,
+            "email": info.email,
+            "company_info_completed": True
         }}
     )
     
-    updated = await db.attendance.find_one({"employee_id": current_user.id, "date": today}, {"_id": 0})
-    return Attendance(**updated)
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_INFO", "Updated company information")
+    
+    return {"message": "Company information updated successfully"}
 
-@api_router.get("/attendance", response_model=List[Attendance])
-async def get_attendance(employee_id: Optional[str] = None, from_date: Optional[str] = None, to_date: Optional[str] = None, current_user: User = Depends(get_current_user)):
-    query = {}
+@api_router.get("/company/logs")
+async def get_company_logs(limit: int = 100, current_user: User = Depends(get_current_user)):
+    if current_user.role == "super_admin":
+        raise HTTPException(status_code=400, detail="Not applicable for super admin")
     
-    if current_user.role in ["admin", "manager"]:
-        if employee_id:
-            query["employee_id"] = employee_id
-    else:
-        query["employee_id"] = current_user.id
+    logs = await db.activity_logs.find(
+        {"company_id": current_user.company_id},
+        {"_id": 0}
+    ).sort("timestamp", -1).limit(limit).to_list(limit)
     
-    if from_date and to_date:
-        query["date"] = {"$gte": from_date, "$lte": to_date}
-    
-    attendance_records = await db.attendance.find(query, {"_id": 0}).sort("date", -1).to_list(1000)
-    return attendance_records
-
-@api_router.get("/attendance/my", response_model=List[Attendance])
-async def get_my_attendance(current_user: User = Depends(get_current_user)):
-    records = await db.attendance.find({"employee_id": current_user.id}, {"_id": 0}).sort("date", -1).to_list(100)
-    return records
-
-# Leave Endpoints
-@api_router.post("/leaves", response_model=Leave)
-async def create_leave(leave_data: LeaveCreate, current_user: User = Depends(get_current_user)):
-    leave = Leave(
-        employee_id=current_user.id,
-        employee_name=current_user.name,
-        **leave_data.model_dump()
-    )
-    
-    doc = leave.model_dump()
-    await db.leaves.insert_one(doc)
-    return leave
-
-@api_router.get("/leaves", response_model=List[Leave])
-async def get_leaves(status: Optional[str] = None, current_user: User = Depends(get_current_user)):
-    query = {}
-    
-    if current_user.role in ["admin", "manager"]:
-        if status:
-            query["status"] = status
-    else:
-        query["employee_id"] = current_user.id
-        if status:
-            query["status"] = status
-    
-    leaves = await db.leaves.find(query, {"_id": 0}).sort("applied_date", -1).to_list(1000)
-    return leaves
-
-@api_router.put("/leaves/{leave_id}", response_model=Leave)
-async def update_leave_status(leave_id: str, leave_update: LeaveUpdate, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "manager"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    leave = await db.leaves.find_one({"id": leave_id})
-    if not leave:
-        raise HTTPException(status_code=404, detail="Leave not found")
-    
-    await db.leaves.update_one(
-        {"id": leave_id},
-        {"$set": {"status": leave_update.status, "approved_by": current_user.name}}
-    )
-    
-    updated = await db.leaves.find_one({"id": leave_id}, {"_id": 0})
-    return Leave(**updated)
-
-# Advance Endpoints
-@api_router.post("/advances", response_model=Advance)
-async def create_advance(advance_data: AdvanceCreate, current_user: User = Depends(get_current_user)):
-    advance = Advance(
-        employee_id=current_user.id,
-        employee_name=current_user.name,
-        **advance_data.model_dump()
-    )
-    
-    doc = advance.model_dump()
-    await db.advances.insert_one(doc)
-    return advance
-
-@api_router.get("/advances", response_model=List[Advance])
-async def get_advances(status: Optional[str] = None, current_user: User = Depends(get_current_user)):
-    query = {}
-    
-    if current_user.role in ["admin", "manager"]:
-        if status:
-            query["status"] = status
-    else:
-        query["employee_id"] = current_user.id
-        if status:
-            query["status"] = status
-    
-    advances = await db.advances.find(query, {"_id": 0}).sort("request_date", -1).to_list(1000)
-    return advances
-
-@api_router.put("/advances/{advance_id}", response_model=Advance)
-async def update_advance_status(advance_id: str, advance_update: AdvanceUpdate, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "manager"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    advance = await db.advances.find_one({"id": advance_id})
-    if not advance:
-        raise HTTPException(status_code=404, detail="Advance not found")
-    
-    await db.advances.update_one(
-        {"id": advance_id},
-        {"$set": {"status": advance_update.status, "approved_by": current_user.name}}
-    )
-    
-    updated = await db.advances.find_one({"id": advance_id}, {"_id": 0})
-    return Advance(**updated)
-
-# Increment Endpoints
-@api_router.post("/increments", response_model=Increment)
-async def create_increment(increment_data: IncrementCreate, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "manager"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    # Get employee current salary
-    employee = await db.users.find_one({"id": increment_data.employee_id})
-    if not employee:
-        raise HTTPException(status_code=404, detail="Employee not found")
-    
-    previous_salary = employee["basic_salary"]
-    increment_amount = increment_data.new_salary - previous_salary
-    
-    increment = Increment(
-        employee_id=increment_data.employee_id,
-        employee_name=employee["name"],
-        previous_salary=previous_salary,
-        new_salary=increment_data.new_salary,
-        increment_amount=increment_amount,
-        effective_date=increment_data.effective_date,
-        reason=increment_data.reason,
-        created_by=current_user.name
-    )
-    
-    # Update employee salary
-    await db.users.update_one(
-        {"id": increment_data.employee_id},
-        {"$set": {"basic_salary": increment_data.new_salary}}
-    )
-    
-    doc = increment.model_dump()
-    await db.increments.insert_one(doc)
-    return increment
-
-@api_router.get("/increments", response_model=List[Increment])
-async def get_increments(employee_id: Optional[str] = None, current_user: User = Depends(get_current_user)):
-    query = {}
-    
-    if current_user.role in ["admin", "manager"]:
-        if employee_id:
-            query["employee_id"] = employee_id
-    else:
-        query["employee_id"] = current_user.id
-    
-    increments = await db.increments.find(query, {"_id": 0}).sort("created_at", -1).to_list(1000)
-    return increments
-
-# Payroll Endpoints
-@api_router.get("/payroll", response_model=List[Payroll])
-async def get_payroll(month: Optional[str] = None, year: Optional[int] = None, employee_id: Optional[str] = None, current_user: User = Depends(get_current_user)):
-    query = {}
-    
-    if current_user.role in ["admin", "manager"]:
-        if employee_id:
-            query["employee_id"] = employee_id
-    else:
-        query["employee_id"] = current_user.id
-    
-    if month:
-        query["month"] = month
-    if year:
-        query["year"] = year
-    
-    payrolls = await db.payroll.find(query, {"_id": 0}).sort("generated_at", -1).to_list(1000)
-    return payrolls
-
-@api_router.post("/payroll/generate")
-async def generate_payroll(month: str, year: int, current_user: User = Depends(get_current_user)):
-    if current_user.role not in ["admin", "manager"]:
-        raise HTTPException(status_code=403, detail="Not authorized")
-    
-    # Get all active employees
-    employees = await db.users.find({"is_active": True}, {"_id": 0}).to_list(1000)
-    
-    payrolls_generated = []
-    
-    for employee in employees:
-        # Get approved advances for this employee
-        advances = await db.advances.find({
-            "employee_id": employee["id"],
-            "status": "approved"
-        }).to_list(1000)
-        
-        total_advances = sum(adv["amount"] for adv in advances)
-        
-        # Calculate payroll
-        basic_salary = employee.get("basic_salary", 0)
-        allowances = employee.get("allowances", 0)
-        deductions = 0  # Can be calculated based on business logic
-        net_salary = basic_salary + allowances - deductions - total_advances
-        
-        payroll = Payroll(
-            employee_id=employee["id"],
-            employee_name=employee["name"],
-            month=month,
-            year=year,
-            basic_salary=basic_salary,
-            allowances=allowances,
-            deductions=deductions,
-            advances=total_advances,
-            net_salary=net_salary
-        )
-        
-        # Check if payroll already exists
-        existing = await db.payroll.find_one({
-            "employee_id": employee["id"],
-            "month": month,
-            "year": year
-        })
-        
-        if not existing:
-            doc = payroll.model_dump()
-            await db.payroll.insert_one(doc)
-            payrolls_generated.append(payroll)
-    
-    return {"message": f"Generated payroll for {len(payrolls_generated)} employees", "payrolls": payrolls_generated}
-
-@api_router.get("/payroll/my", response_model=List[Payroll])
-async def get_my_payroll(current_user: User = Depends(get_current_user)):
-    payrolls = await db.payroll.find({"employee_id": current_user.id}, {"_id": 0}).sort("generated_at", -1).to_list(100)
-    return payrolls
-
-# Dashboard Endpoints
-@api_router.get("/dashboard/stats")
-async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
-    if current_user.role in ["admin", "manager"]:
-        # Admin/Manager stats
-        total_employees = await db.users.count_documents({"is_active": True})
-        total_attendance_today = await db.attendance.count_documents({"date": datetime.now(timezone.utc).date().isoformat()})
-        pending_leaves = await db.leaves.count_documents({"status": "pending"})
-        pending_advances = await db.advances.count_documents({"status": "pending"})
-        
-        # Recent activities
-        recent_leaves = await db.leaves.find({}, {"_id": 0}).sort("applied_date", -1).limit(5).to_list(5)
-        recent_advances = await db.advances.find({}, {"_id": 0}).sort("request_date", -1).limit(5).to_list(5)
-        
-        return {
-            "total_employees": total_employees,
-            "attendance_today": total_attendance_today,
-            "pending_leaves": pending_leaves,
-            "pending_advances": pending_advances,
-            "recent_leaves": recent_leaves,
-            "recent_advances": recent_advances
-        }
-    else:
-        # Employee/Staff stats
-        my_attendance = await db.attendance.count_documents({"employee_id": current_user.id})
-        my_leaves = await db.leaves.find({"employee_id": current_user.id}, {"_id": 0}).to_list(100)
-        my_advances = await db.advances.find({"employee_id": current_user.id}, {"_id": 0}).to_list(100)
-        my_payroll = await db.payroll.find({"employee_id": current_user.id}, {"_id": 0}).sort("generated_at", -1).limit(1).to_list(1)
-        
-        # Check today's attendance
-        today = datetime.now(timezone.utc).date().isoformat()
-        today_attendance = await db.attendance.find_one({"employee_id": current_user.id, "date": today}, {"_id": 0})
-        
-        return {
-            "total_attendance_days": my_attendance,
-            "total_leaves": len(my_leaves),
-            "approved_leaves": len([l for l in my_leaves if l["status"] == "approved"]),
-            "total_advances": len(my_advances),
-            "approved_advances": sum(a["amount"] for a in my_advances if a["status"] == "approved"),
-            "latest_payroll": my_payroll[0] if my_payroll else None,
-            "today_attendance": today_attendance
-        }
+    return logs
 
 # Include router
 app.include_router(api_router)
@@ -674,7 +455,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
