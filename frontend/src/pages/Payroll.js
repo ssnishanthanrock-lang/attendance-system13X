@@ -2,12 +2,9 @@ import { useState, useEffect } from 'react';
 import { api } from '../App';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { Plus, ArrowLeft, TrendingUp, Briefcase, AlertCircle } from 'lucide-react';
+import { ArrowLeft, TrendingUp, Briefcase, AlertCircle } from 'lucide-react';
 
 export default function Payroll() {
   const [months, setMonths] = useState([]);
