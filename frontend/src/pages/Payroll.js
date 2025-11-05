@@ -306,9 +306,9 @@ export default function Payroll() {
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => {
-                            const daySalary = emp.working_days > 0 ? (emp.basic_salary / emp.working_days) : 0;
-                            const attendedDays = emp.present_days + (emp.allowed_leaves || 0) + ((emp.allowed_half_days || 0) * 0.5);
-                            return sum + (attendedDays * daySalary);
+                            const totalMinutes = emp.total_attendance_minutes || 0;
+                            const perMinuteSalary = emp.salary_per_minute || 0;
+                            return sum + (perMinuteSalary * totalMinutes);
                           }, 0).toLocaleString(undefined, {maximumFractionDigits: 2})}
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
