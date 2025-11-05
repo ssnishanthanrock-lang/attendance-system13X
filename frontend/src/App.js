@@ -48,55 +48,55 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/login/select-role" element={<LoginRoleSelection />} />
           <Route path="/superadmin" element={
-            <PrivateRoute>
+            <ProtectedRoute allowedRoles={['super_admin']}>
               <SuperAdminDashboard />
-            </PrivateRoute>
+            </ProtectedRoute>
           } />
           <Route path="/superadmin/companies/:companyId" element={
-            <PrivateRoute>
+            <ProtectedRoute allowedRoles={['super_admin']}>
               <SuperAdminCompanyDetail />
-            </PrivateRoute>
+            </ProtectedRoute>
           } />
           <Route path="/superadmin/admins" element={
-            <PrivateRoute>
+            <ProtectedRoute allowedRoles={['super_admin']}>
               <SuperAdminManagement />
-            </PrivateRoute>
+            </ProtectedRoute>
           } />
           <Route path="/onboarding" element={
-            <PrivateRoute>
+            <ProtectedRoute allowedRoles={['admin', 'manager']}>
               <CompanyOnboarding />
-            </PrivateRoute>
+            </ProtectedRoute>
           } />
           <Route
             path="/"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
                 <Dashboard />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/settings"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
                 <CompanySettings />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/employees"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
                 <Employees />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
           <Route
             path="/attendance"
             element={
-              <PrivateRoute>
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
                 <Attendance />
-              </PrivateRoute>
+              </ProtectedRoute>
             }
           />
           <Route
