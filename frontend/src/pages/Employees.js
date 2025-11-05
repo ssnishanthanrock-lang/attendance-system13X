@@ -230,9 +230,9 @@ export default function Employees() {
                     </Select>
                   </div>
                   {/* Department and Position in one line with labels */}
-                  <div className="sm:col-span-2 grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Department</label>
+                  <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                    <label className="col-span-3 text-sm font-medium flex items-center">Department</label>
+                    <div className="col-span-3">
                       <Input
                         data-testid="department-input"
                         value={formData.department}
@@ -240,8 +240,8 @@ export default function Employees() {
                         placeholder="Enter department"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Position</label>
+                    <label className="col-span-3 text-sm font-medium flex items-center">Position</label>
+                    <div className="col-span-3">
                       <Input
                         data-testid="position-input"
                         value={formData.position}
@@ -252,9 +252,9 @@ export default function Employees() {
                   </div>
                   
                   {/* Basic Salary and Allowances in one line with labels */}
-                  <div className="sm:col-span-2 grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Basic Salary (Rs.)</label>
+                  <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                    <label className="col-span-3 text-sm font-medium flex items-center">Basic Salary (Rs.)</label>
+                    <div className="col-span-3">
                       <Input
                         data-testid="salary-input"
                         type="number"
@@ -263,8 +263,8 @@ export default function Employees() {
                         placeholder="0"
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium">Allowances (Rs.)</label>
+                    <label className="col-span-3 text-sm font-medium flex items-center">Allowances (Rs.)</label>
+                    <div className="col-span-3">
                       <Input
                         data-testid="allowances-input"
                         type="number"
