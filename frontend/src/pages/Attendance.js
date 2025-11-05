@@ -640,7 +640,9 @@ export default function Attendance() {
                   <div className="max-h-40 overflow-y-auto space-y-2">
                     {editHistory.map((history) => (
                       <div key={history.id} className="bg-gray-50 p-2 rounded text-xs">
-                        <p className="font-medium text-gray-900">{history.changes}</p>
+                        <p className="font-medium text-gray-900">
+                          Changed {history.field_changed} from "<span className="text-red-600">{history.old_value}</span>" to "<span className="text-green-600">{history.new_value}</span>"
+                        </p>
                         <p className="text-gray-500 mt-1">
                           By {history.edited_by} • {new Date(history.edited_at).toLocaleString()}
                         </p>
