@@ -368,8 +368,10 @@ function WorkingDaysCalculator({ settings }) {
   ];
 
   useEffect(() => {
-    calculateWorkingDays();
-  }, [selectedMonth, selectedYear, settings?.holidays]);
+    if (settings) {
+      calculateWorkingDays();
+    }
+  }, [selectedMonth, selectedYear, settings]);
 
   const calculateWorkingDays = async () => {
     setLoading(true);
