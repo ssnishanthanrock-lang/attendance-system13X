@@ -869,7 +869,7 @@ async def delete_employee(employee_id: str, current_user: User = Depends(get_cur
         {"$set": {"is_active": False}}
     )
     
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_EMPLOYEE", f"Deleted employee {employee['name']}")
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_EMPLOYEE", f"Deleted employee: {employee['name']}, ID: {employee.get('employee_id', 'N/A')}, Role: {employee.get('role', 'N/A')}")
     
     return {"message": "Employee deleted successfully"}
 
