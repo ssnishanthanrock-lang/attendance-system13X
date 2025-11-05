@@ -1242,6 +1242,16 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or manager access required")
     
+    # Validate date is not in the future
+    from datetime import date
+    try:
+        attendance_date = date.fromisoformat(attendance_data["date"])
+        today = date.today()
+        if attendance_date > today:
+            raise HTTPException(status_code=400, detail="Cannot add attendance for future dates")
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid date format")
+    
     # Validate employee belongs to same company
     employee = await db.users.find_one({"id": attendance_data["employee_id"], "company_id": current_user.company_id})
     if not employee:
@@ -1255,7 +1265,7 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
     })
     
     if existing:
-        raise HTTPException(status_code=400, detail="Attendance already exists for this date")
+        raise HTTPException(status_code=400, detail=f"Attendance already exists for {employee['name']} on {attendance_data['date']}")
     
     # Create attendance record
     # Combine date with times to create ISO datetime strings
