@@ -627,29 +627,37 @@ export default function Attendance() {
                       </td>
                     </tr>
                   ) : viewMode === 'last7days' ? (
-                    // Grouped by date view
-                    Object.entries(groupAttendanceByDate())
-                      .sort(([dateA], [dateB]) => dateB.localeCompare(dateA)) // Sort by date descending
-                      .map(([date, records]) => (
-                        <>
-                          {/* Date Header Row */}
-                          <tr key={`header-${date}`} className="bg-gradient-to-r from-blue-50 to-indigo-50 border-t-2 border-blue-200">
-                            <td colSpan="7" className="px-4 py-3">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-3">
-                                  <Calendar className="w-5 h-5 text-blue-600" />
-                                  <span className="font-bold text-blue-900 text-base">
-                                    {formatDateForDisplay(date)}
-                                  </span>
-                                  <span className="text-sm text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
-                                    {records.length} record{records.length !== 1 ? 's' : ''}
-                                  </span>
+                    // Grouped by date view - Card-based design
+                    <tr>
+                      <td colSpan="7" className="p-0">
+                        <div className="space-y-4 p-4">
+                          {Object.entries(groupAttendanceByDate())
+                            .sort(([dateA], [dateB]) => dateB.localeCompare(dateA))
+                            .map(([date, records]) => (
+                              <Card key={date} className="overflow-hidden border-l-4 border-l-blue-500">
+                                {/* Date Header */}
+                                <div className="bg-gradient-to-r from-blue-50 via-blue-100 to-indigo-50 px-4 py-3 border-b border-blue-200">
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                      <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                                        <Calendar className="w-5 h-5 text-white" />
+                                      </div>
+                                      <div>
+                                        <h3 className="font-bold text-gray-900 text-base">
+                                          {formatDateForDisplay(date)}
+                                        </h3>
+                                        <p className="text-xs text-gray-600">
+                                          {records.length} attendance record{records.length !== 1 ? 's' : ''}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                          </tr>
-                          {/* Records for this date */}
-                          {records.map((record) => (
+                                
+                                {/* Records Grid */}
+                                <CardContent className="p-0">
+                                  <div className="divide-y divide-gray-100">
+                                    {records.map((record) => (
                             <tr key={record.id} className={`hover:bg-gray-50 transition-colors ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}>
                               <td className="px-4 py-3 text-sm font-medium text-gray-900">
                                 <div className="flex items-center gap-3">
