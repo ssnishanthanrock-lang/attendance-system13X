@@ -472,6 +472,60 @@ export default function Attendance() {
           </div>
         )}
       </div>
+
+      {/* Edit Attendance Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Update Attendance</DialogTitle>
+            <DialogDescription>
+              Update check-in/check-out times for {editingAttendance?.employee_name} on {editingAttendance?.date}
+            </DialogDescription>
+          </DialogHeader>
+          {editingAttendance && (
+            <form onSubmit={handleUpdateAttendance} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Check In Time *</label>
+                  <Input
+                    type="time"
+                    value={editingAttendance.check_in}
+                    onChange={(e) => setEditingAttendance({...editingAttendance, check_in: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Check Out Time</label>
+                  <Input
+                    type="time"
+                    value={editingAttendance.check_out}
+                    onChange={(e) => setEditingAttendance({...editingAttendance, check_out: e.target.value})}
+                    placeholder="Optional"
+                  />
+                </div>
+              </div>
+              
+              {!editingAttendance.check_out && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <p className="text-sm text-amber-800">
+                    ⚠️ No check-out time set. You can add it later when the day finishes.
+                  </p>
+                </div>
+              )}
+              
+              <div className="flex justify-end gap-2 pt-4">
+                <Button type="button" variant="outline" onClick={() => setEditDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+                  <Edit className="w-4 h-4 mr-2" />
+                  Update
+                </Button>
+              </div>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
