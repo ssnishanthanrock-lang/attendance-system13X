@@ -280,13 +280,13 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except Exception:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-async def log_activity(company_id: str, user_id: str, user_name: str, action: str, description: str):
+async def log_activity(company_id: str, user_id: str, user_name: str, action: str, details: str):
     log = ActivityLog(
         company_id=company_id,
         user_id=user_id,
         user_name=user_name,
         action=action,
-        description=description
+        details=details
     )
     await db.activity_logs.insert_one(log.model_dump())
 
