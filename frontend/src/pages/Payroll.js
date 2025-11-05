@@ -318,9 +318,13 @@ export default function Payroll() {
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => {
-                            const totalMinutes = emp.total_attendance_minutes || 0;
-                            const perMinuteSalary = emp.salary_per_minute || 0;
-                            return sum + (perMinuteSalary * totalMinutes);
+                            if (emp.fixed_salary) {
+                              return sum + emp.basic_salary + emp.allowances;
+                            } else {
+                              const totalMinutes = emp.total_attendance_minutes || 0;
+                              const perMinuteSalary = emp.salary_per_minute || 0;
+                              return sum + (perMinuteSalary * totalMinutes);
+                            }
                           }, 0).toLocaleString(undefined, {maximumFractionDigits: 2})}
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
