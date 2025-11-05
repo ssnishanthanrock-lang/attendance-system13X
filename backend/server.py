@@ -765,25 +765,33 @@ async def create_employee(employee: UserCreate, current_user: User = Depends(get
     if existing:
         raise HTTPException(status_code=400, detail="Employee with this mobile number already exists")
     
+    # Get company settings for default times
+    settings = await db.settings.find_one({"company_id": current_user.company_id})
+    default_start_time = settings.get("office_start_time", "09:00") if settings else "09:00"
+    default_finish_time = settings.get("office_end_time", "17:00") if settings else "17:00"
+    
     # Create new employee
     new_employee = User(
         id=str(uuid.uuid4()),
         company_id=current_user.company_id,
-        employee_id=employee.employee_id,
+        employee_id=employee.employee_id or f"EMP-{str(uuid.uuid4())[:8]}",
         mobile=employee.mobile,
-        name=employee.name,
+        name=capitalize_name(employee.name),
         role=employee.role,
         department=employee.department or "",
         position=employee.position or "",
         basic_salary=employee.basic_salary or 0,
         allowances=employee.allowances or 0,
         join_date=employee.join_date,
+        start_time=employee.start_time or default_start_time,
+        finish_time=employee.finish_time or default_finish_time,
+        fixed_salary=employee.fixed_salary or False,
         is_active=True,
         created_at=datetime.now(timezone.utc).isoformat()
     )
     
     await db.users.insert_one(new_employee.model_dump())
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_EMPLOYEE", f"Created employee {employee.name}")
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_EMPLOYEE", f"Created employee {capitalize_name(employee.name)}")
     
     return new_employee
 
