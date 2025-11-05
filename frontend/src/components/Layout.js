@@ -170,16 +170,16 @@ export default function Layout({ children }) {
             </h1>
           </div>
 
-          <div className="flex-1 px-4 py-6 space-y-2">
+          <div className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
             {filteredMenuItems.map((item) => (
               <NavLink key={item.path} item={item} />
             ))}
           </div>
 
-          <div className="p-4 border-t border-gray-200">
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-4">
+          <div className="p-3 border-t border-gray-200">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-3 mb-3">
               <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
-              <p className="text-xs text-gray-600 mt-1 capitalize">{user?.role?.replace('_', ' ')}</p>
+              <p className="text-xs text-gray-600 mt-0.5 capitalize">{user?.role?.replace('_', ' ')}</p>
             </div>
             <Button
               data-testid="logout-button"
