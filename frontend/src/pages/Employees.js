@@ -275,6 +275,36 @@ export default function Employees() {
                       required
                     />
                   </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Start Time</label>
+                    <Input
+                      type="time"
+                      value={formData.start_time}
+                      onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                    />
+                    <p className="text-xs text-gray-500">Default office start time</p>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Finish Time</label>
+                    <Input
+                      type="time"
+                      value={formData.finish_time}
+                      onChange={(e) => setFormData({ ...formData, finish_time: e.target.value })}
+                    />
+                    <p className="text-xs text-gray-500">Default office finish time</p>
+                  </div>
+                  <div className="space-y-2 sm:col-span-2">
+                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                      <div>
+                        <label className="text-sm font-medium">Fixed Salary</label>
+                        <p className="text-xs text-gray-600">Skip late attendance deductions</p>
+                      </div>
+                      <Switch
+                        checked={formData.fixed_salary}
+                        onCheckedChange={(checked) => setFormData({ ...formData, fixed_salary: checked })}
+                      />
+                    </div>
+                  </div>
                   <div className="space-y-2 sm:col-span-2">
                     <label className="text-sm font-medium">Profile Picture</label>
                     <Input
