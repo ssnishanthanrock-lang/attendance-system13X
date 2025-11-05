@@ -39,6 +39,9 @@ export default function Employees() {
     profile_picture: null
   });
 
+  // Check if user can edit (not read-only impersonation)
+  const canEdit = !isImpersonating() || canEditInImpersonation();
+
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
