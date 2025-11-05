@@ -45,7 +45,7 @@ export default function SuperAdminManagement() {
         style: { background: '#10b981', color: 'white' }
       });
       setDialogOpen(false);
-      setFormData({ name: '', mobile: '', employee_id: '' });
+      setFormData({ name: '', mobile: '', employee_id: '', can_full_access_companies: false });
       fetchSuperAdmins();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to create super admin', {
