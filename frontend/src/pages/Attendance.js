@@ -1,0 +1,231 @@
+import { useState, useEffect } from 'react';
+import { api } from '../App';
+import Layout from '../components/Layout';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
+import { toast } from 'sonner';
+import { Calendar, Clock, CheckCircle, XCircle } from 'lucide-react';
+
+export default function Attendance() {
+  const [attendance, setAttendance] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
+  const [filters, setFilters] = useState({
+    employee_id: '',
+    from_date: '',
+    to_date: '',
+  });
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('user'));
+    setUser(userData);
+    if (userData?.role === 'admin' || userData?.role === 'manager') {
+      fetchEmployees();
+    }
+    fetchAttendance();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const response = await api.get('/employees');
+      setEmployees(response.data);
+    } catch (error) {
+      toast.error('Failed to fetch employees');
+    }
+  };
+
+  const fetchAttendance = async () => {
+    try {
+      const params = new URLSearchParams();
+      if (filters.employee_id) params.append('employee_id', filters.employee_id);
+      if (filters.from_date) params.append('from_date', filters.from_date);
+      if (filters.to_date) params.append('to_date', filters.to_date);
+
+      const response = await api.get(`/attendance?${params.toString()}`);
+      setAttendance(response.data);
+    } catch (error) {
+      toast.error('Failed to fetch attendance');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilter = () => {
+    setLoading(true);
+    fetchAttendance();
+  };
+
+  const formatTime = (isoString) => {
+    if (!isoString) return 'N/A';
+    return new Date(isoString).toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const calculateHours = (checkIn, checkOut) => {
+    if (!checkIn || !checkOut) return 'N/A';
+    const diff = new Date(checkOut) - new Date(checkIn);
+    const hours = Math.floor(diff / 1000 / 60 / 60);
+    const minutes = Math.floor((diff / 1000 / 60) % 60);
+    return `${hours}h ${minutes}m`;
+  };
+
+  const isAdmin = user?.role === 'admin' || user?.role === 'manager';
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="flex items-center justify-center h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      </Layout>
+    );
+  }
+
+  return (
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }} data-testid="attendance-title">
+            Attendance Records
+          </h1>
+        </div>
+
+        {/* Filters */}
+        <Card>
+          <CardHeader>
+            <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Filter Attendance</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {isAdmin && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Employee</label>
+                  <Select value={filters.employee_id} onValueChange={(value) => setFilters({ ...filters, employee_id: value })}>
+                    <SelectTrigger data-testid="employee-filter">
+                      <SelectValue placeholder="All Employees" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Employees</SelectItem>
+                      {employees.map((emp) => (
+                        <SelectItem key={emp.id} value={emp.id}>
+                          {emp.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">From Date</label>
+                <Input
+                  data-testid="from-date-input"
+                  type="date"
+                  value={filters.from_date}
+                  onChange={(e) => setFilters({ ...filters, from_date: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">To Date</label>
+                <Input
+                  data-testid="to-date-input"
+                  type="date"
+                  value={filters.to_date}
+                  onChange={(e) => setFilters({ ...filters, to_date: e.target.value })}
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  data-testid="filter-button"
+                  onClick={handleFilter}
+                  className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                >
+                  Apply Filter
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Attendance Records */}
+        <div className="space-y-4" data-testid="attendance-list">
+          {attendance.map((record) => (
+            <Card key={record.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+              <CardContent className="p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex-1 space-y-3">
+                    <div className="flex items-center justify-between sm:justify-start gap-4">
+                      <div>
+                        <h3 className="font-semibold text-lg text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                          {record.employee_name}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Calendar className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm text-gray-600">{record.date}</span>
+                        </div>
+                      </div>
+                      <span
+                        className={`text-xs px-3 py-1 rounded-full ${
+                          record.status === 'present'
+                            ? 'bg-green-100 text-green-700'
+                            : record.status === 'absent'
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}
+                      >
+                        {record.status}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span className="text-xs text-gray-600">Check In</span>
+                        </div>
+                        <p className="font-semibold text-green-700">{formatTime(record.check_in)}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <XCircle className="w-4 h-4 text-orange-600" />
+                          <span className="text-xs text-gray-600">Check Out</span>
+                        </div>
+                        <p className="font-semibold text-orange-700">{formatTime(record.check_out)}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-blue-600" />
+                          <span className="text-xs text-gray-600">Total Hours</span>
+                        </div>
+                        <p className="font-semibold text-blue-700">{calculateHours(record.check_in, record.check_out)}</p>
+                      </div>
+                    </div>
+
+                    {record.notes && (
+                      <div className="pt-2 border-t border-gray-100">
+                        <p className="text-sm text-gray-600">
+                          <span className="font-medium">Notes:</span> {record.notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {attendance.length === 0 && (
+          <div className="text-center py-12">
+            <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-gray-500">No attendance records found</p>
+          </div>
+        )}
+      </div>
+    </Layout>
+  );
+}
