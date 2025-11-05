@@ -19,8 +19,18 @@ export default function Dashboard() {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     fetchStats();
+    
     if (userData?.role === 'admin' || userData?.role === 'manager') {
+      // Initial fetch
       fetchLivePayroll();
+      
+      // Set up live updates every second
+      const intervalId = setInterval(() => {
+        fetchLivePayroll();
+      }, 1000);
+      
+      // Cleanup on unmount
+      return () => clearInterval(intervalId);
     }
   }, []);
 
