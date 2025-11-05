@@ -1327,6 +1327,137 @@ async def get_deleted_attendance(current_user: User = Depends(get_current_user))
     
     return deleted_records
 
+# ============= PAYROLL ENDPOINTS =============
+@api_router.post("/payroll/generate")
+async def generate_payroll(payroll_data: dict, current_user: User = Depends(get_current_user)):
+    """Generate payroll for a specific month"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    month = payroll_data["month"]  # Format: "YYYY-MM"
+    year, month_num = month.split("-")
+    
+    # Get all employees for the company
+    employees = await db.users.find({
+        "company_id": current_user.company_id,
+        "role": {"$in": ["employee", "staff_member", "manager"]}
+    }).to_list(length=None)
+    
+    payroll_records = []
+    
+    for employee in employees:
+        # Get effective salary for this month (considers increment history)
+        effective_salary = await get_effective_salary(
+            employee["id"], 
+            current_user.company_id, 
+            month
+        )
+        
+        # Get attendance for this employee for this month
+        attendance_records = await db.attendance.find({
+            "employee_id": employee["id"],
+            "company_id": current_user.company_id,
+            "date": {"$regex": f"^{month}"}
+        }).to_list(length=None)
+        
+        # Calculate attendance metrics
+        present_days = len([a for a in attendance_records if a.get("status") == "present"])
+        leave_days = len([a for a in attendance_records if a.get("status") == "leave"])
+        half_days = len([a for a in attendance_records if a.get("status") == "half_day"])
+        
+        # Calculate total hours worked
+        total_hours = 0
+        for record in attendance_records:
+            if record.get("check_in") and record.get("check_out"):
+                try:
+                    check_in = datetime.fromisoformat(record["check_in"])
+                    check_out = datetime.fromisoformat(record["check_out"])
+                    hours = (check_out - check_in).total_seconds() / 3600
+                    total_hours += hours
+                except:
+                    pass
+        
+        # Get company settings for working hours
+        settings = await db.settings.find_one({"company_id": current_user.company_id})
+        expected_hours_per_day = 8  # default
+        if settings:
+            try:
+                start = datetime.strptime(settings.get("start_time", "09:00"), "%H:%M")
+                finish = datetime.strptime(settings.get("finish_time", "17:00"), "%H:%M")
+                expected_hours_per_day = (finish - start).total_seconds() / 3600
+            except:
+                pass
+        
+        # Calculate late days (simplified - you can enhance this)
+        late_days = 0
+        
+        # Calculate deductions
+        deductions = employee.get("deductions", 0)
+        
+        # Calculate allowances
+        allowances = employee.get("allowances", 0)
+        
+        # Calculate gross salary (using effective salary for this month)
+        gross_salary = effective_salary
+        
+        # Calculate net salary
+        net_salary = gross_salary + allowances - deductions
+        
+        # Create payroll record
+        payroll_record = {
+            "id": str(uuid.uuid4()),
+            "company_id": current_user.company_id,
+            "employee_id": employee["id"],
+            "employee_name": employee["name"],
+            "month": month,
+            "basic_salary": effective_salary,  # This is the key - uses effective salary
+            "allowances": allowances,
+            "deductions": deductions,
+            "gross_salary": gross_salary,
+            "net_salary": net_salary,
+            "present_days": present_days,
+            "leave_days": leave_days,
+            "half_days": half_days,
+            "late_days": late_days,
+            "total_hours": round(total_hours, 2),
+            "generated_by": current_user.name,
+            "generated_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        # Save to database
+        await db.payroll.insert_one(payroll_record)
+        payroll_records.append(payroll_record)
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "GENERATE_PAYROLL",
+        f"Generated payroll for {month} - {len(payroll_records)} employee(s)"
+    )
+    
+    return {
+        "message": f"Payroll generated for {len(payroll_records)} employee(s)",
+        "month": month,
+        "employee_count": len(payroll_records)
+    }
+
+@api_router.get("/payroll")
+async def get_payroll(month: Optional[str] = None, employee_id: Optional[str] = None, current_user: User = Depends(get_current_user)):
+    """Get payroll records"""
+    query = {"company_id": current_user.company_id}
+    
+    if month:
+        query["month"] = month
+    
+    if employee_id:
+        query["employee_id"] = employee_id
+    
+    payroll = await db.payroll.find(query, {"_id": 0}).sort("generated_at", -1).to_list(length=None)
+    
+    return payroll
+
 # ============= UTILITY FUNCTIONS =============
 def capitalize_name(name: str) -> str:
     """Capitalize first letter of each word in a name"""
