@@ -805,6 +805,70 @@ async def delete_employee(employee_id: str, current_user: User = Depends(get_cur
     
     return {"message": "Employee deleted successfully"}
 
+# ============= UTILITY FUNCTIONS =============
+def calculate_working_days(year: int, month: int, holidays: List[dict], saturday_enabled: bool = True, saturday_type: str = "full") -> dict:
+    """
+    Calculate working days for a given month considering:
+    - Sundays (weekly off)
+    - Public holidays from holiday calendar
+    - Saturday settings (full day, half day, or off)
+    """
+    import calendar
+    from datetime import date
+    
+    # Get total days in month
+    total_days = calendar.monthrange(year, month)[1]
+    
+    # Count working days
+    working_days = 0
+    half_days = 0
+    
+    # Convert holidays to date strings for comparison
+    holiday_dates = set()
+    for holiday in holidays:
+        try:
+            holiday_date = datetime.fromisoformat(holiday['date']).date()
+            if holiday_date.year == year and holiday_date.month == month:
+                holiday_dates.add(holiday['date'])
+        except:
+            continue
+    
+    for day in range(1, total_days + 1):
+        current_date = date(year, month, day)
+        date_str = current_date.isoformat()
+        weekday = current_date.weekday()  # 0=Monday, 6=Sunday
+        
+        # Skip Sundays
+        if weekday == 6:
+            continue
+        
+        # Skip holidays
+        if date_str in holiday_dates:
+            continue
+        
+        # Handle Saturday
+        if weekday == 5:  # Saturday
+            if not saturday_enabled:
+                continue
+            elif saturday_type == "half":
+                half_days += 1
+            else:  # full day
+                working_days += 1
+        else:
+            working_days += 1
+    
+    # Convert half days to working days (2 half days = 1 full day)
+    total_working_days = working_days + (half_days * 0.5)
+    
+    return {
+        "total_days": total_days,
+        "working_days": round(total_working_days, 1),
+        "full_days": working_days,
+        "half_days": half_days,
+        "holidays": len(holiday_dates),
+        "sundays": sum(1 for day in range(1, total_days + 1) if date(year, month, day).weekday() == 6)
+    }
+
 # ============= SETTINGS ENDPOINTS =============
 @api_router.get("/settings")
 async def get_settings(current_user: User = Depends(get_current_user)):
