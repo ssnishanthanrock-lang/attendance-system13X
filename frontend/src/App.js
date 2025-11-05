@@ -158,6 +158,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/deleted-employees"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <DeletedEmployees />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </BrowserRouter>
       <Toaster 
