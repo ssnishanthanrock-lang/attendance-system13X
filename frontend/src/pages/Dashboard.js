@@ -35,6 +35,15 @@ export default function Dashboard() {
     }
   };
 
+  const fetchLivePayroll = async () => {
+    try {
+      const response = await api.get('/payroll/live-current-month');
+      setLivePayroll(response.data);
+    } catch (error) {
+      console.error('Failed to fetch live payroll:', error);
+    }
+  };
+
   const handleCheckIn = async () => {
     setCheckingIn(true);
     try {
