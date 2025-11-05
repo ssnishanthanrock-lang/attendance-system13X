@@ -17,6 +17,7 @@ import Advances from "./pages/Advances";
 import Increments from "./pages/Increments";
 import Payroll from "./pages/Payroll";
 import ActivityLogs from "./pages/ActivityLogs";
+import DeletedAttendance from "./pages/DeletedAttendance";
 import { Toaster } from "./components/ui/sonner";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
