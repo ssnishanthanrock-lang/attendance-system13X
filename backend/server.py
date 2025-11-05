@@ -829,7 +829,7 @@ async def create_employee(employee: UserCreate, current_user: User = Depends(get
     )
     
     await db.users.insert_one(new_employee.model_dump())
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_EMPLOYEE", f"Created employee {capitalize_name(employee.name)}")
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_EMPLOYEE", f"Created employee: {capitalize_name(employee.name)}, Role: {employee.role}, Mobile: {employee.mobile}, Department: {employee.department or 'N/A'}")
     
     return new_employee
 
