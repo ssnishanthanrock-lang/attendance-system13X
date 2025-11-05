@@ -387,6 +387,16 @@ async def send_otp(request: OTPRequest):
     message = f"Your OTP for IT Signature ERP is: {otp_code}. Valid for 5 minutes."
     sms_sent = send_sms(request.mobile, message, None)  # None = use default system gateway
     
+    # Log activity - OTP sent
+    if user.get("company_id"):
+        await log_activity(
+            user["company_id"],
+            user["id"],
+            user["name"],
+            "OTP_SENT",
+            f"OTP sent to mobile {request.mobile}"
+        )
+    
     return {"message": "OTP sent successfully", "sms_sent": sms_sent}
 
 @api_router.post("/auth/verify-otp")
