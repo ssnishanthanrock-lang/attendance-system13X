@@ -14,6 +14,7 @@ import { canEditInImpersonation, isImpersonating } from '../utils/impersonation'
 export default function Attendance() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { date, employeeId, fromDate, toDate } = useParams();
   const [attendance, setAttendance] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
