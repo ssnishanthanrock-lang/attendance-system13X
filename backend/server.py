@@ -1205,6 +1205,120 @@ async def activate_pending_increments(current_user: User = Depends(get_current_u
         "activated_count": activated_count
     }
 
+
+# ============= LOAN ENDPOINTS =============
+@api_router.post("/loans")
+async def create_loan(loan_data: dict, current_user: User = Depends(get_current_user)):
+    """Create a new loan for an employee"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    # Validate employee exists
+    employee = await db.users.find_one({
+        "id": loan_data["employee_id"],
+        "company_id": current_user.company_id
+    })
+    
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    loan = {
+        "id": str(uuid.uuid4()),
+        "company_id": current_user.company_id,
+        "employee_id": loan_data["employee_id"],
+        "employee_name": employee["name"],
+        "amount": loan_data["amount"],
+        "monthly_deduction": loan_data["monthly_deduction"],
+        "start_month": loan_data["start_month"],  # Format: YYYY-MM
+        "remaining_amount": loan_data["amount"],
+        "status": "active",
+        "notes": loan_data.get("notes", ""),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": current_user.name
+    }
+    
+    await db.loans.insert_one(loan)
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "CREATE_LOAN",
+        f"Created loan for {employee['name']} - Rs. {loan_data['amount']}"
+    )
+    
+    return loan
+
+@api_router.get("/loans")
+async def get_loans(employee_id: Optional[str] = None, current_user: User = Depends(get_current_user)):
+    """Get all loans or loans for a specific employee"""
+    query = {"company_id": current_user.company_id}
+    
+    if employee_id:
+        query["employee_id"] = employee_id
+    
+    loans = await db.loans.find(query, {"_id": 0}).sort("created_at", -1).to_list(length=None)
+    
+    return loans
+
+@api_router.put("/loans/{loan_id}/status")
+async def update_loan_status(loan_id: str, status_data: dict, current_user: User = Depends(get_current_user)):
+    """Update loan status (mark as completed/cancelled)"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    loan = await db.loans.find_one({
+        "id": loan_id,
+        "company_id": current_user.company_id
+    })
+    
+    if not loan:
+        raise HTTPException(status_code=404, detail="Loan not found")
+    
+    await db.loans.update_one(
+        {"id": loan_id, "company_id": current_user.company_id},
+        {"$set": {"status": status_data["status"]}}
+    )
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "UPDATE_LOAN_STATUS",
+        f"Updated loan status to {status_data['status']} for {loan['employee_name']}"
+    )
+    
+    return {"message": "Loan status updated successfully"}
+
+@api_router.delete("/loans/{loan_id}")
+async def delete_loan(loan_id: str, current_user: User = Depends(get_current_user)):
+    """Delete a loan"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    loan = await db.loans.find_one({
+        "id": loan_id,
+        "company_id": current_user.company_id
+    })
+    
+    if not loan:
+        raise HTTPException(status_code=404, detail="Loan not found")
+    
+    await db.loans.delete_one({"id": loan_id, "company_id": current_user.company_id})
+    
+    # Log activity
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "DELETE_LOAN",
+        f"Deleted loan for {loan['employee_name']}"
+    )
+    
+    return {"message": "Loan deleted successfully"}
+
 # ============= ATTENDANCE ENDPOINTS =============
 @api_router.get("/attendance")
 async def get_attendance(
