@@ -199,7 +199,7 @@ export default function Layout({ children }) {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className={`hidden lg:fixed lg:flex lg:w-72 lg:flex-col ${impersonationState ? 'lg:top-[72px] lg:bottom-0' : 'lg:inset-y-0'}`}>
+      <aside className={`hidden lg:fixed lg:flex lg:w-72 lg:flex-col ${impersonationState ? 'lg:top-[48px] lg:bottom-0' : 'lg:inset-y-0'}`}>
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
           <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
             {companyInfo?.logo ? (
