@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv('/app/frontend/.env')
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://erp-attendance-1.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://employee-pulse-13.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class ERPTester:
