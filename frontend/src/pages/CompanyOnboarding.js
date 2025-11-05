@@ -7,6 +7,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { Building2 } from 'lucide-react';
+import { capitalizeName } from '../utils/helpers';
 
 export default function CompanyOnboarding() {
   const navigate = useNavigate();
