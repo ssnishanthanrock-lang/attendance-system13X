@@ -33,15 +33,16 @@ export default function Payroll() {
   // Handle month parameter changes
   useEffect(() => {
     if (month) {
-      fetchDetailedPayroll(month);
+      // Initial load with loading state
+      fetchDetailedPayroll(month, false);
       
       // Check if this is the current month
       const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
       
       if (month === currentMonth) {
-        // Set up live updates for current month
+        // Set up live updates for current month (silent updates - no loading state)
         const intervalId = setInterval(() => {
-          fetchDetailedPayroll(month);
+          fetchDetailedPayroll(month, true); // true = silent update, no page refresh
         }, 1000);
         
         // Clean up interval when month changes or component unmounts
