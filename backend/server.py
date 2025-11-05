@@ -1876,6 +1876,18 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         leave_days = len([a for a in attendance_records if a.get("status") == "leave"])
         half_days = len([a for a in attendance_records if a.get("status") == "half_day"])
         
+        # Calculate total attendance minutes
+        total_attendance_minutes = 0
+        for record in attendance_records:
+            if record.get("check_in") and record.get("check_out"):
+                try:
+                    checkin_dt = datetime.fromisoformat(record["check_in"])
+                    checkout_dt = datetime.fromisoformat(record["check_out"])
+                    duration = checkout_dt - checkin_dt
+                    total_attendance_minutes += int(duration.total_seconds() / 60)
+                except:
+                    pass
+        
         # Calculate late minutes and deduction
         late_minutes = 0
         late_deduction = 0
