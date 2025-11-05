@@ -150,8 +150,7 @@ export default function Layout({ children }) {
                 <div className="p-4 border-t border-gray-200">
                   <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 mb-4">
                     <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
-                    <p className="text-xs text-gray-600 mt-1">{user?.role}</p>
-                    <p className="text-xs text-gray-500 mt-1">{user?.employee_id}</p>
+                    <p className="text-xs text-gray-600 mt-1 capitalize">{user?.role?.replace('_', ' ')}</p>
                   </div>
                   <Button
                     onClick={handleLogout}
