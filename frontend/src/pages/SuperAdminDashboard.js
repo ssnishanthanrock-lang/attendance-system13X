@@ -109,10 +109,18 @@ export default function SuperAdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <StatCard title="Total Companies" value={stats?.total_companies || 0} icon={<Building2 />} color="blue" />
-          <StatCard title="Active Companies" value={stats?.active_companies || 0} icon={<CheckCircle />} color="green" />
-          <StatCard title="Pending Approval" value={stats?.pending_companies || 0} icon={<Clock />} color="orange" />
-          <StatCard title="Total Employees" value={stats?.total_employees || 0} icon={<Users />} color="purple" />
+          <div onClick={() => setStatusFilter('all')} className="cursor-pointer">
+            <StatCard title="Total Companies" value={stats?.total_companies || 0} icon={<Building2 />} color="blue" active={statusFilter === 'all'} />
+          </div>
+          <div onClick={() => setStatusFilter('active')} className="cursor-pointer">
+            <StatCard title="Active Companies" value={stats?.active_companies || 0} icon={<CheckCircle />} color="green" active={statusFilter === 'active'} />
+          </div>
+          <div onClick={() => setStatusFilter('pending')} className="cursor-pointer">
+            <StatCard title="Pending Approval" value={stats?.pending_companies || 0} icon={<Clock />} color="orange" active={statusFilter === 'pending'} />
+          </div>
+          <div onClick={() => setStatusFilter('suspended')} className="cursor-pointer">
+            <StatCard title="Suspended" value={(stats?.total_companies || 0) - (stats?.active_companies || 0) - (stats?.pending_companies || 0)} icon={<XCircle />} color="red" active={statusFilter === 'suspended'} />
+          </div>
         </div>
 
         {/* Actions */}
