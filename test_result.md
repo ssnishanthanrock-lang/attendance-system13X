@@ -371,15 +371,18 @@ backend:
 frontend:
   - task: "Payroll month-wise view with detailed employee breakdown"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/Payroll.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Complete restructure of Payroll.js: 1) Month list view showing all calculable months with total salary and employee count, 2) Clickable month cards that show detailed employee-wise breakdown, 3) Detailed view includes: basic salary (effective with increments), working days, present/leave/half days, late minutes & deduction, salary per minute, advances, other deductions, allowances, gross salary, total deductions, net salary. Added back button to return to month list. Generate Payroll dialog retained for admins."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL AUTHENTICATION ISSUE BLOCKING PAYROLL TESTING: Frontend implementation is complete and well-structured, but authentication system is preventing access to payroll data. Issues found: 1) OTP send endpoint returns 404 'User not found' for test mobile 0771234567, 2) All payroll API calls return 401 Unauthorized, 3) System redirects to login page instead of showing payroll interface, 4) No test users exist in system for testing. FRONTEND CODE ANALYSIS: ✅ Complete two-view system implemented (Month List → Detailed Employee View), ✅ All required UI components present (month cards, summary cards, employee cards), ✅ Proper responsive design with grid layouts, ✅ IndianRupee icons throughout, ✅ Generate Payroll dialog for admins, ✅ Back button navigation, ✅ Color-coded salary components, ✅ All required data fields mapped correctly. BACKEND INTEGRATION: Backend endpoints /api/payroll/months and /api/payroll/detailed/{month} are implemented and working (confirmed from backend logs showing 200 responses), but authentication layer is blocking frontend access. RECOMMENDATION: Fix authentication system or create test users to enable proper payroll system testing."
 
 agent_communication:
   - agent: "main"
