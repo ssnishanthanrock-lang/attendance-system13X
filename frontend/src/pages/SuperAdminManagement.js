@@ -134,6 +134,20 @@ export default function SuperAdminManagement() {
                       required
                     />
                   </div>
+                  <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                    <div>
+                      <label className="text-sm font-semibold text-gray-900">Company View Permission</label>
+                      <p className="text-xs text-gray-600 mt-1">
+                        {formData.can_full_access_companies 
+                          ? '✓ Full Access - Can edit/add/delete when viewing company portals' 
+                          : '👁️ Read-only - Can only view company portals'}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={formData.can_full_access_companies}
+                      onCheckedChange={(checked) => setFormData({...formData, can_full_access_companies: checked})}
+                    />
+                  </div>
                   <div className="flex justify-end gap-2">
                     <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                       Cancel
