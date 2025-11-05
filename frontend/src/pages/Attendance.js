@@ -76,6 +76,17 @@ export default function Attendance() {
     }
   };
 
+
+  const checkDeletedAttendance = async () => {
+    try {
+      const response = await api.get('/deleted-attendance');
+      setHasDeletedAttendance(response.data && response.data.length > 0);
+    } catch (error) {
+      console.error('Failed to check deleted attendance:', error);
+    }
+  };
+
+
   const fetchAttendance = async () => {
     try {
       const params = new URLSearchParams();
