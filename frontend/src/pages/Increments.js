@@ -67,7 +67,7 @@ export default function Increments() {
 
   const resetForm = () => {
     setFormData({
-      employee_id: '',
+      employee_id: 'none',
       new_salary: 0,
       effective_date: new Date().toISOString().split('T')[0],
       reason: '',
