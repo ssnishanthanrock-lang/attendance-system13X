@@ -70,8 +70,25 @@ export default function Attendance() {
 
   const handleAddManual = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!manualAttendance.employee_id) {
+      toast.error('Please select an employee');
+      return;
+    }
+    
+    if (manualAttendance.status === 'present' && (!manualAttendance.check_in || !manualAttendance.check_out)) {
+      toast.error('Please enter check-in and check-out times');
+      return;
+    }
+    
+    if (manualAttendance.status === 'leave' && !manualAttendance.leave_type) {
+      toast.error('Please select leave type');
+      return;
+    }
+    
     try {
-      await api.post('/attendance', manualAttendance);
+      const response = await api.post('/attendance', manualAttendance);
       toast.success('Attendance added successfully');
       setDialogOpen(false);
       setManualAttendance({
@@ -84,6 +101,7 @@ export default function Attendance() {
       });
       fetchAttendance();
     } catch (error) {
+      console.error('Attendance error:', error);
       toast.error(error.response?.data?.detail || 'Failed to add attendance');
     }
   };
