@@ -345,7 +345,7 @@ export default function Payroll() {
         )}
 
         {/* Detailed Payroll Sheet - Spreadsheet Style */}
-        {selectedMonth && detailedPayroll && (
+        {month && detailedPayroll && (
           <div className="space-y-4">
             {/* Header with Back Button */}
             <div className="flex items-center gap-4">
