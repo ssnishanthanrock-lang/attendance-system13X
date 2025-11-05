@@ -185,7 +185,13 @@ export default function Layout({ children }) {
     { path: '/activity-logs', label: 'Activity Logs', icon: FileText, roles: ['admin', 'manager'], smaller: true },
   ];
 
-  const filteredMenuItems = menuItems.filter((item) => item.roles.includes(user?.role));
+  const filteredMenuItems = menuItems.filter((item) => {
+    const hasRole = item.roles.includes(user?.role);
+    if (item.requiresInvoicing) {
+      return hasRole && companyInfo?.invoicing_enabled;
+    }
+    return hasRole;
+  });
 
   const NavLink = ({ item, onClick }) => {
     const Icon = item.icon;
