@@ -58,12 +58,12 @@ export default function Attendance() {
         to_date: date,
       });
       setViewMode('filtered');
-    } else if (fromDate || toDate) {
+    } else if (fromDate && toDate) {
       // Date range from path parameters
       setFilters({
         employee_id: employeeId || '',
-        from_date: fromDate || '',
-        to_date: toDate || '',
+        from_date: fromDate,
+        to_date: toDate,
       });
       setViewMode('filtered');
     } else if (employeeId) {
@@ -74,6 +74,9 @@ export default function Attendance() {
         to_date: '',
       });
       setViewMode('filtered');
+    } else {
+      // No URL parameters, reset to default
+      setViewMode('today');
     }
   }, [date, employeeId, fromDate, toDate]);
 
