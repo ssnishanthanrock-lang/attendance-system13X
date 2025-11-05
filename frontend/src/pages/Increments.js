@@ -54,6 +54,12 @@ export default function Increments() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (formData.employee_id === 'none') {
+      toast.error('Please select an employee');
+      return;
+    }
+    
     try {
       await api.post('/increments', formData);
       toast.success('Increment added successfully');
