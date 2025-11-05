@@ -167,19 +167,43 @@ export default function SuperAdminManagement() {
             <Card key={admin.id}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 flex-1">
                     <div className="w-12 h-12 rounded-full bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
                       <Shield className="w-6 h-6 text-white" />
                     </div>
-                    <div>
+                    <div className="flex-1">
                       <h3 className="font-bold text-lg">{admin.name}</h3>
                       <p className="text-sm text-gray-600">
                         {admin.employee_id} | {admin.mobile}
                       </p>
-                      <Badge className="mt-1 bg-red-100 text-red-700">Super Admin</Badge>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Badge className="bg-red-100 text-red-700">Super Admin</Badge>
+                        <Badge className={admin.can_full_access_companies ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-700"}>
+                          {admin.can_full_access_companies ? (
+                            <><Edit className="w-3 h-3 mr-1" /> Full Access</>
+                          ) : (
+                            <><Eye className="w-3 h-3 mr-1" /> Read-only</>
+                          )}
+                        </Badge>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-600">Company View:</span>
+                      <Switch
+                        checked={admin.can_full_access_companies}
+                        onCheckedChange={async (checked) => {
+                          try {
+                            await api.put(`/superadmin/admins/${admin.id}`, { can_full_access_companies: checked });
+                            toast.success('Permission updated', { style: { background: '#10b981', color: 'white' } });
+                            fetchSuperAdmins();
+                          } catch (error) {
+                            toast.error('Failed to update permission', { style: { background: '#ef4444', color: 'white' } });
+                          }
+                        }}
+                      />
+                    </div>
                     <Button
                       variant="outline"
                       size="sm"
