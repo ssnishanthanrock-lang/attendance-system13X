@@ -41,6 +41,12 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/login/select-role" element={<LoginRoleSelection />} />
+          <Route path="/superadmin" element={
+            <PrivateRoute>
+              <SuperAdminDashboard />
+            </PrivateRoute>
+          } />
           <Route
             path="/"
             element={
