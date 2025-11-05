@@ -360,6 +360,7 @@ function WorkingDaysCalculator({ settings }) {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [workingDaysData, setWorkingDaysData] = useState(null);
+  const [allMonthsData, setAllMonthsData] = useState({});
   const [loading, setLoading] = useState(false);
 
   const months = [
@@ -370,6 +371,7 @@ function WorkingDaysCalculator({ settings }) {
   useEffect(() => {
     if (settings) {
       calculateWorkingDays();
+      calculateAllMonths();
     }
   }, [selectedMonth, selectedYear, settings]);
 
@@ -382,6 +384,20 @@ function WorkingDaysCalculator({ settings }) {
       toast.error('Failed to calculate working days');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const calculateAllMonths = async () => {
+    try {
+      const monthsData = {};
+      // Calculate for all 12 months
+      for (let month = 1; month <= 12; month++) {
+        const response = await api.get(`/settings/working-days/${selectedYear}/${month}`);
+        monthsData[month] = response.data;
+      }
+      setAllMonthsData(monthsData);
+    } catch (error) {
+      // Silent fail - dropdown will show without data
     }
   };
 
