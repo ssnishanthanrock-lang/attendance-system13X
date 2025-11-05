@@ -116,16 +116,32 @@ export default function Layout({ children }) {
   const handleExitImpersonation = async () => {
     try {
       const response = await api.post('/superadmin/exit-impersonation');
+      
+      // Restore original token
       localStorage.setItem('token', response.data.token);
+      
+      // Restore original user (fetch from backend or stored backup)
+      const currentUser = JSON.parse(localStorage.getItem('user'));
+      const restoredUser = {
+        ...currentUser,
+        company_id: null,
+        role: 'super_admin',
+        is_impersonating: false
+      };
+      localStorage.setItem('user', JSON.stringify(restoredUser));
+      
+      // Clear impersonation state
       clearImpersonationState();
-      navigate('/superadmin/dashboard');
-      window.location.reload(); // Refresh to update user state
+      
+      // Navigate to super admin dashboard
+      window.location.href = '/superadmin';
     } catch (error) {
       console.error('Failed to exit impersonation:', error);
-      // Fallback: clear state and navigate anyway
+      // Fallback: clear state and navigate to login
       clearImpersonationState();
       localStorage.removeItem('token');
-      navigate('/login');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
     }
   };
 
