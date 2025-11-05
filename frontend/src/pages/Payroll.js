@@ -309,6 +309,43 @@ export default function Payroll() {
                 </Card>
               ))}
             </div>
+
+            {/* Monthly History Section - Below Live Tracker */}
+            {months.length > 0 && (
+              <div className="mt-8 pt-8 border-t border-gray-200">
+                <h2 className="text-lg font-bold text-gray-900 mb-4" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                  Monthly Salary History
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                  {months.map((monthData) => (
+                    <Card
+                      key={monthData.month}
+                      className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
+                      onClick={() => handleMonthClick(monthData.month)}
+                    >
+                      <CardContent className="p-6">
+                        <div className="text-center space-y-3">
+                          <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                            {formatMonthName(monthData.month).monthName} {formatMonthName(monthData.month).year}
+                          </h3>
+                          
+                          <div className="pt-3 border-t border-gray-200">
+                            <p className="text-sm text-gray-500 mb-1">Total Salary</p>
+                            <p className="text-2xl font-bold text-green-600">
+                              Rs {monthData.total_salary.toLocaleString()}
+                            </p>
+                          </div>
+                          
+                          <div className="text-xs text-gray-400">
+                            {monthData.employee_count} employee{monthData.employee_count !== 1 ? 's' : ''}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
