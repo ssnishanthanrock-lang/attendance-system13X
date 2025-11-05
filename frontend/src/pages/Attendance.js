@@ -123,6 +123,102 @@ export default function Attendance() {
           <h1 className="text-3xl sm:text-4xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }} data-testid="attendance-title">
             Attendance Records
           </h1>
+          {isAdmin && (
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Manual Attendance
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Add Manual Attendance</DialogTitle>
+                  <DialogDescription>Record attendance manually for any employee</DialogDescription>
+                </DialogHeader>
+                <form onSubmit={handleAddManual} className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Employee *</label>
+                    <Select value={manualAttendance.employee_id} onValueChange={(value) => setManualAttendance({...manualAttendance, employee_id: value})}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Employee" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {employees.map((emp) => (
+                          <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Date *</label>
+                    <Input
+                      type="date"
+                      value={manualAttendance.date}
+                      onChange={(e) => setManualAttendance({...manualAttendance, date: e.target.value})}
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Status *</label>
+                    <Select value={manualAttendance.status} onValueChange={(value) => setManualAttendance({...manualAttendance, status: value})}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="present">Present</SelectItem>
+                        <SelectItem value="leave">Leave</SelectItem>
+                        <SelectItem value="half_day">Half Day</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {manualAttendance.status === 'present' && (
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Check In Time *</label>
+                          <Input
+                            type="time"
+                            value={manualAttendance.check_in}
+                            onChange={(e) => setManualAttendance({...manualAttendance, check_in: e.target.value})}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">Check Out Time *</label>
+                          <Input
+                            type="time"
+                            value={manualAttendance.check_out}
+                            onChange={(e) => setManualAttendance({...manualAttendance, check_out: e.target.value})}
+                            required
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+                  {manualAttendance.status === 'leave' && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Leave Type *</label>
+                      <Select value={manualAttendance.leave_type} onValueChange={(value) => setManualAttendance({...manualAttendance, leave_type: value})}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select Leave Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="sick">Sick Leave</SelectItem>
+                          <SelectItem value="casual">Casual Leave</SelectItem>
+                          <SelectItem value="annual">Annual Leave</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
+                    <Button type="submit">Add Attendance</Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
 
         {/* Filters */}
