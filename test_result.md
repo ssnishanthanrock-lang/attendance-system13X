@@ -971,9 +971,51 @@ agent_communication:
       - Current month data only shown in "Live Salary Tracker" section
       - File: /app/frontend/src/pages/Payroll.js (line 290)
       
-      TESTING NEEDED:
-      - Test login flow and verify activity logs capture OTP events and login
-      - Test Advances and Leaves pages - should load without errors
-      - Create, view, approve/reject advances and leaves
-      - Verify fixed salary employees show full salary in live payroll
-      - Verify current month doesn't appear in Monthly Salary History section
+backend:
+  - task: "Bug Fix #1: Activity Logs - Login Events"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Activity logs login events working correctly. OTP_SENT activity logged when OTP is sent. INVALID_OTP activity logged when wrong OTP is entered. LOGIN_SUCCESS activity logged on successful authentication. All login events are properly captured in activity logs with correct action types and details."
+
+  - task: "Bug Fix #2: Advances and Leaves Endpoints"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Advances and Leaves CRUD endpoints working correctly. POST /api/advances creates advance requests successfully. GET /api/advances retrieves advances (role-based filtering working). PUT /api/advances/{id} updates advance status to approved/rejected. POST /api/leaves creates leave requests successfully. GET /api/leaves retrieves leaves (role-based filtering working). PUT /api/leaves/{id} updates leave status to approved/rejected. Fixed ObjectId serialization issue by using Pydantic models."
+
+  - task: "Bug Fix #3: Live Payroll - Fixed Salary Calculation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Live payroll fixed salary calculation working correctly. Fixed salary employees show earnings equal to basic_salary + allowances (not pro-rated). Non-fixed salary employees calculate based on attendance minutes. GET /api/payroll/live-current-month returns correct earnings for both fixed and variable salary employees. Calculation logic verified: fixed salary = basic + allowances, variable salary = attendance_minutes × salary_per_minute."
+
+  - task: "Bug Fix #4: Payroll Months - Current Month Filtering"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Payroll months current month filtering working correctly. GET /api/payroll/months includes current month in backend response as required. Backend returns all months including current month with proper structure (month, total_salary, employee_count). Frontend will handle filtering out current month from history display. Backend behavior is correct - returns all calculable months including current."
