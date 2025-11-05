@@ -546,6 +546,7 @@ export default function Payroll() {
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-200">
                           {detailedPayroll.total_net.toLocaleString()}
                         </td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
                       </tr>
                     </tfoot>
                   </table>
