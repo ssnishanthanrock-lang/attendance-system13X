@@ -1110,7 +1110,7 @@ async def add_holiday(holiday: Holiday, current_user: User = Depends(get_current
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Settings not found")
     
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "ADD_HOLIDAY", f"Added holiday: {holiday.name}")
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "ADD_HOLIDAY", f"Added holiday: {holiday.name} on {holiday.date}, Type: {holiday.type}")
     
     return {"message": "Holiday added successfully"}
 
