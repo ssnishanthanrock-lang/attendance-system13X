@@ -114,6 +114,35 @@ export default function Attendance() {
     }
   };
 
+  const handleEdit = (record) => {
+    setEditingAttendance({
+      id: record.id,
+      employee_name: record.employee_name,
+      date: record.date,
+      check_in: record.check_in ? formatTime(record.check_in, true) : '',
+      check_out: record.check_out ? formatTime(record.check_out, true) : '',
+      status: record.status,
+      leave_type: record.leave_type || ''
+    });
+    setEditDialogOpen(true);
+  };
+
+  const handleUpdateAttendance = async (e) => {
+    e.preventDefault();
+    
+    try {
+      await api.put(`/attendance/${editingAttendance.id}`, {
+        check_in: editingAttendance.check_in,
+        check_out: editingAttendance.check_out
+      });
+      toast.success('Attendance updated successfully');
+      setEditDialogOpen(false);
+      fetchAttendance();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update attendance');
+    }
+  };
+
   const handleDelete = async (attendanceId) => {
     if (!window.confirm('Are you sure you want to delete this attendance record?')) {
       return;
