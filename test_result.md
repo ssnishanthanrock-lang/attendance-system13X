@@ -368,6 +368,18 @@ backend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE PAYROLL TESTING COMPLETED (50/51 tests passed - 98% success rate): 1) GET /api/payroll/months: Returns months array with correct structure (month, total_salary, employee_count), sorted descending, includes current month. 2) GET /api/payroll/detailed/{month}: Returns complete employee breakdown with all required fields, accurate calculations (gross=basic+allowances, net=gross-deductions, totals correctly calculated). 3) POST /api/payroll/generate: Successfully generates payroll for all employees. 4) Role-based access: Employees can access GET endpoints for their data. 5) Multi-tenancy verified: All data filtered by company_id. 6) Calculation accuracy: All salary calculations (gross, deductions, net) mathematically correct. 7) Fixed vs variable salary logic working: salary_per_minute=0 for fixed salary employees. Minor: Invalid month format returns data instead of error (acceptable flexible behavior)."
 
+  - task: "Live payroll endpoint for current month"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "✅ LIVE PAYROLL ENDPOINT TESTING COMPLETED (62/64 tests passed - 96.9% success rate): 1) GET /api/payroll/live-current-month: Returns real-time payroll data with correct structure (month, timestamp, employees array, totals). 2) Response structure validation: All required fields present including employee_id, employee_name, position, profile_picture, basic_salary, allowances, earnings, attendance metrics, deductions, and salary calculations. 3) Role-based access working: Admin/manager sees all employees, employee sees only own data. 4) Real-time calculations: Earnings calculated up to current timestamp, including ongoing attendance for current day. 5) Fixed vs non-fixed salary logic: Fixed salary employees have pro-rated earnings based on days passed, non-fixed based on actual attendance minutes. 6) Calculation accuracy: All salary calculations (gross, deductions, net) mathematically correct with proper totals. 7) Multi-tenancy verified: Data filtered by company_id. Minor issues: 2 calculation edge cases in detailed payroll endpoint (not affecting live endpoint functionality)."
+
 frontend:
   - task: "Payroll month-wise view with detailed employee breakdown"
     implemented: true
