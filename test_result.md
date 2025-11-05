@@ -371,11 +371,11 @@ backend:
 frontend:
   - task: "Payroll month-wise view with detailed employee breakdown"
     implemented: true
-    working: false
+    working: "NA"
     file: "/app/frontend/src/pages/Payroll.js"
     stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
@@ -383,6 +383,9 @@ frontend:
       - working: false
         agent: "testing"
         comment: "❌ CRITICAL AUTHENTICATION ISSUE BLOCKING PAYROLL TESTING: Frontend implementation is complete and well-structured, but authentication system is preventing access to payroll data. Issues found: 1) OTP send endpoint returns 404 'User not found' for test mobile 0771234567, 2) All payroll API calls return 401 Unauthorized, 3) System redirects to login page instead of showing payroll interface, 4) No test users exist in system for testing. FRONTEND CODE ANALYSIS: ✅ Complete two-view system implemented (Month List → Detailed Employee View), ✅ All required UI components present (month cards, summary cards, employee cards), ✅ Proper responsive design with grid layouts, ✅ IndianRupee icons throughout, ✅ Generate Payroll dialog for admins, ✅ Back button navigation, ✅ Color-coded salary components, ✅ All required data fields mapped correctly. BACKEND INTEGRATION: Backend endpoints /api/payroll/months and /api/payroll/detailed/{month} are implemented and working (confirmed from backend logs showing 200 responses), but authentication layer is blocking frontend access. RECOMMENDATION: Fix authentication system or create test users to enable proper payroll system testing."
+      - working: "NA"
+        agent: "main"
+        comment: "PHASE 1 COMPLETED - Payroll Table Column Reordering: 1) Moved 'Extra Payment' column from wrong position (in Attendance section) to correct position (after Late Salary, before Deductions). 2) Updated table body to match header structure: Employee → Salary → Attendance → Extra Payment → Deductions → Net. 3) Fixed footer totals to match new column order. 4) Verified backend calculation fix for fixed-salary employees (allowances no longer double-counted). Column order is now: No | Employee Name | Basic | Day Salary | Minute Salary | Allowances | Gross | Present | Leave | Allowed Leaves | Allowed Half | Late Salary | Extra Payment | Advance | Loan | Other | Net. Ready for testing."
 
 agent_communication:
   - agent: "main"
