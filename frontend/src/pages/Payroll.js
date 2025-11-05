@@ -578,6 +578,15 @@ export default function Payroll() {
           </div>
         )}
       </div>
+
+      {/* Salary Slip Dialog */}
+      {viewingSalarySlip && (
+        <EmployeeSalarySlip
+          employee={viewingSalarySlip}
+          month={month}
+          onClose={() => setViewingSalarySlip(null)}
+        />
+      )}
     </Layout>
   );
 }
