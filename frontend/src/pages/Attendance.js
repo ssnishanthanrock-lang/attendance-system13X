@@ -77,16 +77,73 @@ export default function Attendance() {
   const fetchAttendance = async () => {
     try {
       const params = new URLSearchParams();
-      if (filters.employee_id) params.append('employee_id', filters.employee_id);
-      if (filters.from_date) params.append('from_date', filters.from_date);
-      if (filters.to_date) params.append('to_date', filters.to_date);
+      const today = new Date().toISOString().split('T')[0];
+      
+      // If in today view mode and no filters set, fetch only today's attendance
+      if (viewMode === 'today' && !filters.employee_id && !filters.from_date && !filters.to_date) {
+        params.append('from_date', today);
+        params.append('to_date', today);
+      } else if (viewMode === 'last7days' && !filters.from_date && !filters.to_date) {
+        // Last 7 days view
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        params.append('from_date', sevenDaysAgo.toISOString().split('T')[0]);
+        params.append('to_date', today);
+      } else {
+        // Use manual filters if set
+        if (filters.employee_id) params.append('employee_id', filters.employee_id);
+        if (filters.from_date) params.append('from_date', filters.from_date);
+        if (filters.to_date) params.append('to_date', filters.to_date);
+      }
 
       const response = await api.get(`/attendance?${params.toString()}`);
       setAttendance(response.data);
+      
+      // If today view, check if we have any attendance
+      if (viewMode === 'today' && response.data.length === 0) {
+        // Switch to last 7 days view and fetch summary
+        setViewMode('last7days');
+        fetchLast7DaysSummary();
+      } else if (viewMode === 'today') {
+        // We have today's attendance
+        setTodayAttendanceCount(response.data.length);
+        // Fetch total active employees count
+        if (user?.role === 'admin' || user?.role === 'manager') {
+          const empResponse = await api.get('/employees');
+          setActiveEmployeesCount(empResponse.data.length);
+        }
+      }
     } catch (error) {
       toast.error('Failed to fetch attendance');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchLast7DaysSummary = async () => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      const params = new URLSearchParams();
+      params.append('from_date', sevenDaysAgo.toISOString().split('T')[0]);
+      params.append('to_date', today);
+      
+      const response = await api.get(`/attendance?${params.toString()}`);
+      setAttendance(response.data);
+      
+      // Count unique employees in last 7 days
+      const uniqueEmployees = new Set(response.data.map(a => a.employee_id));
+      setTodayAttendanceCount(uniqueEmployees.size);
+      
+      // Get total active employees
+      if (user?.role === 'admin' || user?.role === 'manager') {
+        const empResponse = await api.get('/employees');
+        setActiveEmployeesCount(empResponse.data.length);
+      }
+    } catch (error) {
+      console.error('Failed to fetch 7 days summary:', error);
     }
   };
 
