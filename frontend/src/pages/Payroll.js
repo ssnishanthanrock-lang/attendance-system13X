@@ -88,15 +88,21 @@ export default function Payroll() {
     }
   };
 
-  const fetchDetailedPayroll = async (monthStr) => {
+  const fetchDetailedPayroll = async (monthStr, silentUpdate = false) => {
     try {
-      setLoading(true);
+      if (!silentUpdate) {
+        setLoading(true);
+      }
       const response = await api.get(`/payroll/detailed/${monthStr}`);
       setDetailedPayroll(response.data);
     } catch (error) {
-      toast.error('Failed to fetch detailed payroll');
+      if (!silentUpdate) {
+        toast.error('Failed to fetch detailed payroll');
+      }
     } finally {
-      setLoading(false);
+      if (!silentUpdate) {
+        setLoading(false);
+      }
     }
   };
 
