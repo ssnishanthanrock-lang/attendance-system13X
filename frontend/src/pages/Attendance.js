@@ -106,6 +106,20 @@ export default function Attendance() {
     }
   };
 
+  const handleDelete = async (attendanceId) => {
+    if (!window.confirm('Are you sure you want to delete this attendance record?')) {
+      return;
+    }
+    
+    try {
+      await api.delete(`/attendance/${attendanceId}`);
+      toast.success('Attendance deleted successfully');
+      fetchAttendance();
+    } catch (error) {
+      toast.error('Failed to delete attendance');
+    }
+  };
+
   const formatTime = (isoString) => {
     if (!isoString) return 'N/A';
     return new Date(isoString).toLocaleTimeString('en-US', {
