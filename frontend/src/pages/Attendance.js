@@ -476,6 +476,10 @@ export default function Attendance() {
                                 ? 'bg-green-100 text-green-700'
                                 : record.status === 'leave'
                                 ? 'bg-yellow-100 text-yellow-700'
+                                : record.status === 'allowed_leave'
+                                ? 'bg-blue-100 text-blue-700'
+                                : record.status === 'allowed_half_day'
+                                ? 'bg-blue-100 text-blue-700'
                                 : 'bg-red-100 text-red-700'
                             }`}
                           >
