@@ -554,9 +554,10 @@ export default function Payroll() {
 
             {/* Table View */}
             {viewMode === 'table' && (
-            <Card>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
+              <>
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
                   <table className="w-full min-w-max border-collapse">
                     {/* Header */}
                     <thead>
