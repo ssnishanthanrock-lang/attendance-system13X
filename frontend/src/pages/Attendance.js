@@ -289,13 +289,16 @@ export default function Attendance() {
                               />
                             </div>
                             <div className="space-y-2">
-                              <label className="text-sm font-medium">Check Out Time *</label>
+                              <label className="text-sm font-medium">Check Out Time (Optional)</label>
                               <Input
                                 type="time"
                                 value={manualAttendance.check_out}
                                 onChange={(e) => setManualAttendance({...manualAttendance, check_out: e.target.value})}
-                                required
+                                placeholder="Leave empty if not yet checked out"
                               />
+                              <p className="text-xs text-gray-500">
+                                Leave empty if the day hasn't finished. You can update later.
+                              </p>
                             </div>
                           </div>
                         </>
