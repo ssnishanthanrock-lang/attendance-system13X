@@ -229,39 +229,50 @@ export default function Employees() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Input
-                      data-testid="department-input"
-                      value={formData.department}
-                      onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                      placeholder="Department"
-                    />
+                  {/* Department and Position in one line with labels */}
+                  <div className="sm:col-span-2 grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Department</label>
+                      <Input
+                        data-testid="department-input"
+                        value={formData.department}
+                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                        placeholder="Enter department"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Position</label>
+                      <Input
+                        data-testid="position-input"
+                        value={formData.position}
+                        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                        placeholder="Enter position"
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Input
-                      data-testid="position-input"
-                      value={formData.position}
-                      onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                      placeholder="Position"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      data-testid="salary-input"
-                      type="number"
-                      value={formData.basic_salary}
-                      onChange={(e) => setFormData({ ...formData, basic_salary: parseFloat(e.target.value) })}
-                      placeholder="Basic Salary (Rs.)"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      data-testid="allowances-input"
-                      type="number"
-                      value={formData.allowances}
-                      onChange={(e) => setFormData({ ...formData, allowances: parseFloat(e.target.value) })}
-                      placeholder="Allowances (Rs.)"
-                    />
+                  
+                  {/* Basic Salary and Allowances in one line with labels */}
+                  <div className="sm:col-span-2 grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Basic Salary (Rs.)</label>
+                      <Input
+                        data-testid="salary-input"
+                        type="number"
+                        value={formData.basic_salary}
+                        onChange={(e) => setFormData({ ...formData, basic_salary: parseFloat(e.target.value) })}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Allowances (Rs.)</label>
+                      <Input
+                        data-testid="allowances-input"
+                        type="number"
+                        value={formData.allowances}
+                        onChange={(e) => setFormData({ ...formData, allowances: parseFloat(e.target.value) })}
+                        placeholder="0"
+                      />
+                    </div>
                   </div>
                   <div className="sm:col-span-2">
                     <Input
