@@ -39,6 +39,17 @@ export default function Employees() {
     fixed_salary: false,
     profile_picture: null
   });
+  
+  // Increment state
+  const [incrementDialogOpen, setIncrementDialogOpen] = useState(false);
+  const [incrementHistoryOpen, setIncrementHistoryOpen] = useState(false);
+  const [selectedEmployeeForIncrement, setSelectedEmployeeForIncrement] = useState(null);
+  const [increments, setIncrements] = useState([]);
+  const [incrementForm, setIncrementForm] = useState({
+    effective_from: new Date().toISOString().slice(0, 7), // YYYY-MM format
+    new_salary: 0,
+    reason: ''
+  });
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
