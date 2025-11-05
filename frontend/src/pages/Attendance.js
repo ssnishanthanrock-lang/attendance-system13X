@@ -265,29 +265,32 @@ export default function Attendance() {
                           </SelectContent>
                         </Select>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Date *</label>
-                        <Input
-                          type="date"
-                          value={manualAttendance.date}
-                          onChange={(e) => setManualAttendance({...manualAttendance, date: e.target.value})}
-                          max={new Date().toISOString().split('T')[0]}
-                          required
-                        />
-                        <p className="text-xs text-gray-500">Only today and past dates allowed</p>
+                      <div className="grid grid-cols-12 gap-4 items-center">
+                        <label className="text-sm font-medium col-span-3">Date *</label>
+                        <div className="col-span-9">
+                          <Input
+                            type="date"
+                            value={manualAttendance.date}
+                            onChange={(e) => setManualAttendance({...manualAttendance, date: e.target.value})}
+                            max={new Date().toISOString().split('T')[0]}
+                            required
+                          />
+                        </div>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium">Status *</label>
-                        <Select value={manualAttendance.status} onValueChange={(value) => setManualAttendance({...manualAttendance, status: value})}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="present">Present</SelectItem>
-                            <SelectItem value="leave">Leave</SelectItem>
-                            <SelectItem value="half_day">Half Day</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div className="grid grid-cols-12 gap-4 items-center">
+                        <label className="text-sm font-medium col-span-3">Status *</label>
+                        <div className="col-span-9">
+                          <Select value={manualAttendance.status} onValueChange={(value) => setManualAttendance({...manualAttendance, status: value})}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="present">Present</SelectItem>
+                              <SelectItem value="leave">Leave</SelectItem>
+                              <SelectItem value="half_day">Half Day</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                       {manualAttendance.status === 'present' && (
                         <>
