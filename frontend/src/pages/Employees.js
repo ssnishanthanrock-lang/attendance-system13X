@@ -263,38 +263,36 @@ export default function Employees() {
                       placeholder="Allowances (Rs.)"
                     />
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
-                    <label className="text-sm font-medium">Join Date *</label>
+                  <div className="sm:col-span-2">
                     <Input
                       data-testid="join-date-input"
                       type="date"
                       value={formData.join_date}
                       onChange={(e) => setFormData({ ...formData, join_date: e.target.value })}
+                      placeholder="Join Date *"
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Start Time</label>
+                  <div>
                     <Input
                       type="time"
                       value={formData.start_time}
                       onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                      placeholder="Start Time"
                     />
-                    <p className="text-xs text-gray-500">Default office start time</p>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Finish Time</label>
+                  <div>
                     <Input
                       type="time"
                       value={formData.finish_time}
                       onChange={(e) => setFormData({ ...formData, finish_time: e.target.value })}
+                      placeholder="Finish Time"
                     />
-                    <p className="text-xs text-gray-500">Default office finish time</p>
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
+                  <div className="sm:col-span-2">
                     <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                       <div>
-                        <label className="text-sm font-medium">Fixed Salary</label>
+                        <p className="text-sm font-medium">Fixed Salary</p>
                         <p className="text-xs text-gray-600">Skip late attendance deductions</p>
                       </div>
                       <Switch
@@ -303,15 +301,27 @@ export default function Employees() {
                       />
                     </div>
                   </div>
-                  <div className="space-y-2 sm:col-span-2">
-                    <label className="text-sm font-medium">Profile Picture</label>
+                  {editingEmployee?.profile_pic && (
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                        <img 
+                          src={editingEmployee.profile_pic} 
+                          alt="Current Profile" 
+                          className="w-16 h-16 rounded-full object-cover"
+                          style={{ borderRadius: '50%' }}
+                        />
+                        <span className="text-sm text-gray-600">Current Profile Picture</span>
+                      </div>
+                    </div>
+                  )}
+                  <div className="sm:col-span-2">
                     <Input
                       data-testid="profile-picture-input"
                       type="file"
                       accept="image/*"
                       onChange={(e) => setFormData({ ...formData, profile_picture: e.target.files[0] })}
+                      placeholder="Upload Profile Picture"
                     />
-                    <p className="text-xs text-gray-500">Upload a profile picture (JPG, PNG, max 5MB)</p>
                   </div>
                 </div>
                 <div className="flex justify-end gap-2 pt-4">
