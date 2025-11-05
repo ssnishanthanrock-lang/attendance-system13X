@@ -225,6 +225,127 @@ export default function Dashboard() {
           </Card>
         )}
 
+        {/* My Leaves & Advances for Employee */}
+        {!isAdmin && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Card data-testid="my-leaves-card">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>My Leaves</CardTitle>
+                    <CardDescription>Your leave applications</CardDescription>
+                  </div>
+                  <Button 
+                    size="sm"
+                    onClick={() => navigate('/leaves')}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600"
+                  >
+                    Apply Leave
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {stats?.my_leaves?.length > 0 ? (
+                    stats.my_leaves.slice(0, 5).map((leave) => (
+                      <div key={leave.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="font-medium text-sm capitalize">{leave.leave_type} Leave</p>
+                          <p className="text-xs text-gray-500">
+                            {leave.from_date} to {leave.to_date}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${
+                            leave.status === 'approved'
+                              ? 'bg-green-100 text-green-700'
+                              : leave.status === 'rejected'
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-yellow-100 text-yellow-700'
+                          }`}
+                        >
+                          {leave.status}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <FileText className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">No leave applications</p>
+                      <Button 
+                        size="sm"
+                        variant="outline"
+                        onClick={() => navigate('/leaves')}
+                        className="mt-3"
+                      >
+                        Apply for Leave
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card data-testid="my-advances-card">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>My Advances</CardTitle>
+                    <CardDescription>Your advance requests</CardDescription>
+                  </div>
+                  <Button 
+                    size="sm"
+                    onClick={() => navigate('/advances')}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600"
+                  >
+                    Request Advance
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {stats?.my_advances?.length > 0 ? (
+                    stats.my_advances.slice(0, 5).map((advance) => (
+                      <div key={advance.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="font-medium text-sm">Rs. {advance.amount.toLocaleString()}</p>
+                          <p className="text-xs text-gray-500">
+                            {advance.reason} • {new Date(advance.request_date).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <span
+                          className={`text-xs px-2 py-1 rounded-full ${
+                            advance.status === 'approved'
+                              ? 'bg-green-100 text-green-700'
+                              : advance.status === 'rejected'
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-yellow-100 text-yellow-700'
+                          }`}
+                        >
+                          {advance.status}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <DollarSign className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">No advance requests</p>
+                      <Button 
+                        size="sm"
+                        variant="outline"
+                        onClick={() => navigate('/advances')}
+                        className="mt-3"
+                      >
+                        Request Advance
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         {/* Recent Activities for Admin/Manager */}
         {isAdmin && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
