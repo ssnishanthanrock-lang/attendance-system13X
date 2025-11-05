@@ -189,6 +189,93 @@ class Leave(BaseModel):
     applied_date: str = Field(default_factory=lambda: datetime.now(timezone.utc).date().isoformat())
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+# ============= INVOICING MODELS =============
+class Customer(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    name: str
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class ProductCategory(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    name: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class Product(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    category_id: Optional[str] = None
+    name: str
+    description: Optional[str] = None
+    price: float
+    unit: str = "pcs"  # pcs, kg, hrs, etc
+    stock_quantity: float = 0
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class InvoiceItem(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    product_id: Optional[str] = None
+    product_name: str
+    description: Optional[str] = None
+    quantity: float
+    unit_price: float
+    total: float
+
+class Invoice(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    customer_id: str
+    invoice_number: str
+    invoice_date: str
+    due_date: Optional[str] = None
+    items: List[InvoiceItem] = []
+    subtotal: float
+    total: float
+    amount_paid: float = 0
+    status: str = "unpaid"  # unpaid, partial, paid
+    notes: Optional[str] = None
+    created_by: str
+    created_by_name: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class Payment(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    invoice_id: str
+    amount: float
+    payment_date: str
+    payment_method: str  # cash, bank_transfer, cheque, card
+    notes: Optional[str] = None
+    created_by: str
+    created_by_name: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class Estimate(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    customer_id: str
+    estimate_number: str
+    estimate_date: str
+    valid_until: Optional[str] = None
+    items: List[InvoiceItem] = []
+    subtotal: float
+    total: float
+    status: str = "draft"  # draft, sent, accepted, rejected, converted
+    notes: Optional[str] = None
+    created_by: str
+    created_by_name: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # ============= HELPER FUNCTIONS =============
 def create_access_token(data: dict):
     to_encode = data.copy()
