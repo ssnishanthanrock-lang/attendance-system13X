@@ -12,7 +12,7 @@ import {
   Wallet,
   Menu,
   LogOut,
-  X,
+  Phone,
 } from 'lucide-react';
 
 export default function Layout({ children }) {
@@ -70,13 +70,18 @@ export default function Layout({ children }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200 overflow-y-auto">
-          <div className="flex items-center justify-center h-20 px-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
-            <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-              EAS System
+          <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
+            <img 
+              src="https://cfms.lk/img/itsignature_logo_blue_only.png" 
+              alt="IT Signature Logo" 
+              className="h-12 w-auto mb-2 brightness-0 invert"
+            />
+            <h1 className="text-xl font-bold text-white text-center" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+              IT Signature ERP
             </h1>
           </div>
 
@@ -108,9 +113,16 @@ export default function Layout({ children }) {
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between h-16 px-4">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-            EAS System
-          </h1>
+          <div className="flex items-center gap-2">
+            <img 
+              src="https://cfms.lk/img/itsignature_logo_blue_only.png" 
+              alt="IT Signature Logo" 
+              className="h-8 w-auto"
+            />
+            <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+              IT Signature ERP
+            </h1>
+          </div>
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" data-testid="mobile-menu-button">
@@ -119,8 +131,13 @@ export default function Layout({ children }) {
             </SheetTrigger>
             <SheetContent side="right" className="w-80 p-0">
               <div className="flex flex-col h-full">
-                <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
-                  <h2 className="text-xl font-bold text-white" style={{ fontFamily: 'Work Sans, sans-serif' }}>Menu</h2>
+                <div className="flex flex-col items-center justify-center px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-600 to-indigo-600">
+                  <img 
+                    src="https://cfms.lk/img/itsignature_logo_blue_only.png" 
+                    alt="IT Signature Logo" 
+                    className="h-10 w-auto mb-2 brightness-0 invert"
+                  />
+                  <h2 className="text-lg font-bold text-white text-center" style={{ fontFamily: 'Work Sans, sans-serif' }}>IT Signature ERP</h2>
                 </div>
 
                 <div className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
@@ -138,11 +155,18 @@ export default function Layout({ children }) {
                   <Button
                     onClick={handleLogout}
                     variant="outline"
-                    className="w-full justify-start border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                    className="w-full justify-start border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 mb-3"
                   >
                     <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </Button>
+                  <div className="text-xs text-gray-600 text-center pt-3 border-t border-gray-200">
+                    <p className="font-medium">IT Signature (Pvt) Ltd</p>
+                    <div className="flex items-center justify-center gap-1 mt-1">
+                      <Phone className="w-3 h-3" />
+                      <span>011 4848 988 | 077 3966 920</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </SheetContent>
@@ -151,8 +175,22 @@ export default function Layout({ children }) {
       </div>
 
       {/* Main Content */}
-      <div className="lg:pl-72">
-        <main className="pt-20 lg:pt-0 px-4 sm:px-6 lg:px-8 py-8">{children}</main>
+      <div className="lg:pl-72 flex-1 flex flex-col">
+        <main className="flex-1 pt-20 lg:pt-0 px-4 sm:px-6 lg:px-8 py-8">{children}</main>
+        
+        {/* Footer */}
+        <footer className="hidden lg:block border-t border-gray-200 bg-white py-4 px-8">
+          <div className="flex items-center justify-between text-sm text-gray-600">
+            <div>
+              <p className="font-medium">IT Signature (Pvt) Ltd</p>
+              <p className="text-xs mt-1">Employee Resource Planning System</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <Phone className="w-4 h-4" />
+              <span>Support: 011 4848 988 | 077 3966 920</span>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
