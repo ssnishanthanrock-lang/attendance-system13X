@@ -159,13 +159,13 @@ export default function Payroll() {
                           Employee Details
                         </th>
                         <th colSpan="5" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-yellow-100">
-                          Salary & Earnings
-                        </th>
-                        <th colSpan="1" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-blue-100">
-                          Extra
+                          Salary
                         </th>
                         <th colSpan="5" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-green-100">
                           Attendance
+                        </th>
+                        <th colSpan="1" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-blue-100">
+                          Extra
                         </th>
                         <th colSpan="3" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-red-100">
                           Deductions
