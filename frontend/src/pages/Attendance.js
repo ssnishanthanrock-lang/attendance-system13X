@@ -118,6 +118,35 @@ export default function Attendance() {
       manualAttendance.check_out = '';
     }
     
+    // Check-out time restriction: Only allow check-out after finish time
+    if (manualAttendance.check_out && companySettings) {
+      const finishTime = companySettings.finish_time || '17:00';
+      const selectedDate = manualAttendance.date;
+      const today = new Date().toISOString().split('T')[0];
+      
+      // Only apply restriction for current day
+      if (selectedDate === today) {
+        const currentTime = new Date();
+        const [finishHour, finishMinute] = finishTime.split(':').map(Number);
+        const finishDateTime = new Date();
+        finishDateTime.setHours(finishHour, finishMinute, 0, 0);
+        
+        // Check if current time is before finish time
+        if (currentTime < finishDateTime) {
+          toast.error(`Check-out time can only be added after finish time (${finishTime})`);
+          return;
+        }
+      }
+      
+      // Also validate that check-out is not before check-in
+      if (manualAttendance.check_in && manualAttendance.check_out) {
+        if (manualAttendance.check_out < manualAttendance.check_in) {
+          toast.error('Check-out time cannot be before check-in time');
+          return;
+        }
+      }
+    }
+    
     try {
       await api.post('/attendance', manualAttendance);
       toast.success('Attendance added successfully');
