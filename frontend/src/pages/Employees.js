@@ -144,8 +144,8 @@ export default function Employees() {
       basic_salary: employee.basic_salary,
       allowances: employee.allowances,
       join_date: employee.join_date,
-      start_time: employee.start_time || '09:00',
-      finish_time: employee.finish_time || '17:00',
+      start_time: employee.start_time || defaultTimes.start_time,
+      finish_time: employee.finish_time || defaultTimes.finish_time,
       fixed_salary: employee.fixed_salary || false,
       profile_picture: null
     });
