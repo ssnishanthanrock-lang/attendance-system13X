@@ -343,15 +343,15 @@ export default function Dashboard() {
         {/* Recent Activities for Admin/Manager */}
         {isAdmin && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card data-testid="recent-leaves-card">
-              <CardHeader>
-                <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Recent Leave Requests</CardTitle>
-                <CardDescription>Latest leave applications</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {stats?.recent_leaves?.length > 0 ? (
-                    stats.recent_leaves.map((leave) => (
+            {/* Only show if there are recent leaves */}
+            {stats?.recent_leaves?.length > 0 && (
+              <Card data-testid="recent-leaves-card">
+                <CardHeader>
+                  <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Recent Leave Requests</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {stats.recent_leaves.map((leave) => (
                       <div key={leave.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                           <p className="font-medium text-sm">{leave.employee_name}</p>
@@ -371,23 +371,21 @@ export default function Dashboard() {
                           {leave.status}
                         </span>
                       </div>
-                    ))
-                  ) : (
-                    <p className="text-sm text-gray-500 text-center py-4">No recent leaves</p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
-            <Card data-testid="recent-advances-card">
-              <CardHeader>
-                <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Recent Advance Requests</CardTitle>
-                <CardDescription>Latest advance applications</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {stats?.recent_advances?.length > 0 ? (
-                    stats.recent_advances.map((advance) => (
+            {/* Only show if there are recent advances */}
+            {stats?.recent_advances?.length > 0 && (
+              <Card data-testid="recent-advances-card">
+                <CardHeader>
+                  <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Recent Advance Requests</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {stats.recent_advances.map((advance) => (
                       <div key={advance.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div>
                           <p className="font-medium text-sm">{advance.employee_name}</p>
