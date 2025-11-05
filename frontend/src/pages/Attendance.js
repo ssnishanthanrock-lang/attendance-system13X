@@ -443,7 +443,17 @@ export default function Attendance() {
                   ) : (
                     attendance.map((record) => (
                       <tr key={record.id} className={`hover:bg-gray-50 transition-colors ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}>
-                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{record.employee_name}</td>
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                          <div className="flex items-center gap-2">
+                            {record.employee_name}
+                            {historyCount[record.id] && (
+                              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full" title="This record has been edited">
+                                <Clock className="w-3 h-3" />
+                                {historyCount[record.id]}
+                              </span>
+                            )}
+                          </div>
+                        </td>
                         <td className="px-4 py-3 text-sm text-gray-600">{record.date}</td>
                         <td className="px-4 py-3">
                           <span
