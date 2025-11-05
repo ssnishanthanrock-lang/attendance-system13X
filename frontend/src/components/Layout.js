@@ -25,6 +25,7 @@ export default function Layout({ children }) {
   const [user, setUser] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [companyInfo, setCompanyInfo] = useState(null);
+  const [impersonationState, setImpersonationState] = useState(null);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
