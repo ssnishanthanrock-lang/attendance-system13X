@@ -241,16 +241,17 @@ export default function SuperAdminDashboard() {
   );
 }
 
-function StatCard({ title, value, icon, color }) {
+function StatCard({ title, value, icon, color, active }) {
   const colors = {
     blue: 'from-blue-500 to-blue-600',
     green: 'from-green-500 to-emerald-600',
     orange: 'from-orange-500 to-orange-600',
     purple: 'from-purple-500 to-purple-600',
+    red: 'from-red-500 to-red-600',
   };
 
   return (
-    <Card>
+    <Card className={`transition-all duration-200 hover:shadow-lg ${active ? 'ring-2 ring-blue-500 shadow-lg' : ''}`}>
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
