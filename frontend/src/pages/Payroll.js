@@ -194,12 +194,12 @@ export default function Payroll() {
               )}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Month</label>
-                <Select value={filters.month} onValueChange={(value) => setFilters({ ...filters, month: value })}>
+                <Select value={filters.month || "all"} onValueChange={(value) => setFilters({ ...filters, month: value === "all" ? "" : value })}>
                   <SelectTrigger data-testid="month-filter">
                     <SelectValue placeholder="All Months" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Months</SelectItem>
+                    <SelectItem value="all">All Months</SelectItem>
                     {months.map((month) => (
                       <SelectItem key={month} value={month}>
                         {month}
