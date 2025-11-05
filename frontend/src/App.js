@@ -16,6 +16,7 @@ import Leaves from "./pages/Leaves";
 import Advances from "./pages/Advances";
 import Increments from "./pages/Increments";
 import Payroll from "./pages/Payroll";
+import ActivityLogs from "./pages/ActivityLogs";
 import { Toaster } from "./components/ui/sonner";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
