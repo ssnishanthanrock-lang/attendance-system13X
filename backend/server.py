@@ -146,6 +146,21 @@ class ActivityLog(BaseModel):
     details: str
     timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+class Increment(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    employee_id: str
+    employee_name: str
+    old_salary: float
+    new_salary: float
+    increment_amount: float
+    effective_from: str  # Format: "YYYY-MM"
+    reason: str
+    created_by: str
+    created_by_name: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # ============= HELPER FUNCTIONS =============
 def create_access_token(data: dict):
     to_encode = data.copy()
