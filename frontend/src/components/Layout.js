@@ -100,6 +100,7 @@ export default function Layout({ children }) {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    localStorage.removeItem('companyInfo');
     navigate('/login');
   };
 
