@@ -48,11 +48,25 @@ export default function Employees() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Prepare FormData if profile picture is included
+      const submitData = new FormData();
+      Object.keys(formData).forEach(key => {
+        if (key === 'profile_picture' && formData[key]) {
+          submitData.append('profile_picture', formData[key]);
+        } else if (key !== 'profile_picture') {
+          submitData.append(key, formData[key]);
+        }
+      });
+
+      const config = formData.profile_picture ? {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      } : {};
+
       if (editingEmployee) {
-        await api.put(`/employees/${editingEmployee.id}`, formData);
+        await api.put(`/employees/${editingEmployee.id}`, formData.profile_picture ? submitData : formData, config);
         toast.success('Employee updated successfully');
       } else {
-        await api.post('/employees', formData);
+        await api.post('/employees', formData.profile_picture ? submitData : formData, config);
         toast.success('Employee created successfully');
       }
       setDialogOpen(false);
