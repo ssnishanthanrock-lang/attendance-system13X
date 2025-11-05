@@ -267,8 +267,8 @@ export default function Payroll() {
                             <td className="border border-gray-300 px-2 py-3 text-center text-sm text-blue-600 bg-green-50">
                               {emp.allowed_half_days || 0}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-green-50">
-                              {emp.late_deduction.toLocaleString()}
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-green-50" title={`Late minutes: ${emp.late_minutes} | Deducted: Rs ${emp.late_deduction.toFixed(2)}`}>
+                              {emp.late_deduction.toLocaleString(undefined, {maximumFractionDigits: 2})}
                             </td>
                             
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
