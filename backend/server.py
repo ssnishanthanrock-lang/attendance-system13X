@@ -1599,9 +1599,16 @@ async def get_attendance(
     
     history_map = {item["_id"]: item["count"] for item in history_counts}
     
+    # Enrich with employee profile pictures
+    employee_ids = list(set([att.get("employee_id") for att in attendance if att.get("employee_id")]))
+    employees = await db.users.find({"id": {"$in": employee_ids}}, {"id": 1, "profile_pic": 1, "_id": 0}).to_list(length=None)
+    employee_profile_map = {emp["id"]: emp.get("profile_pic") for emp in employees}
+    
     for att in attendance:
         att["has_history"] = att["id"] in history_map
         att["history_count"] = history_map.get(att["id"], 0)
+        # Add profile picture
+        att["profile_pic"] = employee_profile_map.get(att.get("employee_id"))
     
     return attendance
 
