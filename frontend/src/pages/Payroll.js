@@ -5,9 +5,9 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { Calendar, Download, Plus, ArrowLeft, Users, TrendingUp, Wallet, DollarSign, FileText, Clock } from 'lucide-react';
+import { Calendar, Plus, ArrowLeft, Users, TrendingUp, Briefcase, Clock, AlertCircle } from 'lucide-react';
 
 export default function Payroll() {
   const [months, setMonths] = useState([]);
@@ -62,7 +62,6 @@ export default function Payroll() {
     e.preventDefault();
     setGenerating(true);
     try {
-      // Convert month name to number and format as YYYY-MM
       const monthIndex = monthNames.indexOf(generateForm.month) + 1;
       const monthStr = monthIndex.toString().padStart(2, '0');
       const yearMonth = `${generateForm.year}-${monthStr}`;
@@ -122,16 +121,19 @@ export default function Payroll() {
                 Back
               </Button>
             )}
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-              {selectedMonth ? formatMonthName(selectedMonth) : 'Payroll Management'}
-            </h1>
+            <div>
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                {selectedMonth ? formatMonthName(selectedMonth) : 'Payroll Management'}
+              </h1>
+              {!selectedMonth && (
+                <p className="text-sm text-gray-500 mt-1">View and manage employee payroll</p>
+              )}
+            </div>
           </div>
           {isAdmin && (
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
-                <Button
-                  className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                >
+                <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                   <Plus className="w-4 h-4 mr-2" />
                   Generate Payroll
                 </Button>
@@ -186,201 +188,232 @@ export default function Payroll() {
 
         {/* Month List View */}
         {!selectedMonth && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {months.map((monthData) => (
-              <Card
-                key={monthData.month}
-                className="cursor-pointer hover:shadow-lg transition-all hover:scale-105"
-                onClick={() => handleMonthClick(monthData.month)}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-3 bg-blue-100 rounded-lg">
-                      <Calendar className="w-6 h-6 text-blue-600" />
-                    </div>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                    {formatMonthName(monthData.month)}
-                  </h3>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-600 flex items-center gap-2">
-                        <Users className="w-4 h-4" />
-                        Employees
-                      </span>
-                      <span className="font-semibold text-gray-900">{monthData.employee_count}</span>
-                    </div>
-                    <div className="pt-3 border-t border-gray-200">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Total Salary</span>
-                        <span className="text-lg font-bold text-green-600 flex items-center gap-1">
-                          <IndianRupee className="w-4 h-4" />
-                          {monthData.total_salary.toLocaleString()}
-                        </span>
+          <>
+            {months.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {months.map((monthData) => (
+                  <Card
+                    key={monthData.month}
+                    className="cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-l-4 border-l-blue-500"
+                    onClick={() => handleMonthClick(monthData.month)}
+                  >
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-3 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl">
+                          <Calendar className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="text-lg font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                            {formatMonthName(monthData.month)}
+                          </h3>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {months.length === 0 && !selectedMonth && (
-          <div className="text-center py-12">
-            <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-gray-500">No payroll data available</p>
-          </div>
+                      
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-gray-500" />
+                            <span className="text-sm text-gray-600">Employees</span>
+                          </div>
+                          <span className="text-sm font-bold text-gray-900">{monthData.employee_count}</span>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
+                          <span className="text-sm font-medium text-green-700">Total Payroll</span>
+                          <div className="text-right">
+                            <span className="text-lg font-bold text-green-700">
+                              Rs {monthData.total_salary.toLocaleString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                  <Calendar className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-gray-500 text-lg">No payroll data available</p>
+                <p className="text-gray-400 text-sm mt-2">Generate payroll to get started</p>
+              </div>
+            )}
+          </>
         )}
 
         {/* Detailed Employee View */}
         {selectedMonth && detailedPayroll && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
-                  <p className="text-2xl font-bold text-blue-600 flex items-center gap-1">
-                    <IndianRupee className="w-5 h-5" />
-                    {detailedPayroll.total_gross.toLocaleString()}
-                  </p>
+              <Card className="border-t-4 border-t-blue-500">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Total Gross</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        Rs {detailedPayroll.total_gross.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-blue-100 rounded-lg">
+                      <TrendingUp className="w-6 h-6 text-blue-600" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
-                  <p className="text-2xl font-bold text-red-600 flex items-center gap-1">
-                    <IndianRupee className="w-5 h-5" />
-                    {detailedPayroll.total_deductions.toLocaleString()}
-                  </p>
+              
+              <Card className="border-t-4 border-t-red-500">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        Rs {detailedPayroll.total_deductions.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-red-100 rounded-lg">
+                      <AlertCircle className="w-6 h-6 text-red-600" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
-              <Card>
-                <CardContent className="p-4">
-                  <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
-                  <p className="text-2xl font-bold text-green-600 flex items-center gap-1">
-                    <IndianRupee className="w-5 h-5" />
-                    {detailedPayroll.total_net.toLocaleString()}
-                  </p>
+              
+              <Card className="border-t-4 border-t-green-500">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">Total Net</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        Rs {detailedPayroll.total_net.toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="p-3 bg-green-100 rounded-lg">
+                      <Briefcase className="w-6 h-6 text-green-600" />
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Employee Details */}
             <div className="space-y-4">
-              {detailedPayroll.employees.map((emp) => (
-                <Card key={emp.employee_id} className="overflow-hidden">
+              {detailedPayroll.employees.map((emp, index) => (
+                <Card key={emp.employee_id} className="overflow-hidden border-l-4 border-l-indigo-500">
                   <CardContent className="p-6">
-                    <div className="space-y-4">
-                      {/* Employee Header */}
-                      <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-                        <h3 className="text-lg font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                          {emp.employee_name}
-                        </h3>
-                        {emp.fixed_salary && (
-                          <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
-                            Fixed Salary
+                    {/* Employee Header */}
+                    <div className="flex items-center justify-between pb-4 mb-4 border-b-2 border-gray-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">
+                            {emp.employee_name.split(' ').map(n => n[0]).join('').substring(0, 2)}
                           </span>
-                        )}
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                            {emp.employee_name}
+                          </h3>
+                          <p className="text-xs text-gray-500">Employee #{index + 1}</p>
+                        </div>
                       </div>
+                      {emp.fixed_salary && (
+                        <span className="px-3 py-1 bg-indigo-100 text-indigo-700 text-xs font-semibold rounded-full">
+                          Fixed Salary
+                        </span>
+                      )}
+                    </div>
 
-                      {/* Salary Breakdown */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                        <div className="bg-blue-50 p-3 rounded-lg">
-                          <p className="text-xs text-blue-600 mb-1">Basic Salary</p>
-                          <p className="text-sm font-bold text-blue-700 flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
-                            {emp.basic_salary.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="bg-green-50 p-3 rounded-lg">
-                          <p className="text-xs text-green-600 mb-1">Allowances</p>
-                          <p className="text-sm font-bold text-green-700 flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
-                            {emp.allowances.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="bg-purple-50 p-3 rounded-lg">
-                          <p className="text-xs text-purple-600 mb-1">Gross Salary</p>
-                          <p className="text-sm font-bold text-purple-700 flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
-                            {emp.gross_salary.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="bg-red-50 p-3 rounded-lg">
-                          <p className="text-xs text-red-600 mb-1">Total Deductions</p>
-                          <p className="text-sm font-bold text-red-700 flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
-                            {emp.total_deductions.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="bg-green-50 p-3 rounded-lg border-2 border-green-200">
-                          <p className="text-xs text-green-600 mb-1">Net Salary</p>
-                          <p className="text-sm font-bold text-green-700 flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
-                            {emp.net_salary.toLocaleString()}
-                          </p>
-                        </div>
+                    {/* Main Salary Info - Horizontal Layout */}
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-4">
+                      <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                        <p className="text-xs text-blue-600 font-medium mb-1">Basic Salary</p>
+                        <p className="text-lg font-bold text-blue-700">
+                          Rs {emp.basic_salary.toLocaleString()}
+                        </p>
                       </div>
+                      
+                      <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
+                        <p className="text-xs text-green-600 font-medium mb-1">Allowances</p>
+                        <p className="text-lg font-bold text-green-700">
+                          Rs {emp.allowances.toLocaleString()}
+                        </p>
+                      </div>
+                      
+                      <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+                        <p className="text-xs text-purple-600 font-medium mb-1">Gross</p>
+                        <p className="text-lg font-bold text-purple-700">
+                          Rs {emp.gross_salary.toLocaleString()}
+                        </p>
+                      </div>
+                      
+                      <div className="text-center p-4 bg-gradient-to-br from-red-50 to-red-100 rounded-xl border border-red-200">
+                        <p className="text-xs text-red-600 font-medium mb-1">Deductions</p>
+                        <p className="text-lg font-bold text-red-700">
+                          Rs {emp.total_deductions.toLocaleString()}
+                        </p>
+                      </div>
+                      
+                      <div className="text-center p-4 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border-2 border-emerald-300">
+                        <p className="text-xs text-emerald-600 font-medium mb-1">Net Salary</p>
+                        <p className="text-lg font-bold text-emerald-700">
+                          Rs {emp.net_salary.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
 
-                      {/* Attendance & Deductions Details */}
-                      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 pt-3 border-t border-gray-200">
-                        <div className="text-center p-2 bg-gray-50 rounded">
-                          <p className="text-xs text-gray-600 mb-1">Working Days</p>
-                          <p className="text-sm font-semibold text-gray-900">{emp.working_days}</p>
-                        </div>
-                        <div className="text-center p-2 bg-gray-50 rounded">
-                          <p className="text-xs text-gray-600 mb-1">Present</p>
-                          <p className="text-sm font-semibold text-gray-900">{emp.present_days}</p>
-                        </div>
-                        <div className="text-center p-2 bg-gray-50 rounded">
-                          <p className="text-xs text-gray-600 mb-1">Leave</p>
-                          <p className="text-sm font-semibold text-gray-900">{emp.leave_days}</p>
-                        </div>
-                        <div className="text-center p-2 bg-gray-50 rounded">
-                          <p className="text-xs text-gray-600 mb-1">Half Days</p>
-                          <p className="text-sm font-semibold text-gray-900">{emp.half_days}</p>
-                        </div>
-                        <div className="text-center p-2 bg-orange-50 rounded">
-                          <p className="text-xs text-orange-600 mb-1">Late (mins)</p>
-                          <p className="text-sm font-semibold text-orange-700">{emp.late_minutes}</p>
-                        </div>
-                        <div className="text-center p-2 bg-orange-50 rounded">
-                          <p className="text-xs text-orange-600 mb-1">Late Deduction</p>
-                          <p className="text-sm font-semibold text-orange-700 flex items-center justify-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
-                            {emp.late_deduction.toLocaleString()}
-                          </p>
-                        </div>
+                    {/* Attendance Metrics */}
+                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mb-4 p-4 bg-gray-50 rounded-xl">
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Working</p>
+                        <p className="text-sm font-bold text-gray-900">{emp.working_days} days</p>
                       </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Present</p>
+                        <p className="text-sm font-bold text-green-600">{emp.present_days} days</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Leave</p>
+                        <p className="text-sm font-bold text-orange-600">{emp.leave_days} days</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Half Day</p>
+                        <p className="text-sm font-bold text-yellow-600">{emp.half_days} days</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Late</p>
+                        <p className="text-sm font-bold text-red-600">{emp.late_minutes} mins</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-xs text-gray-500 mb-1">Late Loss</p>
+                        <p className="text-sm font-bold text-red-700">Rs {emp.late_deduction.toLocaleString()}</p>
+                      </div>
+                    </div>
 
-                      {/* Additional Details */}
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-3 border-t border-gray-200">
-                        <div className="bg-red-50 p-3 rounded-lg">
-                          <p className="text-xs text-red-600 mb-1">Advances</p>
-                          <p className="text-sm font-bold text-red-700 flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
-                            {emp.advances.toLocaleString()}
-                          </p>
-                        </div>
-                        <div className="bg-orange-50 p-3 rounded-lg">
-                          <p className="text-xs text-orange-600 mb-1">Other Deductions</p>
-                          <p className="text-sm font-bold text-orange-700 flex items-center gap-1">
-                            <IndianRupee className="w-3 h-3" />
-                            {emp.other_deductions.toLocaleString()}
-                          </p>
-                        </div>
-                        {!emp.fixed_salary && (
-                          <div className="bg-gray-50 p-3 rounded-lg">
-                            <p className="text-xs text-gray-600 mb-1">Salary/Minute</p>
-                            <p className="text-sm font-bold text-gray-700 flex items-center gap-1">
-                              <IndianRupee className="w-3 h-3" />
-                              {emp.salary_per_minute.toLocaleString()}
-                            </p>
-                          </div>
-                        )}
+                    {/* Additional Breakdown */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      <div className="p-3 bg-white border border-red-200 rounded-lg">
+                        <p className="text-xs text-red-600 font-medium mb-1">Advances</p>
+                        <p className="text-base font-bold text-red-700">
+                          Rs {emp.advances.toLocaleString()}
+                        </p>
                       </div>
+                      
+                      <div className="p-3 bg-white border border-orange-200 rounded-lg">
+                        <p className="text-xs text-orange-600 font-medium mb-1">Other Deductions</p>
+                        <p className="text-base font-bold text-orange-700">
+                          Rs {emp.other_deductions.toLocaleString()}
+                        </p>
+                      </div>
+                      
+                      {!emp.fixed_salary && (
+                        <div className="p-3 bg-white border border-gray-200 rounded-lg">
+                          <p className="text-xs text-gray-600 font-medium mb-1">Per Minute Rate</p>
+                          <p className="text-base font-bold text-gray-700">
+                            Rs {emp.salary_per_minute.toLocaleString()}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
