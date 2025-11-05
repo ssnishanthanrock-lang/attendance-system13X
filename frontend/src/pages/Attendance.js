@@ -48,49 +48,54 @@ export default function Attendance() {
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
 
-  // Read URL path parameters on mount
+  // Read URL path parameters and trigger fetch
   useEffect(() => {
     let hasFilters = false;
+    let newFilters = { employee_id: '', from_date: '', to_date: '' };
+    let newViewMode = 'today';
     
     if (date) {
       // Single date from path parameter
-      setFilters({
+      newFilters = {
         employee_id: employeeId || '',
         from_date: date,
         to_date: date,
-      });
-      setViewMode('filtered');
+      };
+      newViewMode = 'filtered';
       hasFilters = true;
     } else if (fromDate && toDate) {
       // Date range from path parameters
-      setFilters({
+      newFilters = {
         employee_id: employeeId || '',
         from_date: fromDate,
         to_date: toDate,
-      });
-      setViewMode('filtered');
+      };
+      newViewMode = 'filtered';
       hasFilters = true;
     } else if (employeeId) {
       // Only employee filter
-      setFilters({
+      newFilters = {
         employee_id: employeeId,
         from_date: '',
         to_date: '',
-      });
-      setViewMode('filtered');
+      };
+      newViewMode = 'filtered';
       hasFilters = true;
     }
     
-    if (!hasFilters) {
-      // No URL parameters, reset to default
-      setViewMode('today');
-      setFilters({
-        employee_id: '',
-        from_date: '',
-        to_date: '',
-      });
+    // Set filters and viewMode
+    setFilters(newFilters);
+    setViewMode(newViewMode);
+    
+    // Trigger fetch after setting filters
+    if (user) {
+      setLoading(true);
+      // Use timeout to ensure state is updated
+      setTimeout(() => {
+        fetchAttendanceWithParams(newFilters, newViewMode);
+      }, 0);
     }
-  }, [date, employeeId, fromDate, toDate]);
+  }, [date, employeeId, fromDate, toDate, user]);
 
   // Initialize user and settings once
   useEffect(() => {
