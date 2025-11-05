@@ -7,7 +7,7 @@ import {
   Users,
   Calendar,
   FileText,
-  TrendingUp,
+  Banknote,
   Wallet,
   Menu,
   LogOut,
