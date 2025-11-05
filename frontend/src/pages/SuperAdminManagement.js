@@ -18,7 +18,8 @@ export default function SuperAdminManagement() {
   const [formData, setFormData] = useState({
     name: '',
     mobile: '',
-    employee_id: ''
+    employee_id: '',
+    can_full_access_companies: false
   });
 
   useEffect(() => {
