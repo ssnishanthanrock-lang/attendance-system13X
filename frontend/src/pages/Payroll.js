@@ -198,7 +198,8 @@ export default function Payroll() {
               </Card>
             </div>
 
-            {/* Employee Cards */}
+            {/* Employee Cards - Card View */}
+            {viewMode === 'card' && (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
               {livePayroll.employees.map((emp) => (
                 <Card key={emp.employee_id} className="hover:shadow-lg transition-shadow">
