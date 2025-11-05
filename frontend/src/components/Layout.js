@@ -177,7 +177,59 @@ export default function Layout({ children }) {
   const NavLink = ({ item, onClick }) => {
     const Icon = item.icon;
     const isActive = location.pathname === item.path;
+    const isChildActive = item.children?.some(child => location.pathname === child.path);
+    const textSize = item.smaller ? 'text-xs' : 'text-sm';
 
+    // Dropdown menu item
+    if (item.isDropdown) {
+      return (
+        <div className="w-full">
+          <button
+            data-testid={`nav-${item.label.toLowerCase()}`}
+            onClick={() => setApplyMenuOpen(!applyMenuOpen)}
+            className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${textSize} ${
+              isChildActive
+                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Icon className="w-4 h-4" />
+              <span>{item.label}</span>
+            </div>
+            {applyMenuOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          </button>
+          {applyMenuOpen && (
+            <div className="ml-6 mt-1 space-y-1">
+              {item.children.map((child) => {
+                const ChildIcon = child.icon;
+                const childActive = location.pathname === child.path;
+                return (
+                  <button
+                    key={child.path}
+                    data-testid={`nav-${child.label.toLowerCase()}`}
+                    onClick={() => {
+                      navigate(child.path);
+                      onClick?.();
+                    }}
+                    className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all text-sm ${
+                      childActive
+                        ? 'bg-blue-100 text-blue-700'
+                        : 'text-gray-600 hover:bg-gray-50'
+                    }`}
+                  >
+                    <ChildIcon className="w-3 h-3" />
+                    <span className="text-sm">{child.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // Regular menu item
     return (
       <button
         data-testid={`nav-${item.label.toLowerCase()}`}
@@ -185,14 +237,14 @@ export default function Layout({ children }) {
           navigate(item.path);
           onClick?.();
         }}
-        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all text-sm ${
+        className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg font-medium transition-all ${textSize} ${
           isActive
             ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
             : 'text-gray-700 hover:bg-gray-100'
         }`}
       >
         <Icon className="w-4 h-4" />
-        <span className="text-sm">{item.label}</span>
+        <span>{item.label}</span>
       </button>
     );
   };
