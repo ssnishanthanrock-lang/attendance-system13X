@@ -72,9 +72,22 @@ class CompanyInfoUpdate(BaseModel):
 class SMSSettings(BaseModel):
     sms_gateway: str  # textit, dialog, hutch, mobitel, disabled
     sms_enabled: bool
+    # Textit.biz
     sms_username: Optional[str] = None
     sms_password: Optional[str] = None
-    sms_api_key: Optional[str] = None
+    # Dialog
+    dialog_username: Optional[str] = None
+    dialog_password: Optional[str] = None
+    dialog_mask: Optional[str] = None  # Sender ID
+    # Hutch
+    hutch_client_id: Optional[str] = None
+    hutch_client_secret: Optional[str] = None
+    hutch_access_token: Optional[str] = None
+    hutch_refresh_token: Optional[str] = None
+    # Mobitel
+    mobitel_app_id: Optional[str] = None
+    mobitel_app_key: Optional[str] = None
+    mobitel_client_id: Optional[str] = None
 
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
