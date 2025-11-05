@@ -258,11 +258,15 @@ export default function SuperAdminCompanyDetail() {
                 checked={company?.invoicing_enabled || false}
                 onCheckedChange={async (checked) => {
                   try {
+                    // Optimistically update UI
+                    setCompany({ ...company, invoicing_enabled: checked });
+                    
                     await api.put(`/superadmin/companies/${companyId}/invoicing`, { enabled: checked });
                     toast.success(`Invoicing ${checked ? 'enabled' : 'disabled'} successfully`);
-                    fetchCompany();
                   } catch (error) {
                     toast.error('Failed to update invoicing status');
+                    // Revert on error
+                    fetchCompany();
                   }
                 }}
               />
