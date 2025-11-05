@@ -37,6 +37,7 @@ export default function Attendance() {
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [viewingHistoryRecord, setViewingHistoryRecord] = useState(null);
   const [loadingHistory, setLoadingHistory] = useState(false);
+  const [companySettings, setCompanySettings] = useState(null);
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
@@ -47,6 +48,7 @@ export default function Attendance() {
     if (userData?.role === 'admin' || userData?.role === 'manager') {
       fetchEmployees();
     }
+    fetchCompanySettings();
     fetchAttendance();
   }, []);
 
