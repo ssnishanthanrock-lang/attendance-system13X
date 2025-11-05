@@ -184,47 +184,47 @@ export default function Payroll() {
                     <tbody className="divide-y divide-gray-200">
                       {detailedPayroll.employees.map((emp) => (
                         <tr key={emp.employee_id} className="hover:bg-gray-50">
-                          <td className="px-4 py-3">
+                          <td className="px-3 py-2 sticky left-0 bg-white whitespace-nowrap">
                             <div>
-                              <p className="font-semibold text-gray-900">{emp.employee_name}</p>
+                              <p className="font-semibold text-sm text-gray-900">{emp.employee_name}</p>
                               {emp.fixed_salary && (
-                                <span className="text-xs text-blue-600">Fixed Salary</span>
+                                <span className="text-xs text-blue-600">Fixed</span>
                               )}
                               {!emp.fixed_salary && (
-                                <span className="text-xs text-gray-500">Rs {emp.salary_per_minute.toFixed(2)}/min</span>
+                                <span className="text-xs text-gray-500">{emp.salary_per_minute.toFixed(2)}/m</span>
                               )}
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-right font-semibold text-gray-900">
-                            Rs {emp.basic_salary.toLocaleString()}
+                          <td className="px-3 py-2 text-right font-semibold text-sm text-gray-900 whitespace-nowrap">
+                            {emp.basic_salary.toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-right text-gray-700">
-                            Rs {emp.allowances.toLocaleString()}
+                          <td className="px-3 py-2 text-right text-sm text-gray-700 whitespace-nowrap">
+                            {emp.allowances.toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-center text-gray-700">{emp.working_days}</td>
-                          <td className="px-4 py-3 text-center text-green-600 font-semibold">{emp.present_days}</td>
-                          <td className="px-4 py-3 text-center text-orange-600">{emp.leave_days}</td>
-                          <td className="px-4 py-3 text-right text-red-600">{emp.late_minutes}</td>
-                          <td className="px-4 py-3 text-right text-red-600">
-                            Rs {emp.late_deduction.toLocaleString()}
+                          <td className="px-3 py-2 text-center text-sm text-gray-700 whitespace-nowrap">{emp.working_days}</td>
+                          <td className="px-3 py-2 text-center text-sm text-green-600 font-semibold whitespace-nowrap">{emp.present_days}</td>
+                          <td className="px-3 py-2 text-center text-sm text-orange-600 whitespace-nowrap">{emp.leave_days}</td>
+                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">{emp.late_minutes}</td>
+                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">
+                            {emp.late_deduction.toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-right text-red-600">
-                            Rs {emp.advances.toLocaleString()}
+                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">
+                            {emp.advances.toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-right text-red-600">
-                            Rs {emp.other_deductions.toLocaleString()}
+                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">
+                            {emp.other_deductions.toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-right text-red-600">
-                            Rs {(emp.loan_deduction || 0).toLocaleString()}
+                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">
+                            {(emp.loan_deduction || 0).toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-right font-semibold text-gray-900">
-                            Rs {emp.gross_salary.toLocaleString()}
+                          <td className="px-3 py-2 text-right text-sm font-semibold text-gray-900 whitespace-nowrap">
+                            {emp.gross_salary.toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-right text-red-600 font-semibold">
-                            Rs {emp.total_deductions.toLocaleString()}
+                          <td className="px-3 py-2 text-right text-sm text-red-600 font-semibold whitespace-nowrap">
+                            {emp.total_deductions.toLocaleString()}
                           </td>
-                          <td className="px-4 py-3 text-right text-green-600 font-bold bg-green-50">
-                            Rs {emp.net_salary.toLocaleString()}
+                          <td className="px-3 py-2 text-right text-sm text-green-600 font-bold bg-green-50 sticky right-0 whitespace-nowrap">
+                            {emp.net_salary.toLocaleString()}
                           </td>
                         </tr>
                       ))}
