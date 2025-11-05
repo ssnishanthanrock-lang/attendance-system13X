@@ -50,6 +50,7 @@ export default function Employees() {
     new_salary: 0,
     reason: ''
   });
+  const [pendingIncrements, setPendingIncrements] = useState({});
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
