@@ -455,10 +455,14 @@ export default function Attendance() {
                           <div className="flex items-center gap-2">
                             {record.employee_name}
                             {historyCount[record.id] && (
-                              <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full" title="This record has been edited">
+                              <button
+                                onClick={() => handleViewHistory(record)}
+                                className="inline-flex items-center gap-1 text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full hover:bg-blue-200 transition-colors cursor-pointer"
+                                title="Click to view edit history"
+                              >
                                 <Clock className="w-3 h-3" />
                                 {historyCount[record.id]}
-                              </span>
+                              </button>
                             )}
                           </div>
                         </td>
