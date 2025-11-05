@@ -360,7 +360,7 @@ export default function Payroll() {
               </Button>
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  {formatMonthName(selectedMonth).monthName} Salary Sheet - {formatMonthName(selectedMonth).year}
+                  {formatMonthName(month).monthName} Salary Sheet - {formatMonthName(month).year}
                 </h1>
                 <p className="text-sm text-gray-600">
                   Working Days - {detailedPayroll.employees[0]?.working_days || 26}
