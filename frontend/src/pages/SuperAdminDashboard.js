@@ -68,6 +68,22 @@ export default function SuperAdminDashboard() {
     navigate('/login');
   };
 
+  const handleViewPortal = async (company) => {
+    try {
+      const response = await api.post(`/superadmin/impersonate/${company.company_id}`);
+      localStorage.setItem('token', response.data.token);
+      setImpersonationState(response.data.company_name, response.data.company_id, response.data.can_edit);
+      toast.success(`Now viewing ${response.data.company_name} portal`, {
+        style: { background: '#f59e0b', color: 'white' }
+      });
+      // Navigate to company dashboard
+      navigate('/');
+      window.location.reload(); // Refresh to update auth state
+    } catch (error) {
+      toast.error('Failed to access company portal');
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
