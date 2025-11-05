@@ -90,7 +90,7 @@ class SMSSettings(BaseModel):
     mobitel_client_id: Optional[str] = None
 
 class User(BaseModel):
-    model_config = ConfigDict(extra="ignore")
+    model_config = ConfigDict(extra="allow")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     company_id: Optional[str] = None
     employee_id: Optional[str] = None
