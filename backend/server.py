@@ -1150,6 +1150,51 @@ async def get_all_increments(current_user: User = Depends(get_current_user)):
     
     return increments
 
+@api_router.post("/increments/activate-pending")
+async def activate_pending_increments(current_user: User = Depends(get_current_user)):
+    """Activate pending increments whose effective date has arrived"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    current_month = datetime.now(timezone.utc).strftime("%Y-%m")
+    
+    # Find all pending increments whose effective date is now or past
+    pending_increments = await db.increments.find({
+        "company_id": current_user.company_id,
+        "status": "pending",
+        "effective_from": {"$lte": current_month}
+    }).to_list(length=None)
+    
+    activated_count = 0
+    for increment in pending_increments:
+        # Update employee salary
+        await db.users.update_one(
+            {"id": increment["employee_id"]},
+            {"$set": {"basic_salary": increment["new_salary"]}}
+        )
+        
+        # Mark increment as active
+        await db.increments.update_one(
+            {"id": increment["id"]},
+            {"$set": {"status": "active"}}
+        )
+        
+        # Log activation
+        await log_activity(
+            increment["company_id"],
+            current_user.id,
+            current_user.name,
+            "ACTIVATE_INCREMENT",
+            f"Activated salary increment for {increment['employee_name']}: Rs. {increment['old_salary']:,.2f} → Rs. {increment['new_salary']:,.2f}"
+        )
+        
+        activated_count += 1
+    
+    return {
+        "message": f"Activated {activated_count} pending increment(s)",
+        "activated_count": activated_count
+    }
+
 # ============= ATTENDANCE ENDPOINTS =============
 @api_router.get("/attendance")
 async def get_attendance(
