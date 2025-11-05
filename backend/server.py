@@ -407,22 +407,43 @@ async def verify_otp(request: OTPVerify):
         sort=[("created_at", -1)]
     )
     
+    # Check for multiple roles first to log invalid OTP with correct user context
+    users = await db.users.find({"mobile": request.mobile}, {"_id": 0}).to_list(10)
+    if not users:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Log invalid OTP attempt
     if not otp_doc:
+        # Get first user for logging context
+        first_user = users[0]
+        if first_user.get("company_id"):
+            await log_activity(
+                first_user["company_id"],
+                first_user["id"],
+                first_user["name"],
+                "INVALID_OTP",
+                f"Invalid OTP attempt for mobile {request.mobile}"
+            )
         raise HTTPException(status_code=400, detail="Invalid OTP")
     
     expires_at = datetime.fromisoformat(otp_doc["expires_at"])
     if datetime.now(timezone.utc) > expires_at:
+        # Log expired OTP
+        first_user = users[0]
+        if first_user.get("company_id"):
+            await log_activity(
+                first_user["company_id"],
+                first_user["id"],
+                first_user["name"],
+                "EXPIRED_OTP",
+                f"Expired OTP attempt for mobile {request.mobile}"
+            )
         raise HTTPException(status_code=400, detail="OTP expired")
     
     await db.otps.update_one(
         {"mobile": request.mobile, "otp": request.otp},
         {"$set": {"verified": True}}
     )
-    
-    # Check for multiple roles
-    users = await db.users.find({"mobile": request.mobile}, {"_id": 0}).to_list(10)
-    if not users:
-        raise HTTPException(status_code=404, detail="User not found")
     
     has_super_admin = any(u["role"] == "super_admin" for u in users)
     has_company_role = any(u["role"] != "super_admin" for u in users)
@@ -450,6 +471,15 @@ async def verify_otp(request: OTPVerify):
         await db.companies.update_one(
             {"id": user["company_id"]},
             {"$set": {"last_login": datetime.now(timezone.utc).isoformat()}}
+        )
+        
+        # Log successful login
+        await log_activity(
+            user["company_id"],
+            user["id"],
+            user["name"],
+            "LOGIN_SUCCESS",
+            f"User logged in successfully"
         )
     
     token = create_access_token({"user_id": user["id"], "role": user["role"], "company_id": user.get("company_id")})
