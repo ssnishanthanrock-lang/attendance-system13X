@@ -1986,7 +1986,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
             "employee_id": employee["id"],
             "employee_name": employee["name"],
             "position": employee.get("position", "Staff"),
-            "profile_picture": employee.get("profile_picture"),
+            "profile_picture": employee.get("profile_pic"),
             "basic_salary": round(basic_salary, 2),
             "allowances": round(allowances, 2),
             "working_days": working_days,
