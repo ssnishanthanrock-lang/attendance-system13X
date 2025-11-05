@@ -19,6 +19,10 @@ import Payroll from "./pages/Payroll";
 import ActivityLogs from "./pages/ActivityLogs";
 import DeletedAttendance from "./pages/DeletedAttendance";
 import DeletedEmployees from "./pages/DeletedEmployees";
+import Invoices from "./pages/Invoices";
+import Estimates from "./pages/Estimates";
+import InvoiceCustomers from "./pages/InvoiceCustomers";
+import InvoiceProducts from "./pages/InvoiceProducts";
 import { Toaster } from "./components/ui/sonner";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
