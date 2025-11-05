@@ -203,9 +203,9 @@ async def send_otp(request: OTPRequest):
     }
     await db.otps.insert_one(otp_doc)
     
+    # Send SMS - LOGIN OTP always uses system-wide gateway (not company-specific)
     message = f"Your OTP for IT Signature ERP is: {otp_code}. Valid for 5 minutes."
-    company_id = user.get("company_id") if user.get("role") != "super_admin" else None
-    sms_sent = send_sms(request.mobile, message, company_id)
+    sms_sent = send_sms(request.mobile, message, None)  # None = use default system gateway
     
     return {"message": "OTP sent successfully", "sms_sent": sms_sent}
 
