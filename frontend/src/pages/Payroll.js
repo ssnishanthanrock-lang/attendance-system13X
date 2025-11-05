@@ -134,7 +134,7 @@ export default function Payroll() {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        {!selectedMonth && !isLiveView && (
+        {!month && !isLiveView && (
           <div className="flex items-center justify-between">
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
               Payroll Management
