@@ -26,6 +26,10 @@ export default function Employees() {
     basic_salary: 0,
     allowances: 0,
     join_date: new Date().toISOString().split('T')[0],
+    start_time: '09:00',
+    finish_time: '17:00',
+    fixed_salary: false,
+    profile_picture: null
   });
 
   useEffect(() => {
