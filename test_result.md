@@ -402,15 +402,18 @@ frontend:
 
   - task: "Live Current Month Payroll View with Real-time Updates"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/frontend/src/pages/Payroll.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implemented Live Current Month view with real-time salary tracking. Features: 1) 'Live Current Month' button with Radio icon in header (green background), 2) Live view with animated LIVE indicator (pulsing green badge), 3) Real-time updates every second using setInterval, 4) Summary cards showing Total Gross/Deductions/Net (So Far) with gradient backgrounds, 5) Employee cards grid (1/2/3 columns) with profile pictures, 6) Each employee card shows: earnings section (basic, allowances, earned so far, extra payment, gross), deductions section (late, advances, loan, other), net salary highlighted in green, attendance info (present/leave days, minutes worked, late minutes), 7) Back button to return to month list, 8) Timestamp display showing last update time, 9) Uses Radio icon for LIVE indicator with animate-pulse, 10) Gradient backgrounds for summary cards (blue-50 to blue-100 for gross, red-50 to red-100 for deductions, green-50 to green-100 for net), 11) useEffect cleanup for interval on unmount. Ready for comprehensive frontend testing."
+      - working: false
+        agent: "testing"
+        comment: "❌ CRITICAL AUTHENTICATION BLOCKING LIVE PAYROLL TESTING: Frontend implementation appears complete but cannot be tested due to authentication system failure. Issues identified: 1) OTP send endpoint returns 404 'User not found' (no test users exist), 2) All API calls return 401 Unauthorized, 3) JWT token validation errors: 'Not enough segments' - indicates malformed tokens, 4) Application redirects to login page preventing access to payroll features, 5) Backend logs show continuous token validation failures. FRONTEND CODE ANALYSIS: Live Current Month button implementation is present in code with correct styling (bg-green-600, Radio icon), Live view structure implemented with all required components (LIVE indicator, timestamp, summary cards, employee cards grid), Real-time update logic with setInterval properly implemented, Back button navigation working. BACKEND INTEGRATION: Backend endpoint /api/payroll/live-current-month exists and working (confirmed from previous testing), Authentication layer is blocking all frontend access. CRITICAL ISSUE: Authentication system needs immediate fix - either create valid test users or fix JWT token generation/validation to enable Live Payroll testing."
 
 agent_communication:
   - agent: "main"
