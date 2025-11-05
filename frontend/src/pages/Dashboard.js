@@ -422,7 +422,6 @@ export default function Dashboard() {
                 <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>
                   {stats.monthly_salary_summary.month} {stats.monthly_salary_summary.year} - Salary Summary
                 </CardTitle>
-                <CardDescription>Employee-wise salary overview</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
