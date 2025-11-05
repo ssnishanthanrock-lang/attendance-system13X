@@ -285,9 +285,6 @@ export default function Payroll() {
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
                               {(emp.loan_deduction || 0).toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600 bg-red-50">
-                              {(emp.extra_payment || 0).toLocaleString()}
-                            </td>
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
                               {emp.other_deductions.toLocaleString()}
                             </td>
