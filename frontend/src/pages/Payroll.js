@@ -4,7 +4,7 @@ import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, User } from 'lucide-react';
 
 export default function Payroll() {
   const [months, setMonths] = useState([]);
@@ -60,7 +60,7 @@ export default function Payroll() {
       'July', 'August', 'September', 'October', 'November', 'December'
     ];
     const monthName = monthNames[parseInt(month) - 1];
-    return `${monthName} ${year}`;
+    return { monthName, year };
   };
 
   if (loading) {
@@ -77,22 +77,11 @@ export default function Payroll() {
     <Layout>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-center gap-3">
-          {selectedMonth && (
-            <Button
-              onClick={handleBackToMonths}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-          )}
+        {!selectedMonth && (
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-            {selectedMonth ? formatMonthName(selectedMonth) : 'Payroll Management'}
+            Payroll Management
           </h1>
-        </div>
+        )}
 
         {/* Month List View */}
         {!selectedMonth && (
@@ -108,7 +97,7 @@ export default function Payroll() {
                     <CardContent className="p-6">
                       <div className="text-center space-y-3">
                         <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                          {formatMonthName(monthData.month)}
+                          {formatMonthName(monthData.month).monthName} {formatMonthName(monthData.month).year}
                         </h3>
                         
                         <div className="pt-3 border-t border-gray-200">
@@ -129,138 +118,178 @@ export default function Payroll() {
             ) : (
               <div className="text-center py-16">
                 <p className="text-gray-500 text-lg">No payroll data available</p>
-                <p className="text-gray-400 text-sm mt-2">Generate payroll to get started</p>
               </div>
             )}
           </>
         )}
 
-        {/* Detailed Employee Report - Table Format */}
+        {/* Detailed Payroll Sheet - Spreadsheet Style */}
         {selectedMonth && detailedPayroll && (
-          <div className="space-y-6">
-            {/* Summary Totals */}
-            <Card>
-              <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
-                    <p className="text-2xl font-bold text-gray-900">Rs {detailedPayroll.total_gross.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
-                    <p className="text-2xl font-bold text-red-600">Rs {detailedPayroll.total_deductions.toLocaleString()}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
-                    <p className="text-2xl font-bold text-green-600">Rs {detailedPayroll.total_net.toLocaleString()}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="space-y-4">
+            {/* Back Button */}
+            <Button
+              onClick={handleBackToMonths}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back
+            </Button>
 
-            {/* Employee Payroll Table */}
+            {/* Salary Sheet Header */}
+            <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-6 rounded-lg text-center">
+              <h1 className="text-2xl sm:text-3xl font-bold" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                Month of {formatMonthName(selectedMonth).monthName} Salary Sheet - {formatMonthName(selectedMonth).year}
+              </h1>
+              <p className="text-sm mt-2 text-gray-300">
+                Working Days - {detailedPayroll.employees[0]?.working_days || 26}
+              </p>
+            </div>
+
+            {/* Payroll Table */}
             <Card>
               <CardContent className="p-0">
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-max">
-                    <thead className="bg-gray-50 border-b-2 border-gray-200">
-                      <tr>
-                        <th className="px-3 py-2 text-left text-xs font-semibold text-gray-700 whitespace-nowrap sticky left-0 bg-gray-50 z-10">Employee</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Basic Salary</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Allowances</th>
-                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap">Work Days</th>
-                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap">Present</th>
-                        <th className="px-3 py-2 text-center text-xs font-semibold text-gray-700 whitespace-nowrap">Leave</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Late (m)</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Late Loss</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Advances</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Other Ded.</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Loan Ded.</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Gross</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap">Total Ded.</th>
-                        <th className="px-3 py-2 text-right text-xs font-semibold text-gray-700 whitespace-nowrap bg-green-50 sticky right-0 z-10">Net Salary</th>
+                  <table className="w-full min-w-max border-collapse">
+                    {/* Header */}
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th colSpan="3" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-blue-100">
+                          Employee Details
+                        </th>
+                        <th colSpan="3" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-yellow-100">
+                          Allowances
+                        </th>
+                        <th colSpan="4" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-green-100">
+                          Attendance
+                        </th>
+                        <th colSpan="3" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-red-100">
+                          Deductions
+                        </th>
+                        <th colSpan="1" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-green-200">
+                          Net Salary
+                        </th>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">No</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Employee Name</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Designation</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Basic Salary</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Allowances</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Gross</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Present</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Leave</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Late (m)</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Late Loss</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Advance</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Loan</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Other</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-100">Net</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
-                      {detailedPayroll.employees.map((emp) => (
+
+                    {/* Body */}
+                    <tbody>
+                      {detailedPayroll.employees.map((emp, index) => (
                         <tr key={emp.employee_id} className="hover:bg-gray-50">
-                          <td className="px-3 py-2 sticky left-0 bg-white whitespace-nowrap">
-                            <div>
-                              <p className="font-semibold text-sm text-gray-900">{emp.employee_name}</p>
-                              {emp.fixed_salary && (
-                                <span className="text-xs text-blue-600">Fixed</span>
-                              )}
-                              {!emp.fixed_salary && (
-                                <span className="text-xs text-gray-500">{emp.salary_per_minute.toFixed(2)}/m</span>
-                              )}
+                          <td className="border border-gray-300 px-2 py-3 text-center text-sm">{index + 1}</td>
+                          <td className="border border-gray-300 px-3 py-3">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                {emp.profile_picture ? (
+                                  <img src={emp.profile_picture} alt={emp.employee_name} className="w-8 h-8 rounded-full" />
+                                ) : (
+                                  <User className="w-4 h-4 text-white" />
+                                )}
+                              </div>
+                              <div>
+                                <p className="font-semibold text-sm whitespace-nowrap">{emp.employee_name}</p>
+                                {emp.fixed_salary && (
+                                  <span className="text-xs text-blue-600">Fixed</span>
+                                )}
+                              </div>
                             </div>
                           </td>
-                          <td className="px-3 py-2 text-right font-semibold text-sm text-gray-900 whitespace-nowrap">
+                          <td className="border border-gray-300 px-2 py-3 text-sm text-center whitespace-nowrap">
+                            {emp.position || 'Staff'}
+                          </td>
+                          
+                          <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
                             {emp.basic_salary.toLocaleString()}
                           </td>
-                          <td className="px-3 py-2 text-right text-sm text-gray-700 whitespace-nowrap">
+                          <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
                             {emp.allowances.toLocaleString()}
                           </td>
-                          <td className="px-3 py-2 text-center text-sm text-gray-700 whitespace-nowrap">{emp.working_days}</td>
-                          <td className="px-3 py-2 text-center text-sm text-green-600 font-semibold whitespace-nowrap">{emp.present_days}</td>
-                          <td className="px-3 py-2 text-center text-sm text-orange-600 whitespace-nowrap">{emp.leave_days}</td>
-                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">{emp.late_minutes}</td>
-                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">
-                            {emp.late_deduction.toLocaleString()}
-                          </td>
-                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">
-                            {emp.advances.toLocaleString()}
-                          </td>
-                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">
-                            {emp.other_deductions.toLocaleString()}
-                          </td>
-                          <td className="px-3 py-2 text-right text-sm text-red-600 whitespace-nowrap">
-                            {(emp.loan_deduction || 0).toLocaleString()}
-                          </td>
-                          <td className="px-3 py-2 text-right text-sm font-semibold text-gray-900 whitespace-nowrap">
+                          <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
                             {emp.gross_salary.toLocaleString()}
                           </td>
-                          <td className="px-3 py-2 text-right text-sm text-red-600 font-semibold whitespace-nowrap">
-                            {emp.total_deductions.toLocaleString()}
+                          
+                          <td className="border border-gray-300 px-2 py-3 text-center text-sm font-semibold text-green-600 bg-green-50">
+                            {emp.present_days}
                           </td>
-                          <td className="px-3 py-2 text-right text-sm text-green-600 font-bold bg-green-50 sticky right-0 whitespace-nowrap">
+                          <td className="border border-gray-300 px-2 py-3 text-center text-sm text-orange-600 bg-green-50">
+                            {emp.leave_days}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-3 text-center text-sm text-red-600 bg-green-50">
+                            {emp.late_minutes}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-green-50">
+                            {emp.late_deduction.toLocaleString()}
+                          </td>
+                          
+                          <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                            {emp.advances.toLocaleString()}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                            {(emp.loan_deduction || 0).toLocaleString()}
+                          </td>
+                          <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                            {emp.other_deductions.toLocaleString()}
+                          </td>
+                          
+                          <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-100">
                             {emp.net_salary.toLocaleString()}
                           </td>
                         </tr>
                       ))}
                     </tbody>
-                    <tfoot className="bg-gray-100 border-t-2 border-gray-300">
-                      <tr className="font-bold">
-                        <td className="px-3 py-3 text-sm text-gray-900 sticky left-0 bg-gray-100 whitespace-nowrap">TOTAL</td>
-                        <td className="px-3 py-3 text-right text-sm text-gray-900 whitespace-nowrap">
+
+                    {/* Footer Totals */}
+                    <tfoot>
+                      <tr className="bg-gray-200 font-bold">
+                        <td colSpan="3" className="border border-gray-300 px-3 py-3 text-center text-sm">
+                          TOTAL
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.basic_salary, 0).toLocaleString()}
                         </td>
-                        <td className="px-3 py-3 text-right text-sm text-gray-900 whitespace-nowrap">
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
                         </td>
-                        <td className="px-3 py-3"></td>
-                        <td className="px-3 py-3"></td>
-                        <td className="px-3 py-3"></td>
-                        <td className="px-3 py-3"></td>
-                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
-                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.late_deduction, 0).toLocaleString()}
-                        </td>
-                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
-                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.advances, 0).toLocaleString()}
-                        </td>
-                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
-                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.other_deductions, 0).toLocaleString()}
-                        </td>
-                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
-                          {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.loan_deduction || 0), 0).toLocaleString()}
-                        </td>
-                        <td className="px-3 py-3 text-right text-sm text-gray-900 whitespace-nowrap">
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
                           {detailedPayroll.total_gross.toLocaleString()}
                         </td>
-                        <td className="px-3 py-3 text-right text-sm text-red-600 whitespace-nowrap">
-                          {detailedPayroll.total_deductions.toLocaleString()}
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.late_deduction, 0).toLocaleString()}
                         </td>
-                        <td className="px-3 py-3 text-right text-sm text-green-600 bg-green-100 sticky right-0 whitespace-nowrap">
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.advances, 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.loan_deduction || 0), 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.other_deductions, 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-200">
                           {detailedPayroll.total_net.toLocaleString()}
                         </td>
                       </tr>
@@ -269,6 +298,28 @@ export default function Payroll() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Summary Cards at Bottom */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
+                  <p className="text-2xl font-bold text-blue-700">Rs {detailedPayroll.total_gross.toLocaleString()}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-red-50 border-red-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                  <p className="text-2xl font-bold text-red-700">Rs {detailedPayroll.total_deductions.toLocaleString()}</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-green-50 border-green-200">
+                <CardContent className="p-4 text-center">
+                  <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
+                  <p className="text-2xl font-bold text-green-700">Rs {detailedPayroll.total_net.toLocaleString()}</p>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         )}
       </div>
