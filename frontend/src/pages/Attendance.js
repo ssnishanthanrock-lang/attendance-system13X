@@ -51,6 +51,7 @@ export default function Attendance() {
     setUser(userData);
     if (userData?.role === 'admin' || userData?.role === 'manager') {
       fetchEmployees();
+      checkDeletedAttendance();
     }
     fetchCompanySettings();
     fetchAttendance();
