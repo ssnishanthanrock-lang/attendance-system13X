@@ -1506,20 +1506,16 @@ async def delete_loan(loan_id: str, current_user: User = Depends(get_current_use
 @api_router.post("/advances")
 async def create_advance(advance_data: dict, current_user: User = Depends(get_current_user)):
     """Create a new advance request"""
-    advance = {
-        "id": str(uuid.uuid4()),
-        "company_id": current_user.company_id,
-        "employee_id": current_user.id,
-        "employee_name": current_user.name,
-        "amount": advance_data["amount"],
-        "reason": advance_data.get("reason", ""),
-        "repayment_months": advance_data.get("repayment_months", 1),
-        "status": "pending",
-        "request_date": datetime.now(timezone.utc).date().isoformat(),
-        "created_at": datetime.now(timezone.utc).isoformat()
-    }
+    advance = Advance(
+        company_id=current_user.company_id,
+        employee_id=current_user.id,
+        employee_name=current_user.name,
+        amount=advance_data["amount"],
+        reason=advance_data.get("reason", ""),
+        repayment_months=advance_data.get("repayment_months", 1)
+    )
     
-    result = await db.advances.insert_one(advance)
+    await db.advances.insert_one(advance.model_dump())
     
     # Log activity
     await log_activity(
@@ -1530,7 +1526,6 @@ async def create_advance(advance_data: dict, current_user: User = Depends(get_cu
         f"Requested advance of Rs. {advance_data['amount']}"
     )
     
-    # Return the advance without MongoDB ObjectId
     return advance
 
 @api_router.get("/advances")
