@@ -156,72 +156,54 @@ export default function Login() {
           </CardHeader>
           <CardContent className="px-6 pb-6">
             {!otpSent ? (
-              <form onSubmit={handleSendOTP} className="space-y-4">
-                <div className="space-y-3">
-                  <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-                    <Phone className="w-4 h-4 text-blue-600" />
-                    Mobile Number
-                  </label>
-                  <div className="relative -mx-6 px-6 py-6 bg-gradient-to-br from-blue-900 via-indigo-900 to-purple-900 rounded-xl">
-                    <div className="flex items-center justify-center gap-2 py-4">
-                      {[0, 1, 2].map((group) => (
-                        <div key={group} className="flex gap-2">
-                          {Array.from({ length: group === 0 ? 3 : group === 1 ? 4 : 3 }).map((_, idx) => {
-                            const position = group === 0 ? idx : group === 1 ? 3 + idx : 7 + idx;
-                            const digit = mobile[position] || '';
-                            return (
-                              <div
-                                key={position}
-                                className="flex items-center justify-center transition-all duration-200"
-                              >
-                                <span className={`text-3xl sm:text-4xl font-bold transition-all duration-300 ${
-                                  digit
-                                    ? 'text-white scale-110 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]'
-                                    : position === mobile.length
-                                    ? 'text-white/70 animate-pulse'
-                                    : 'text-white/30'
-                                }`}>
-                                  {digit || '_'}
-                                </span>
-                              </div>
-                            );
-                          })}
-                          {group < 2 && <div className="w-4"></div>}
-                        </div>
-                      ))}
+              <form onSubmit={handleSendOTP} className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Mobile Number</label>
+                  <div className="relative">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2">
+                      <Phone className="w-5 h-5 text-gray-400" />
                     </div>
-                    <input
+                    <Input
                       data-testid="mobile-input"
                       type="tel"
+                      placeholder="0771234567"
                       value={mobile}
                       onChange={(e) => setMobile(e.target.value.replace(/\D/g, '').slice(0, 10))}
                       maxLength={10}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      placeholder="0771234567"
+                      className="pl-12 h-14 text-xl font-semibold tracking-wider border-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
                       required
                       autoFocus
                     />
+                    {mobile.length > 0 && (
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                        <div className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                          mobile.length === 10 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {mobile.length}/10
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center justify-between text-xs mt-2">
-                    <p className="text-white/70">Enter your 10-digit mobile number</p>
-                    <p className={`font-semibold transition-colors ${mobile.length === 10 ? 'text-green-400' : 'text-white/50'}`}>
-                      {mobile.length}/10
-                    </p>
-                  </div>
+                  <p className="text-xs text-gray-500">Enter your 10-digit Sri Lankan mobile number</p>
                 </div>
                 <Button
                   data-testid="send-otp-button"
                   type="submit"
-                  className="w-full h-12 text-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300"
+                  className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300"
                   disabled={loading || mobile.length !== 10}
                 >
                   {loading ? (
                     <span className="flex items-center gap-2">
                       <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                      Sending...
+                      Sending OTP...
                     </span>
                   ) : (
-                    'Send OTP →'
+                    <>
+                      Send OTP
+                      <span className="ml-2">→</span>
+                    </>
                   )}
                 </Button>
               </form>
