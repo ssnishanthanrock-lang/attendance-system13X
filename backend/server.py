@@ -1567,7 +1567,7 @@ async def create_leave(leave_data: dict, current_user: User = Depends(get_curren
         "created_at": datetime.now(timezone.utc).isoformat()
     }
     
-    await db.leaves.insert_one(leave)
+    result = await db.leaves.insert_one(leave)
     
     # Log activity
     await log_activity(
@@ -1578,6 +1578,7 @@ async def create_leave(leave_data: dict, current_user: User = Depends(get_curren
         f"Requested {leave_data['leave_type']} leave from {leave_data['from_date']} to {leave_data['to_date']}"
     )
     
+    # Return the leave without MongoDB ObjectId
     return leave
 
 @api_router.get("/leaves")
