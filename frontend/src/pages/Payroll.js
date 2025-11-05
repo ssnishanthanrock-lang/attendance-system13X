@@ -72,12 +72,11 @@ export default function Payroll() {
     }
   };
 
-  const fetchDetailedPayroll = async (month) => {
+  const fetchDetailedPayroll = async (monthStr) => {
     try {
       setLoading(true);
-      const response = await api.get(`/payroll/detailed/${month}`);
+      const response = await api.get(`/payroll/detailed/${monthStr}`);
       setDetailedPayroll(response.data);
-      setSelectedMonth(month);
     } catch (error) {
       toast.error('Failed to fetch detailed payroll');
     } finally {
@@ -99,20 +98,16 @@ export default function Payroll() {
     }
   };
 
-  const handleMonthClick = (month) => {
-    fetchDetailedPayroll(month);
+  const handleMonthClick = (monthStr) => {
+    navigate(`/payroll/month/${monthStr}`);
   };
 
-  const handleBackToMonths = () => {
-    setSelectedMonth(null);
-    setDetailedPayroll(null);
-    setIsLiveView(false);
+  const handleBackToLive = () => {
+    navigate('/payroll');
   };
 
-  const handleLiveViewToggle = () => {
-    setIsLiveView(!isLiveView);
-    setSelectedMonth(null);
-    setDetailedPayroll(null);
+  const handleViewMonthlyHistory = () => {
+    navigate('/payroll/months');
   };
 
   const formatMonthName = (monthStr) => {
