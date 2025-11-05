@@ -879,29 +879,25 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
     
     if current_user.role in ["admin", "manager"]:
         # Admin/Manager stats
-        # Count only active employees (status=1 or not set) with joining_date <= today
+        # Get all active employees (status=1 or not set) - without date filter yet
         today_str = datetime.now(timezone.utc).date().isoformat()
-        active_employees = await db.users.find({
+        all_active_employees = await db.users.find({
             "company_id": current_user.company_id,
             "role": {"$in": ["employee", "staff_member", "manager"]},
-            "$and": [
-                {
-                    "$or": [
-                        {"status": 1},  # status = 1 (active)
-                        {"status": {"$exists": False}}  # or status field doesn't exist (default active)
-                    ]
-                },
-                {
-                    "$or": [
-                        {"joining_date": {"$lte": today_str}},  # joined on or before today
-                        {"joining_date": {"$exists": False}}  # or no joining date set (assume active)
-                    ]
-                }
+            "$or": [
+                {"status": 1},  # status = 1 (active)
+                {"status": {"$exists": False}}  # or status field doesn't exist (default active)
             ]
         }).to_list(length=None)
         
-        total_employees = len(active_employees)
-        active_employee_ids = [emp["id"] for emp in active_employees]
+        # Filter for employees who have joined by today
+        active_employees_today = [
+            emp for emp in all_active_employees
+            if not emp.get("joining_date") or emp.get("joining_date", "") <= today_str
+        ]
+        
+        total_employees = len(active_employees_today)
+        active_employee_ids = [emp["id"] for emp in active_employees_today]
         
         # Count attendance only for active employees who have joined
         total_attendance_today = await db.attendance.count_documents({
