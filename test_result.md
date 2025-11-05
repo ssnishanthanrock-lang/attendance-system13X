@@ -346,13 +346,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Attendance View Deleted icon button"
-    - "Activity Logs pagination"
-    - "Manual attendance form error handling"
-    - "Filter card titles standardization"
-    - "Dashboard salary summary calculation"
-  stuck_tasks:
-    - "Manual attendance form error handling"
+    - "Payroll month-wise view and detailed breakdown endpoints"
+    - "Payroll month-wise view with detailed employee breakdown"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
