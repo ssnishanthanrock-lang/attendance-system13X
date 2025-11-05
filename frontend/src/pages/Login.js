@@ -16,7 +16,7 @@ export default function Login() {
   const otpRefs = [useRef(), useRef(), useRef(), useRef(), useRef(), useRef()];
 
   const handleSendOTP = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (mobile.length !== 10) {
       toast.error('Please enter a valid 10-digit mobile number');
       return;
@@ -34,6 +34,13 @@ export default function Login() {
       setLoading(false);
     }
   };
+
+  // Auto-submit when 10 digits are entered
+  useEffect(() => {
+    if (mobile.length === 10 && !otpSent && !loading) {
+      handleSendOTP();
+    }
+  }, [mobile]);
 
   const handleOtpChange = (index, value) => {
     if (!/^\d*$/.test(value)) return;
