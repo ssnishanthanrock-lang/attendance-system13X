@@ -210,7 +210,7 @@ export default function SuperAdminCompanyDetail() {
                 <label className="text-sm font-medium">Favicon</label>
                 {company?.favicon && (
                   <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed">
-                    <img src={company.favicon} alt="Favicon" className="max-h-16 object-contain rounded" style={{ borderRadius: '4px' }} />
+                    <img src={company.favicon} alt="Favicon" className="max-h-16 object-contain rounded-lg" style={{ borderRadius: '8px' }} />
                   </div>
                 )}
                 <Input
