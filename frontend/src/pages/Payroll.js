@@ -206,12 +206,22 @@ export default function Payroll() {
                             <td className="border border-gray-300 px-2 py-3 text-center text-sm">{index + 1}</td>
                             <td className="border border-gray-300 px-3 py-3">
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                                  {emp.profile_picture ? (
-                                    <img src={emp.profile_picture} alt={emp.employee_name} className="w-8 h-8 rounded-full object-cover" />
-                                  ) : (
-                                    <User className="w-4 h-4 text-white" />
-                                  )}
+                                {emp.profile_picture && emp.profile_picture !== '' ? (
+                                  <img 
+                                    src={emp.profile_picture} 
+                                    alt={emp.employee_name} 
+                                    className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                                    onError={(e) => {
+                                      e.target.style.display = 'none';
+                                      e.target.nextSibling.style.display = 'flex';
+                                    }}
+                                  />
+                                ) : null}
+                                <div 
+                                  className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0"
+                                  style={{ display: emp.profile_picture && emp.profile_picture !== '' ? 'none' : 'flex' }}
+                                >
+                                  <User className="w-4 h-4 text-white" />
                                 </div>
                                 <div>
                                   <p className="font-semibold text-sm whitespace-nowrap">{emp.employee_name}</p>
