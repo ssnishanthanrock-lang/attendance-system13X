@@ -245,7 +245,7 @@ export default function Layout({ children }) {
       </aside>
 
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200">
+      <div className={`lg:hidden fixed left-0 right-0 z-40 bg-white border-b border-gray-200 ${impersonationState ? 'top-[72px]' : 'top-0'}`}>
         <div className="flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
             {companyInfo?.logo ? (
