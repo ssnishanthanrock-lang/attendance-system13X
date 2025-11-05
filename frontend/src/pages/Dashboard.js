@@ -430,8 +430,7 @@ export default function Dashboard() {
         {isAdmin && livePayroll && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Live Salary Summary */}
-            {isAdmin && livePayroll && (
-              <Card>
+            <Card>
                 <CardHeader>
                   <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Live Salary Tracker</CardTitle>
                 </CardHeader>
