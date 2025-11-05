@@ -18,8 +18,22 @@ export default function SuperAdminCompanyDetail() {
   const [smsSettings, setSmsSettings] = useState({
     sms_gateway: 'textit',
     sms_enabled: false,
+    // Textit
     sms_username: '',
-    sms_password: ''
+    sms_password: '',
+    // Dialog
+    dialog_username: '',
+    dialog_password: '',
+    dialog_mask: '',
+    // Hutch
+    hutch_client_id: '',
+    hutch_client_secret: '',
+    hutch_access_token: '',
+    hutch_refresh_token: '',
+    // Mobitel
+    mobitel_app_id: '',
+    mobitel_app_key: '',
+    mobitel_client_id: ''
   });
 
   useEffect(() => {
