@@ -116,10 +116,7 @@ export default function ActivityLogs() {
 
         {/* Filters */}
         <Card>
-          <CardHeader>
-            <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Filters</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Input
                 type="date"
