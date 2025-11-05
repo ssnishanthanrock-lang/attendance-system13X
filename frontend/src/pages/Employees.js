@@ -188,12 +188,12 @@ export default function Employees() {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Employee ID *</label>
+                    <label className="text-sm font-medium">Employee ID</label>
                     <Input
                       data-testid="employee-id-input"
                       value={formData.employee_id}
                       onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
-                      required
+                      placeholder="Auto-generated if left empty"
                     />
                   </div>
                   <div className="space-y-2">
@@ -213,6 +213,7 @@ export default function Employees() {
                       data-testid="name-input"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onBlur={(e) => setFormData({ ...formData, name: capitalizeName(e.target.value) })}
                       required
                     />
                   </div>
