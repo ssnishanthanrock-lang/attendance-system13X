@@ -202,9 +202,16 @@ export default function Payroll() {
                         const daySalary = emp.working_days > 0 ? (emp.basic_salary / emp.working_days) : 0;
                         const perMinuteSalary = emp.salary_per_minute || 0;
                         
-                        // Calculate earnings based on total attendance minutes × per minute salary
-                        const totalMinutes = emp.total_attendance_minutes || 0;
-                        const earnings = perMinuteSalary * totalMinutes;
+                        // Calculate earnings
+                        let earnings;
+                        if (emp.fixed_salary) {
+                          // For fixed salary: basic salary + allowances (full amount regardless of attendance)
+                          earnings = emp.basic_salary + emp.allowances;
+                        } else {
+                          // For non-fixed salary: total attendance minutes × per minute salary
+                          const totalMinutes = emp.total_attendance_minutes || 0;
+                          earnings = perMinuteSalary * totalMinutes;
+                        }
                         
                         return (
                           <tr key={emp.employee_id} className="hover:bg-gray-50">
