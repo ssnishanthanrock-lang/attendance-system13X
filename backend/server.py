@@ -637,7 +637,8 @@ async def update_company_info(info: CompanyInfoUpdate, current_user: User = Depe
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Company not found")
     
-    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_INFO", "Updated company information")
+    changes = f"Name: {info.name}, Address: {info.address}, Contact: {info.contact_number}, Email: {info.email}"
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_INFO", f"Updated company information - {changes}")
     
     return {"message": "Company information updated successfully"}
 
