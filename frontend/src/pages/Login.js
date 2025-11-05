@@ -169,7 +169,7 @@ export default function Login() {
                               >
                                 <span className={`text-4xl sm:text-5xl font-bold transition-all duration-300 ${
                                   digit
-                                    ? 'text-white scale-110'
+                                    ? 'text-blue-400 scale-110 drop-shadow-lg'
                                     : position === mobile.length
                                     ? 'text-blue-300 animate-pulse'
                                     : 'text-white/30'
