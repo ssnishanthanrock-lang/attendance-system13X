@@ -695,7 +695,9 @@ export default function Attendance() {
                       {editHistory.length - index}
                     </div>
                     <div className="flex-1">
-                      <p className="font-medium text-gray-900 mb-1">{history.changes}</p>
+                      <p className="font-medium text-gray-900 mb-1">
+                        Changed <span className="text-blue-600">{history.field_changed}</span> from "<span className="text-red-600">{history.old_value.replace('_', ' ')}</span>" to "<span className="text-green-600">{history.new_value.replace('_', ' ')}</span>"
+                      </p>
                       <div className="text-xs text-gray-500 space-y-1">
                         <p>
                           <span className="font-medium">Edited by:</span> {history.edited_by}
