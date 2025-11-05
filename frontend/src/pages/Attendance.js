@@ -143,6 +143,25 @@ export default function Attendance() {
     setHistoryDialogOpen(true);
   };
 
+  const handleChangeStatus = (record) => {
+    setChangingStatusRecord(record);
+    setNewStatus(record.status);
+    setStatusDialogOpen(true);
+  };
+
+  const handleStatusUpdate = async () => {
+    try {
+      await api.put(`/attendance/${changingStatusRecord.id}/status`, {
+        status: newStatus
+      });
+      toast.success('Status updated successfully');
+      setStatusDialogOpen(false);
+      fetchAttendance();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update status');
+    }
+  };
+
   const handleEdit = async (record) => {
     setEditingAttendance({
       id: record.id,
