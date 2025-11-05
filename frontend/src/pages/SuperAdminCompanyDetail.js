@@ -252,6 +252,43 @@ export default function SuperAdminCompanyDetail() {
           </CardContent>
         </Card>
 
+        {/* Invoicing Module */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              Invoicing Module
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
+              <div>
+                <p className="font-medium">Enable Invoicing</p>
+                <p className="text-sm text-gray-600">Allow this company to use invoicing features (customers, products, invoices, estimates)</p>
+              </div>
+              <Switch
+                checked={company?.invoicing_enabled || false}
+                onCheckedChange={async (checked) => {
+                  try {
+                    await api.put(`/superadmin/companies/${companyId}/invoicing`, { enabled: checked });
+                    toast.success(`Invoicing ${checked ? 'enabled' : 'disabled'} successfully`);
+                    fetchCompany();
+                  } catch (error) {
+                    toast.error('Failed to update invoicing status');
+                  }
+                }}
+              />
+            </div>
+            {company?.invoicing_enabled && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  ✅ Invoicing module is enabled. The company can now access Customers, Products, Invoices, and Estimates.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* SMS Configuration */}
         <Card>
           <CardHeader>
