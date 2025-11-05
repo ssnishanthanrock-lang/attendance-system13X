@@ -2436,6 +2436,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
     
     return {
         "month": month,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "employees": detailed_records,
         "total_gross": sum([r["gross_salary"] for r in detailed_records]),
         "total_net": sum([r["net_salary"] for r in detailed_records]),
