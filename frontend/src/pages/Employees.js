@@ -290,31 +290,38 @@ export default function Employees() {
                       />
                     </div>
                   </div>
-                  <div className="sm:col-span-2">
-                    <Input
-                      data-testid="join-date-input"
-                      type="date"
-                      value={formData.join_date}
-                      onChange={(e) => setFormData({ ...formData, join_date: e.target.value })}
-                      placeholder="Join Date *"
-                      required
-                    />
+                  {/* Join Date with label - 3x9 */}
+                  <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                    <label className="col-span-3 text-sm font-medium flex items-center">Join Date *</label>
+                    <div className="col-span-9">
+                      <Input
+                        data-testid="join-date-input"
+                        type="date"
+                        value={formData.join_date}
+                        onChange={(e) => setFormData({ ...formData, join_date: e.target.value })}
+                        required
+                      />
+                    </div>
                   </div>
-                  <div>
-                    <Input
-                      type="time"
-                      value={formData.start_time}
-                      onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                      placeholder="Start Time"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      type="time"
-                      value={formData.finish_time}
-                      onChange={(e) => setFormData({ ...formData, finish_time: e.target.value })}
-                      placeholder="Finish Time"
-                    />
+                  
+                  {/* Start Time and Finish Time with labels - 3x3 each */}
+                  <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                    <label className="col-span-3 text-sm font-medium flex items-center">Start Time</label>
+                    <div className="col-span-3">
+                      <Input
+                        type="time"
+                        value={formData.start_time}
+                        onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                      />
+                    </div>
+                    <label className="col-span-3 text-sm font-medium flex items-center">Finish Time</label>
+                    <div className="col-span-3">
+                      <Input
+                        type="time"
+                        value={formData.finish_time}
+                        onChange={(e) => setFormData({ ...formData, finish_time: e.target.value })}
+                      />
+                    </div>
                   </div>
                   <div className="sm:col-span-2">
                     <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
