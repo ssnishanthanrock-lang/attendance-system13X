@@ -109,7 +109,24 @@ export default function Layout({ children }) {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('companyInfo');
+    clearImpersonationState();
     navigate('/login');
+  };
+
+  const handleExitImpersonation = async () => {
+    try {
+      const response = await api.post('/superadmin/exit-impersonation');
+      localStorage.setItem('token', response.data.token);
+      clearImpersonationState();
+      navigate('/superadmin/dashboard');
+      window.location.reload(); // Refresh to update user state
+    } catch (error) {
+      console.error('Failed to exit impersonation:', error);
+      // Fallback: clear state and navigate anyway
+      clearImpersonationState();
+      localStorage.removeItem('token');
+      navigate('/login');
+    }
   };
 
   const isAdmin = user?.role === 'admin' || user?.role === 'manager';
