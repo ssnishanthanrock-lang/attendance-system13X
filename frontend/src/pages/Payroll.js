@@ -126,28 +126,26 @@ export default function Payroll() {
         {/* Detailed Payroll Sheet - Spreadsheet Style */}
         {selectedMonth && detailedPayroll && (
           <div className="space-y-4">
-            {/* Back Button */}
-            <Button
-              onClick={handleBackToMonths}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back
-            </Button>
-
-            {/* Salary Sheet Header */}
-            <Card className="border-2 border-gray-200">
-              <CardContent className="p-6 text-center">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+            {/* Header with Back Button */}
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={handleBackToMonths}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back
+              </Button>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
                   {formatMonthName(selectedMonth).monthName} Salary Sheet - {formatMonthName(selectedMonth).year}
                 </h1>
-                <p className="text-sm mt-2 text-gray-600">
+                <p className="text-sm text-gray-600">
                   Working Days - {detailedPayroll.employees[0]?.working_days || 26}
                 </p>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Payroll Table */}
             <Card>
