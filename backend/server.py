@@ -2564,14 +2564,8 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
         salary_per_minute = (basic_salary / working_days / working_hours_per_day / 60) if working_days > 0 else 0
         
         if employee.get("fixed_salary", False):
-            # Fixed salary: proportional to days passed in month
-            import calendar
-            days_in_month = calendar.monthrange(int(year), int(month_num))[1]
-            current_day = now.day
-            # Pro-rata calculation: (basic_salary / days_in_month) * current_day
-            earnings_so_far = (basic_salary / days_in_month) * current_day
-            # Add allowances pro-rata as well
-            earnings = earnings_so_far + ((allowances / days_in_month) * current_day)
+            # Fixed salary: full salary regardless of attendance
+            earnings = basic_salary + allowances
             gross_salary = earnings + total_extra_payment
         else:
             # Non-fixed: based on actual minutes worked so far
