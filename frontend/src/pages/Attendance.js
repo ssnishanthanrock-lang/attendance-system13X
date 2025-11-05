@@ -79,7 +79,7 @@ export default function Attendance() {
 
   const checkDeletedAttendance = async () => {
     try {
-      const response = await api.get('/deleted-attendance');
+      const response = await api.get('/attendance/deleted');
       setHasDeletedAttendance(response.data && response.data.length > 0);
     } catch (error) {
       console.error('Failed to check deleted attendance:', error);
