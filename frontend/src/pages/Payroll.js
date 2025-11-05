@@ -306,7 +306,11 @@ export default function Payroll() {
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-right text-sm">
-                          {detailedPayroll.total_gross.toLocaleString()}
+                          {detailedPayroll.employees.reduce((sum, emp) => {
+                            const daySalary = emp.working_days > 0 ? (emp.basic_salary / emp.working_days) : 0;
+                            const attendedDays = emp.present_days + (emp.allowed_leaves || 0) + ((emp.allowed_half_days || 0) * 0.5);
+                            return sum + (attendedDays * daySalary);
+                          }, 0).toLocaleString(undefined, {maximumFractionDigits: 2})}
                         </td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
                         <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
