@@ -7,7 +7,6 @@ import {
   Users,
   Calendar,
   FileText,
-  IndianRupee,
   TrendingUp,
   Wallet,
   Menu,
