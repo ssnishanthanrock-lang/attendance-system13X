@@ -103,6 +103,38 @@ function App() {
             }
           />
           <Route
+            path="/attendance/date/:date"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
+                <Attendance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/attendance/employee/:employeeId"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
+                <Attendance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/attendance/employee/:employeeId/date/:date"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
+                <Attendance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/attendance/from/:fromDate/to/:toDate"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
+                <Attendance />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/leaves"
             element={
               <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
