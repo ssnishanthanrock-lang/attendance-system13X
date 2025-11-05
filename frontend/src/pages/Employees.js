@@ -540,7 +540,15 @@ export default function Employees() {
                   )}
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Salary:</span>
-                    <span className="font-medium">Rs. {employee.basic_salary.toLocaleString()}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Rs. {employee.basic_salary.toLocaleString()}</span>
+                      {pendingIncrements[employee.id] && (
+                        <span className="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" />
+                          Pending: Rs. {pendingIncrements[employee.id].new_salary.toLocaleString()}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
