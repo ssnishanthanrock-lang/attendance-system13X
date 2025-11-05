@@ -73,12 +73,6 @@ export default function Dashboard() {
     <Layout>
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }} data-testid="dashboard-title">
-              Dashboard
-            </h1>
-            <p className="text-gray-600 mt-1">Welcome back, {user?.name}</p>
-          </div>
           {!isAdmin && stats?.today_attendance && (
             <div className="flex gap-2">
               {!stats.today_attendance.check_in && (
