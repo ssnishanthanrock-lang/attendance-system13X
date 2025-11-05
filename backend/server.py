@@ -717,6 +717,94 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
             "today_attendance": today_attendance
         }
 
+# ============= EMPLOYEE ENDPOINTS =============
+@api_router.get("/employees")
+async def get_employees(current_user: User = Depends(get_current_user)):
+    if current_user.role == "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin cannot access company employees")
+    
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    employees = await db.users.find(
+        {"company_id": current_user.company_id, "role": {"$ne": "super_admin"}},
+        {"_id": 0}
+    ).to_list(1000)
+    
+    return employees
+
+@api_router.post("/employees")
+async def create_employee(employee: UserCreate, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Check if employee already exists
+    existing = await db.users.find_one({"mobile": employee.mobile, "company_id": current_user.company_id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Employee with this mobile number already exists")
+    
+    # Create new employee
+    new_employee = User(
+        id=str(uuid.uuid4()),
+        company_id=current_user.company_id,
+        employee_id=employee.employee_id,
+        mobile=employee.mobile,
+        name=employee.name,
+        role=employee.role,
+        department=employee.department or "",
+        position=employee.position or "",
+        basic_salary=employee.basic_salary or 0,
+        allowances=employee.allowances or 0,
+        join_date=employee.join_date,
+        is_active=True,
+        created_at=datetime.now(timezone.utc).isoformat()
+    )
+    
+    await db.users.insert_one(new_employee.model_dump())
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "CREATE_EMPLOYEE", f"Created employee {employee.name}")
+    
+    return new_employee
+
+@api_router.put("/employees/{employee_id}")
+async def update_employee(employee_id: str, updates: dict, current_user: User = Depends(get_current_user)):
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Check if employee exists and belongs to the same company
+    employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Update employee
+    await db.users.update_one(
+        {"id": employee_id},
+        {"$set": updates}
+    )
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "UPDATE_EMPLOYEE", f"Updated employee {employee['name']}")
+    
+    return {"message": "Employee updated successfully"}
+
+@api_router.delete("/employees/{employee_id}")
+async def delete_employee(employee_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Check if employee exists and belongs to the same company
+    employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Soft delete - mark as inactive
+    await db.users.update_one(
+        {"id": employee_id},
+        {"$set": {"is_active": False}}
+    )
+    
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_EMPLOYEE", f"Deleted employee {employee['name']}")
+    
+    return {"message": "Employee deleted successfully"}
+
 # ============= SETTINGS ENDPOINTS =============
 @api_router.get("/settings")
 async def get_settings(current_user: User = Depends(get_current_user)):
