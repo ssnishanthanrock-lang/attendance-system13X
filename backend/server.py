@@ -879,8 +879,31 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
     
     if current_user.role in ["admin", "manager"]:
         # Admin/Manager stats
-        total_employees = await db.users.count_documents({"company_id": current_user.company_id, "is_active": True})
-        total_attendance_today = await db.attendance.count_documents({"company_id": current_user.company_id, "date": datetime.now(timezone.utc).date().isoformat()})
+        # Count only active employees (status=1) with joining_date <= today
+        today_str = datetime.now(timezone.utc).date().isoformat()
+        active_employees = await db.users.find({
+            "company_id": current_user.company_id,
+            "role": {"$in": ["employee", "staff_member", "manager"]},
+            "$or": [
+                {"status": 1},  # status = 1 (active)
+                {"status": {"$exists": False}}  # or status field doesn't exist (default active)
+            ],
+            "$or": [
+                {"joining_date": {"$lte": today_str}},  # joined on or before today
+                {"joining_date": {"$exists": False}}  # or no joining date set (assume active)
+            ]
+        }).to_list(length=None)
+        
+        total_employees = len(active_employees)
+        active_employee_ids = [emp["id"] for emp in active_employees]
+        
+        # Count attendance only for active employees who have joined
+        total_attendance_today = await db.attendance.count_documents({
+            "company_id": current_user.company_id,
+            "date": today_str,
+            "employee_id": {"$in": active_employee_ids}
+        })
+        
         pending_leaves = await db.leaves.count_documents({"company_id": current_user.company_id, "status": "pending"})
         pending_advances = await db.advances.count_documents({"company_id": current_user.company_id, "status": "pending"})
         
@@ -904,19 +927,29 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         total_net_salary = sum(p.get("net_salary", 0) for p in monthly_payrolls)
         
         # Current month attendance summary (last 7 days)
+        # Count only active employees who have joined
         from datetime import timedelta
         today = datetime.now(timezone.utc).date()
         last_7_days = [(today - timedelta(days=i)).isoformat() for i in range(6, -1, -1)]
         
         attendance_summary = []
         for date in last_7_days:
+            # Get employees who had joined by this date
+            employees_by_date = [
+                emp["id"] for emp in active_employees 
+                if not emp.get("joining_date") or emp.get("joining_date", "") <= date
+            ]
+            
             count = await db.attendance.count_documents({
                 "company_id": current_user.company_id,
-                "date": date
+                "date": date,
+                "employee_id": {"$in": employees_by_date}
             })
+            
             attendance_summary.append({
                 "date": date,
-                "count": count
+                "count": count,
+                "total_employees": len(employees_by_date)
             })
         
         return {
