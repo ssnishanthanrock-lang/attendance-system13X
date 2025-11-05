@@ -10,6 +10,7 @@ import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Search } from 'lucide-react';
 import { capitalizeName } from '../utils/helpers';
+import { canEditInImpersonation, isImpersonating } from '../utils/impersonation';
 
 export default function Employees() {
   const [employees, setEmployees] = useState([]);
