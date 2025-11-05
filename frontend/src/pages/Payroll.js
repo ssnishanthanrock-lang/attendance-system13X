@@ -489,6 +489,19 @@ export default function Payroll() {
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-100">
                               {emp.net_salary.toLocaleString()}
                             </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-center">
+                              <Button
+                                onClick={() => setViewingSalarySlip(emp)}
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                                title="View Salary Slip"
+                              >
+                                <FileText className="w-3 h-3 mr-1" />
+                                Slip
+                              </Button>
+                            </td>
                           </tr>
                         );
                       })}
