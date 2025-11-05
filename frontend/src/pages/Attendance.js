@@ -159,11 +159,8 @@ export default function Attendance() {
     e.preventDefault();
     
     try {
-      // Get original record to check what changed
-      const originalRecord = attendance.find(r => r.id === editingAttendance.id);
-      
       // If status changed, update it first (this tracks history)
-      if (originalRecord && originalRecord.status !== editingAttendance.status) {
+      if (editingAttendance.original_status !== editingAttendance.status) {
         await api.put(`/attendance/${editingAttendance.id}/status`, {
           status: editingAttendance.status
         });
@@ -180,9 +177,6 @@ export default function Attendance() {
       toast.success('Attendance updated successfully');
       setEditDialogOpen(false);
       fetchAttendance();
-      
-      // Refetch history to show the latest changes
-      await fetchEditHistory(editingAttendance.id);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Failed to update attendance');
     }
