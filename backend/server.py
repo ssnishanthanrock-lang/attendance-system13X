@@ -1147,6 +1147,26 @@ async def get_employee_pending_increment(employee_id: str, current_user: User = 
     
     return pending if pending else None
 
+
+@api_router.get("/increments/pending")
+async def get_all_pending_increments(current_user: User = Depends(get_current_user)):
+    """Get all pending increments for the company"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    pending_increments = await db.increments.find(
+        {"company_id": current_user.company_id, "status": "pending"},
+        {"_id": 0}
+    ).to_list(length=None)
+    
+    # Return as a map with employee_id as key
+    result = {}
+    for inc in pending_increments:
+        result[inc["employee_id"]] = inc
+    
+    return result
+
+
 @api_router.get("/increments")
 async def get_all_increments(current_user: User = Depends(get_current_user)):
     """Get all increments for the company (admin view)"""
