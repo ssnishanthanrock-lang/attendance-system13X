@@ -136,7 +136,7 @@ export default function Login() {
           <p className="text-blue-100">Employee Resource Planning System</p>
         </div>
 
-        <Card className="shadow-2xl border-0 animate-slide-in" data-testid="login-card">
+        <Card className="shadow-2xl border-0 animate-slide-in backdrop-blur-lg bg-white/95" data-testid="login-card">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-2xl font-semibold" style={{ fontFamily: 'Work Sans, sans-serif' }}>
               {otpSent ? 'Enter OTP' : 'Welcome Back'}
