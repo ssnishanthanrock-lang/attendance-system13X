@@ -5,7 +5,8 @@ import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { ArrowLeft, User, Radio, Calendar } from 'lucide-react';
+import { ArrowLeft, User, Radio, Calendar, FileText } from 'lucide-react';
+import EmployeeSalarySlip from '../components/EmployeeSalarySlip';
 
 export default function Payroll() {
   const { month } = useParams();
