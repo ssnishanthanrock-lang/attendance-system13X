@@ -429,42 +429,34 @@ export default function Dashboard() {
         {/* Monthly Summary for Admin/Manager */}
         {isAdmin && stats?.monthly_salary_summary && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Salary Summary */}
-            <Card data-testid="salary-summary-card">
-              <CardHeader>
-                <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                  {stats.monthly_salary_summary.month} {stats.monthly_salary_summary.year} - Salary Summary
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">Total Employees</span>
-                    <span className="text-sm font-semibold text-blue-600">
-                      {stats.monthly_salary_summary.employee_count}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">Expected Salary</span>
-                    <span className="text-sm font-semibold text-green-600">
-                      Rs. {stats.monthly_salary_summary.total_expected.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">Calculated Salary</span>
-                    <span className="text-sm font-semibold text-orange-600">
-                      Rs. {stats.monthly_salary_summary.total_calculated.toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                    <span className="text-sm font-medium text-gray-700">Net Salary</span>
-                    <span className="text-sm font-semibold text-purple-600">
-                      Rs. {stats.monthly_salary_summary.total_net.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Live Salary Summary */}
+            {isAdmin && livePayroll && (
+              <Card>
+                <CardHeader>
+                  <CardTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Live Salary Tracker</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-sm text-gray-600 mb-1">Total Gross (So Far)</p>
+                      <p className="text-2xl font-bold text-blue-700">Rs {livePayroll.total_gross?.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                      <p className="text-2xl font-bold text-red-700">Rs {livePayroll.total_deductions?.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-sm text-gray-600 mb-1">Total Net (So Far)</p>
+                      <p className="text-2xl font-bold text-green-700">Rs {livePayroll.total_net?.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Attendance Chart */}
             <Card data-testid="attendance-chart-card">
