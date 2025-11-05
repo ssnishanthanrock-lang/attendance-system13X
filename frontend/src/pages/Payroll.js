@@ -159,7 +159,7 @@ export default function Payroll() {
                           Employee Details
                         </th>
                         <th colSpan="4" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-yellow-100">
-                          Salary & Allowances
+                          Salary & Earnings
                         </th>
                         <th colSpan="5" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-green-100">
                           Attendance
