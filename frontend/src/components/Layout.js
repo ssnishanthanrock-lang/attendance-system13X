@@ -146,13 +146,22 @@ export default function Layout({ children }) {
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200">
         <div className="flex items-center justify-between h-16 px-4">
           <div className="flex items-center gap-2">
-            <img 
-              src="https://cfms.lk/img/itsignature_logo_blue_only.png" 
-              alt="IT Signature Logo" 
-              className="h-8 w-auto"
-            />
+            {companyInfo?.logo ? (
+              <img 
+                src={companyInfo.logo} 
+                alt={`${companyInfo.name} Logo`} 
+                className="h-8 w-auto object-contain rounded"
+                style={{ borderRadius: '4px' }}
+              />
+            ) : (
+              <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+                <span className="text-sm font-bold text-white">
+                  {companyInfo?.name?.split(' ').map(w => w[0]).join('').slice(0, 2) || 'IT'}
+                </span>
+              </div>
+            )}
             <h1 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-              IT Signature ERP
+              {companyInfo?.name || 'IT Signature ERP'}
             </h1>
           </div>
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
