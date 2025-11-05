@@ -1995,6 +1995,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
             "half_days": half_days,
             "allowed_leaves": allowed_leaves,
             "allowed_half_days": allowed_half_days,
+            "total_attendance_minutes": total_attendance_minutes,
             "late_minutes": late_minutes,
             "late_deduction": round(late_deduction, 2),
             "advances": round(total_advances, 2),
