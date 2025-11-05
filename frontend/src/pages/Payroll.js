@@ -53,8 +53,13 @@ export default function Payroll() {
     try {
       const params = new URLSearchParams();
       if (filters.employee_id) params.append('employee_id', filters.employee_id);
-      if (filters.month) params.append('month', filters.month);
-      if (filters.year) params.append('year', filters.year);
+      
+      // Combine month and year into YYYY-MM format if both are provided
+      if (filters.month && filters.year) {
+        const monthIndex = months.indexOf(filters.month) + 1;
+        const monthStr = monthIndex.toString().padStart(2, '0');
+        params.append('month', `${filters.year}-${monthStr}`);
+      }
 
       const response = await api.get(`/payroll?${params.toString()}`);
       setPayrolls(response.data);
