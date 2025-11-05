@@ -111,6 +111,7 @@ class User(BaseModel):
     ot_allowed: bool = False
     sms_notifications: bool = False
     is_active: bool = True
+    can_full_access_companies: bool = False  # For super admins: allow full edit access when viewing company portals
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class UserCreate(BaseModel):
