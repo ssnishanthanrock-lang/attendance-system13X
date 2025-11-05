@@ -73,11 +73,32 @@ export default function Payroll() {
     }
   };
 
+  const fetchLivePayroll = async () => {
+    try {
+      const response = await api.get('/payroll/live-current-month');
+      setLivePayroll(response.data);
+      if (loading) setLoading(false);
+    } catch (error) {
+      if (loading) {
+        toast.error('Failed to fetch live payroll');
+        setLoading(false);
+      }
+      // Don't show toast on every update failure to avoid spam
+    }
+  };
+
   const handleMonthClick = (month) => {
     fetchDetailedPayroll(month);
   };
 
   const handleBackToMonths = () => {
+    setSelectedMonth(null);
+    setDetailedPayroll(null);
+    setIsLiveView(false);
+  };
+
+  const handleLiveViewToggle = () => {
+    setIsLiveView(!isLiveView);
     setSelectedMonth(null);
     setDetailedPayroll(null);
   };
