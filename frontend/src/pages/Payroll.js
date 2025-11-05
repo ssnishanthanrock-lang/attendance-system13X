@@ -192,17 +192,8 @@ export default function Payroll() {
         {/* Live Current Month View */}
         {isLiveView && livePayroll && (
           <div className="space-y-4">
-            {/* Header with Back Button */}
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={handleBackToLive}
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back
-              </Button>
+            {/* Header with Monthly History Button */}
+            <div className="flex items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
@@ -217,6 +208,27 @@ export default function Payroll() {
                   Updates every second • Last updated: {new Date(livePayroll.timestamp).toLocaleTimeString()}
                 </p>
               </div>
+              <Button
+                onClick={() => {
+                  // Show months list as dropdown or navigate to a months page
+                  const monthsListHtml = months.map(m => 
+                    `<button onclick="window.location.href='/payroll/month/${m.month}'" class="block w-full text-left px-4 py-2 hover:bg-gray-100">${formatMonthName(m.month).monthName} ${formatMonthName(m.month).year}</button>`
+                  ).join('');
+                  // For now, navigate to first available month or show a simple selection
+                  if (months.length > 0) {
+                    // Create a simple modal or navigate to the most recent month
+                    const recentMonth = months[0].month;
+                    if (window.confirm(`View monthly history?\n\nAvailable months: ${months.map(m => `${formatMonthName(m.month).monthName} ${formatMonthName(m.month).year}`).join(', ')}\n\nClick OK to view ${formatMonthName(recentMonth).monthName} ${formatMonthName(recentMonth).year}`)) {
+                      handleMonthClick(recentMonth);
+                    }
+                  }
+                }}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <Calendar className="w-4 h-4" />
+                View Monthly History
+              </Button>
             </div>
 
             {/* Summary Cards */}
