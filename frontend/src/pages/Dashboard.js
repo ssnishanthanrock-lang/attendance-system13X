@@ -467,10 +467,15 @@ export default function Dashboard() {
                     const percentage = (day.count / (stats.total_employees || 1)) * 100;
                     
                     return (
-                      <div key={index} className="space-y-1">
+                      <div 
+                        key={index} 
+                        className="space-y-1 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition-colors"
+                        onClick={() => navigate(`/attendance?date=${day.date}`)}
+                        title="Click to view attendance details"
+                      >
                         <div className="flex items-center justify-between text-sm">
                           <span className="font-medium text-gray-700">{dayName}, {dayDate}</span>
-                          <span className="text-gray-600">{day.count} / {stats.total_employees}</span>
+                          <span className="text-gray-600">{day.count} / {day.total_employees || stats.total_employees}</span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
