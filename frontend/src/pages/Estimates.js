@@ -284,11 +284,23 @@ export default function Estimates() {
               <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-6">
                   <label className="block text-sm font-medium mb-1">Customer *</label>
-                  <Select value={estimateForm.customer_id} onValueChange={(value) => setEstimateForm({ ...estimateForm, customer_id: value })}>
+                  <Select 
+                    value={estimateForm.customer_id} 
+                    onValueChange={(value) => {
+                      if (value === 'add_new') {
+                        setAddCustomerDialogOpen(true);
+                      } else {
+                        setEstimateForm({ ...estimateForm, customer_id: value });
+                      }
+                    }}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select or add customer" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="add_new" className="text-blue-600 font-semibold">
+                        + Add New Customer
+                      </SelectItem>
                       {customers.map(customer => (
                         <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>
                       ))}
