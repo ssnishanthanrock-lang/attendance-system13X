@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../App';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
@@ -10,12 +11,15 @@ import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Archive } from 'lucide-react';
 
 export default function InvoiceCustomers() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showDeleted = searchParams.get('view') === 'deleted';
+  
   const [customers, setCustomers] = useState([]);
+  const [deletedCount, setDeletedCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showDeleted, setShowDeleted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     company_name: '',
