@@ -282,7 +282,7 @@ export default function Invoices() {
       invoice_date: new Date().toISOString().split('T')[0],
       due_date: getDefaultDueDate(),
       notes: '',
-      items: [{ product_id: '', product_name: '', description: '', quantity: 1, unit_price: 0 }]
+      items: [{ product_id: '', product_name: '', description: '', quantity: '', unit_price: '' }]
     });
   };
 
