@@ -468,27 +468,33 @@ frontend:
 
   - task: "Invoice Form Date Fields Layout"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Invoices.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Fixed duplicate date columns issue. Removed duplicate disabled inputs for Invoice Date and Due Date. Now showing clean 3x3 layout: Invoice Date (label + input) in col-span-3, Due Date (label + input) in col-span-3."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Invoice form date fields layout fix verified successfully. Found exactly 1 'Invoice Date' label, 1 'Due Date' label, and 2 total date inputs (no duplicates). Date inputs are fully functional and editable. Layout uses correct 3-column grid structure with both date fields positioned side by side. Default dates populate correctly (current date for Invoice Date, +1 month for Due Date). All requirements from review request met: clean layout, no duplicate disabled inputs, proper 3x3 grid spacing."
 
   - task: "Estimate Form Date Fields Layout"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/pages/Estimates.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Fixed duplicate date columns issue. Removed duplicate disabled inputs for Estimate Date and Valid Until. Now showing clean 3x3 layout: Estimate Date (label + input) in col-span-3, Valid Until (label + input) in col-span-3."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Estimate form date fields layout fix verified successfully. Found exactly 1 'Estimate Date' label, 1 'Valid Until' label, and 2 total date inputs (no duplicates). Date inputs are fully functional and editable. Layout uses correct 3-column grid structure with both date fields positioned side by side. Default dates populate correctly (current date for Estimate Date, +1 month for Valid Until). All requirements from review request met: clean layout, no duplicate disabled inputs, proper 3x3 grid spacing."
 
 metadata:
   created_by: "main_agent"
