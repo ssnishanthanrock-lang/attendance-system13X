@@ -240,10 +240,21 @@ export default function Estimates() {
             <Button 
               variant={showDeleted ? "default" : "outline"} 
               size="sm" 
-              onClick={() => setShowDeleted(!showDeleted)}
+              onClick={() => {
+                if (showDeleted) {
+                  setSearchParams({});
+                } else {
+                  setSearchParams({ view: 'deleted' });
+                }
+              }}
               title={showDeleted ? "View Active Estimates" : "View Deleted Estimates"}
             >
               <Archive className="w-4 h-4" />
+              {!showDeleted && deletedCount > 0 && (
+                <span className="ml-1 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5 min-w-[1.25rem] h-5 flex items-center justify-center">
+                  {deletedCount}
+                </span>
+              )}
             </Button>
             <Button onClick={() => setCreateDialogOpen(true)} className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
