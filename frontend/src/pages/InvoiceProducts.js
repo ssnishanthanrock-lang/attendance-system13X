@@ -161,7 +161,7 @@ export default function InvoiceProducts() {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', category_id: '', description: '', price: '', unit: 'pcs', stock_quantity: '0' });
+    setFormData({ name: '', category_id: '', description: '', price: '', unit: 'pcs', stock_quantity: '' });
     setEditingProduct(null);
   };
 
