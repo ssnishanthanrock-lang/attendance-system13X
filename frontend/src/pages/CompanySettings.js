@@ -204,40 +204,32 @@ export default function CompanySettings() {
                     <DialogDescription>Add a public holiday or company leave day</DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleAddHoliday} className="space-y-4">
-                    <div>
-                      <label className="text-sm font-medium">Date *</label>
-                      <Input
-                        type="date"
-                        value={holidayForm.date}
-                        onChange={(e) => setHolidayForm({ ...holidayForm, date: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Holiday Name *</label>
-                      <Input
-                        value={holidayForm.name}
-                        onChange={(e) => setHolidayForm({ ...holidayForm, name: e.target.value })}
-                        placeholder="e.g., Poya Day"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Type</label>
-                      <Select
-                        value={holidayForm.type}
-                        onValueChange={(value) => setHolidayForm({ ...holidayForm, type: value })}
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="public">Public Holiday</SelectItem>
-                          <SelectItem value="poya">Poya Day</SelectItem>
-                          <SelectItem value="company">Company Holiday</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    <Input
+                      type="date"
+                      placeholder="Date *"
+                      value={holidayForm.date}
+                      onChange={(e) => setHolidayForm({ ...holidayForm, date: e.target.value })}
+                      required
+                    />
+                    <Input
+                      placeholder="Holiday Name * (e.g., Poya Day)"
+                      value={holidayForm.name}
+                      onChange={(e) => setHolidayForm({ ...holidayForm, name: e.target.value })}
+                      required
+                    />
+                    <Select
+                      value={holidayForm.type}
+                      onValueChange={(value) => setHolidayForm({ ...holidayForm, type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Holiday Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public">Public Holiday</SelectItem>
+                        <SelectItem value="poya">Poya Day</SelectItem>
+                        <SelectItem value="company">Company Holiday</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <div className="flex justify-end gap-2">
                       <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>Cancel</Button>
                       <Button type="submit">Add Holiday</Button>
