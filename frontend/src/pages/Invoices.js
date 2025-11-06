@@ -971,12 +971,10 @@ export default function Invoices() {
                 <div>
                   <label className="block text-sm font-medium mb-1">Stock *</label>
                   <Input
-                    type="text"
-                    value={newProductData.stock_quantity}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^0-9.]/g, '');
-                      setNewProductData({ ...newProductData, stock_quantity: value });
-                    }}
+                    type="number"
+                    step="0.01"
+                    {...(newProductData.stock_quantity !== '' && { value: newProductData.stock_quantity })}
+                    onChange={(e) => setNewProductData({ ...newProductData, stock_quantity: e.target.value })}
                     placeholder="Enter stock quantity"
                     required
                   />
