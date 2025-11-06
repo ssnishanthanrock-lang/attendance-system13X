@@ -37,6 +37,9 @@ export default function InvoiceProducts() {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
+    if (!showDeleted) {
+      fetchDeletedCount();
+    }
   }, [showDeleted]);
 
   const fetchProducts = async () => {
