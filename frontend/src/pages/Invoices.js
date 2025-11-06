@@ -735,6 +735,7 @@ export default function Invoices() {
                     step="0.01"
                     value={paymentForm.amount}
                     onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
+                    placeholder="Enter payment amount"
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">Outstanding: Rs {(selectedInvoice.total - selectedInvoice.amount_paid).toFixed(2)}</p>
@@ -745,6 +746,7 @@ export default function Invoices() {
                     type="date"
                     value={paymentForm.payment_date}
                     onChange={(e) => setPaymentForm({ ...paymentForm, payment_date: e.target.value })}
+                    placeholder="Select date"
                     required
                   />
                 </div>
@@ -752,7 +754,7 @@ export default function Invoices() {
                   <label className="block text-sm font-medium mb-1">Payment Method *</label>
                   <Select value={paymentForm.payment_method} onValueChange={(value) => setPaymentForm({ ...paymentForm, payment_method: value })}>
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder="Select payment method" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="cash">Cash</SelectItem>
@@ -767,6 +769,7 @@ export default function Invoices() {
                   <Textarea
                     value={paymentForm.notes}
                     onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
+                    placeholder="Add payment notes (optional)"
                     rows={2}
                   />
                 </div>
