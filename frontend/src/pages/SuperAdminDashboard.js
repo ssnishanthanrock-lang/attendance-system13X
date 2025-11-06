@@ -254,17 +254,17 @@ export default function SuperAdminDashboard() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 w-full">
+                  <div className="flex flex-col gap-2 lg:min-w-[140px]">
                     <Button 
                       size="sm" 
                       onClick={() => handleViewPortal(company)}
-                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white w-full"
+                      className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white whitespace-nowrap"
                       title="View company portal"
                     >
                       <Eye className="w-4 h-4 mr-1" />
                       View Portal
                     </Button>
-                    <Button size="sm" variant="outline" className="w-full" onClick={() => navigate(`/superadmin/companies/${company.company_id}`)}>
+                    <Button size="sm" variant="outline" onClick={() => navigate(`/superadmin/companies/${company.company_id}`)}>
                       <Settings className="w-4 h-4 mr-1" />
                       Manage
                     </Button>
