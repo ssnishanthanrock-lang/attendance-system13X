@@ -511,29 +511,21 @@ export default function Invoices() {
 
               <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-6">
-                  <div className="grid grid-cols-6 gap-4">
-                    <div className="col-span-3">
-                      <label className="block text-xs font-medium mb-1">Invoice Date *</label>
-                    </div>
-                    <div className="col-span-3">
-                      <Input
-                        type="date"
-                        value={invoiceForm.invoice_date}
-                        onChange={(e) => setInvoiceForm({ ...invoiceForm, invoice_date: e.target.value })}
-                        required
-                      />
-                    </div>
-                    <div className="col-span-3">
-                      <label className="block text-xs font-medium mb-1">Due Date</label>
-                    </div>
-                    <div className="col-span-3">
-                      <Input
-                        type="date"
-                        value={invoiceForm.due_date}
-                        onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
-                      />
-                    </div>
-                  </div>
+                  <label className="block text-xs font-medium mb-1">Invoice Date *</label>
+                  <Input
+                    type="date"
+                    value={invoiceForm.invoice_date}
+                    onChange={(e) => setInvoiceForm({ ...invoiceForm, invoice_date: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="col-span-6">
+                  <label className="block text-xs font-medium mb-1">Due Date</label>
+                  <Input
+                    type="date"
+                    value={invoiceForm.due_date}
+                    onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
+                  />
                 </div>
               </div>
 
