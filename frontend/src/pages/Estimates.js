@@ -398,27 +398,27 @@ export default function Estimates() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="col-span-6">
+                <div className="col-span-3">
+                  <label className="block text-xs font-medium mb-1">Estimate Date *</label>
                   <Input
                     type="date"
                     value={estimateForm.estimate_date}
                     onChange={(e) => setEstimateForm({ ...estimateForm, estimate_date: e.target.value })}
-                    placeholder="Estimate Date *"
                     required
+                  />
+                </div>
+                <div className="col-span-3">
+                  <label className="block text-xs font-medium mb-1">Valid Until</label>
+                  <Input
+                    type="date"
+                    value={estimateForm.valid_until}
+                    onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6">
-                  <Input
-                    type="date"
-                    value={estimateForm.valid_until}
-                    onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
-                    placeholder="Valid Until (default: 1 month)"
-                  />
-                </div>
-                <div className="col-span-6">
+                <div className="col-span-12">
                   <Textarea
                     value={estimateForm.notes}
                     onChange={(e) => setEstimateForm({ ...estimateForm, notes: e.target.value })}
