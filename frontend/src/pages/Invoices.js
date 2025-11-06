@@ -891,7 +891,13 @@ export default function Invoices() {
         </Dialog>
 
         {/* Add Product Dialog (Inline) */}
-        <Dialog open={addProductDialogOpen} onOpenChange={setAddProductDialogOpen}>
+        <Dialog open={addProductDialogOpen} onOpenChange={(open) => {
+          setAddProductDialogOpen(open);
+          if (!open) {
+            // Reset form when closing
+            setNewProductData({ name: '', description: '', price: '', unit: 'pcs', stock_quantity: '', category_id: '' });
+          }
+        }}>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
