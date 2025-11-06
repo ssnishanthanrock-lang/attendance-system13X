@@ -27,10 +27,17 @@ export default function Invoices() {
   const [invoiceForm, setInvoiceForm] = useState({
     customer_id: '',
     invoice_date: new Date().toISOString().split('T')[0],
-    due_date: '',
+    due_date: getDefaultDueDate(),
     notes: '',
     items: [{ product_id: '', product_name: '', description: '', quantity: 1, unit_price: 0 }]
   });
+
+  // Helper function to get default due date (1 month from today)
+  function getDefaultDueDate() {
+    const today = new Date();
+    const nextMonth = new Date(today.setMonth(today.getMonth() + 1));
+    return nextMonth.toISOString().split('T')[0];
+  }
 
   const [paymentForm, setPaymentForm] = useState({
     amount: '',
