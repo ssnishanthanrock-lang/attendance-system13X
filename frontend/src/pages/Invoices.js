@@ -454,39 +454,35 @@ export default function Invoices() {
             <form onSubmit={handleCreateInvoice} className="space-y-4">
               <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-6">
-                  <label className="block text-sm font-medium mb-1">Customer *</label>
-                  <div className="flex gap-2">
-                    <Select 
-                      value={invoiceForm.customer_id} 
-                      onValueChange={(value) => {
-                        if (value === 'add_new') {
-                          setAddCustomerDialogOpen(true);
-                        } else {
-                          setInvoiceForm({ ...invoiceForm, customer_id: value });
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Select or add customer" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="add_new" className="text-blue-600 font-semibold">
-                          + Add New Customer
-                        </SelectItem>
-                        {customers.map(customer => (
-                          <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  <Select 
+                    value={invoiceForm.customer_id} 
+                    onValueChange={(value) => {
+                      if (value === 'add_new') {
+                        setAddCustomerDialogOpen(true);
+                      } else {
+                        setInvoiceForm({ ...invoiceForm, customer_id: value });
+                      }
+                    }}
+                  >
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Customer *" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="add_new" className="text-blue-600 font-semibold">
+                        + Add New Customer
+                      </SelectItem>
+                      {customers.map(customer => (
+                        <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="col-span-6">
-                  <label className="block text-sm font-medium mb-1">Invoice Date *</label>
                   <Input
                     type="date"
                     value={invoiceForm.invoice_date}
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, invoice_date: e.target.value })}
-                    placeholder="Select invoice date"
+                    placeholder="Invoice Date *"
                     required
                   />
                 </div>
@@ -494,20 +490,18 @@ export default function Invoices() {
 
               <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-6">
-                  <label className="block text-sm font-medium mb-1">Due Date</label>
                   <Input
                     type="date"
                     value={invoiceForm.due_date}
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
-                    placeholder="Due date (default: 1 month)"
+                    placeholder="Due Date (default: 1 month)"
                   />
                 </div>
                 <div className="col-span-6">
-                  <label className="block text-sm font-medium mb-1">Notes</label>
                   <Textarea
                     value={invoiceForm.notes}
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, notes: e.target.value })}
-                    placeholder="Add any notes or terms..."
+                    placeholder="Notes / Terms"
                     rows={1}
                   />
                 </div>
