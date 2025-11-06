@@ -477,27 +477,27 @@ export default function Invoices() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="col-span-6">
+                <div className="col-span-3">
+                  <label className="block text-xs font-medium mb-1">Invoice Date *</label>
                   <Input
                     type="date"
                     value={invoiceForm.invoice_date}
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, invoice_date: e.target.value })}
-                    placeholder="Invoice Date *"
                     required
+                  />
+                </div>
+                <div className="col-span-3">
+                  <label className="block text-xs font-medium mb-1">Due Date</label>
+                  <Input
+                    type="date"
+                    value={invoiceForm.due_date}
+                    onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6">
-                  <Input
-                    type="date"
-                    value={invoiceForm.due_date}
-                    onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
-                    placeholder="Due Date (default: 1 month)"
-                  />
-                </div>
-                <div className="col-span-6">
+                <div className="col-span-12">
                   <Textarea
                     value={invoiceForm.notes}
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, notes: e.target.value })}
