@@ -18,10 +18,17 @@ export default function Estimates() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Helper function to get default valid until date (1 month from today)
+  function getDefaultValidUntil() {
+    const today = new Date();
+    const nextMonth = new Date(today.setMonth(today.getMonth() + 1));
+    return nextMonth.toISOString().split('T')[0];
+  }
+
   const [estimateForm, setEstimateForm] = useState({
     customer_id: '',
     estimate_date: new Date().toISOString().split('T')[0],
-    valid_until: '',
+    valid_until: getDefaultValidUntil(),
     notes: '',
     items: [{ product_id: '', product_name: '', description: '', quantity: 1, unit_price: 0 }]
   });
