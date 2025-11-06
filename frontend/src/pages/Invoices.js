@@ -31,11 +31,14 @@ export default function Invoices() {
   // Inline creation states
   const [addCustomerDialogOpen, setAddCustomerDialogOpen] = useState(false);
   const [addProductDialogOpen, setAddProductDialogOpen] = useState(false);
+  const [addCategoryDialogOpen, setAddCategoryDialogOpen] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [newCategoryName, setNewCategoryName] = useState('');
   const [newCustomerData, setNewCustomerData] = useState({
     name: '', company_name: '', email: '', phone: '', whatsapp: '', city: '', address: ''
   });
   const [newProductData, setNewProductData] = useState({
-    name: '', description: '', price: '', unit: 'pcs', stock_quantity: ''
+    name: '', description: '', price: '', unit: 'pcs', stock_quantity: '', category_id: ''
   });
   
   const [invoiceForm, setInvoiceForm] = useState({
