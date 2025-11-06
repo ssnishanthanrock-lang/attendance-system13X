@@ -390,8 +390,9 @@ export default function Invoices() {
                         >
                           Restore
                         </Button>
-                        <div className="text-xs text-gray-500 flex items-center">
-                          Deleted {invoice.deleted_at ? new Date(invoice.deleted_at).toLocaleDateString() : ''}
+                        <div className="text-xs text-gray-500 flex flex-col items-end">
+                          <span>Deleted: {invoice.deleted_at ? new Date(invoice.deleted_at).toLocaleDateString() : ''}</span>
+                          {invoice.deleted_by && <span>By: {invoice.deleted_by}</span>}
                         </div>
                       </>
                     ) : (
