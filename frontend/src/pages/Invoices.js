@@ -252,7 +252,7 @@ export default function Invoices() {
   const addInvoiceItem = () => {
     setInvoiceForm({
       ...invoiceForm,
-      items: [...invoiceForm.items, { product_id: '', product_name: '', description: '', quantity: 1, unit_price: 0 }]
+      items: [...invoiceForm.items, { product_id: '', product_name: '', description: '', quantity: '', unit_price: '' }]
     });
   };
 
