@@ -280,7 +280,6 @@ export default function CompanySettings() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Company Logo */}
               <div className="space-y-3">
-                <label className="text-sm font-medium">Company Logo</label>
                 {settings?.company_logo && (
                   <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed">
                     <img src={settings.company_logo} alt="Company Logo" className="max-h-24 object-contain" />
@@ -307,12 +306,11 @@ export default function CompanySettings() {
                     }
                   }}
                 />
-                <p className="text-xs text-gray-500">Recommended: PNG/SVG, transparent background, 200x200px</p>
+                <p className="text-xs text-gray-500">Company Logo - PNG/SVG, transparent, 200x200px</p>
               </div>
 
               {/* Favicon */}
               <div className="space-y-3">
-                <label className="text-sm font-medium">Favicon</label>
                 {settings?.favicon && (
                   <div className="flex items-center justify-center p-4 bg-gray-50 rounded-lg border-2 border-dashed">
                     <img src={settings.favicon} alt="Favicon" className="max-h-16 object-contain rounded-lg" style={{ borderRadius: '8px' }} />
@@ -339,7 +337,7 @@ export default function CompanySettings() {
                     }
                   }}
                 />
-                <p className="text-xs text-gray-500">Recommended: ICO/PNG, 32x32px or 64x64px</p>
+                <p className="text-xs text-gray-500">Favicon - ICO/PNG, 32x32px or 64x64px</p>
               </div>
             </div>
           </CardContent>
