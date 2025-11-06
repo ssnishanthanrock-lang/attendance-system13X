@@ -247,7 +247,14 @@ export default function SuperAdminDashboard() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-2 lg:min-w-[140px]">
+                  <div className="flex flex-col gap-2 lg:min-w-[140px] items-end lg:items-stretch">
+                    <Badge className={
+                      company.status === 'active' ? 'bg-green-100 text-green-700 w-fit' :
+                      company.status === 'suspended' ? 'bg-red-100 text-red-700 w-fit' :
+                      'bg-yellow-100 text-yellow-700 w-fit'
+                    }>
+                      {company.status}
+                    </Badge>
                     <Button 
                       size="sm" 
                       onClick={() => handleViewPortal(company)}
