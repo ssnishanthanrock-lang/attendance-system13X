@@ -189,7 +189,7 @@ export default function InvoiceProducts() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-            Products
+            {showDeleted ? 'Deleted Products' : 'Products'}
           </h1>
           <div className="flex gap-2">
             <Button 
