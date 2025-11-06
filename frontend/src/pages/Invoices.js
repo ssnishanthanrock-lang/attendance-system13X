@@ -147,6 +147,39 @@ export default function Invoices() {
     }
   };
 
+  const handleDeleteInvoice = async (invoiceId) => {
+    if (!window.confirm('Are you sure you want to delete this invoice?')) return;
+    try {
+      await api.delete(`/invoices/${invoiceId}`);
+      toast.success('Invoice deleted successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
+      fetchInvoices();
+    } catch (error) {
+      toast.error('Failed to delete invoice', {
+        style: { background: '#ef4444', color: 'white' }
+      });
+    }
+  };
+
+  const handleRestoreInvoice = async (invoiceId) => {
+    if (!window.confirm('Are you sure you want to restore this invoice?')) return;
+    try {
+      await api.put(`/invoices/${invoiceId}/restore`);
+      toast.success('Invoice restored successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
+      setLoading(true);
+      await fetchInvoices();
+      setLoading(false);
+    } catch (error) {
+      toast.error('Failed to restore invoice', {
+        style: { background: '#ef4444', color: 'white' }
+      });
+      setLoading(false);
+    }
+  };
+
   const handleAddPayment = async (e) => {
     e.preventDefault();
     try {
@@ -154,7 +187,9 @@ export default function Invoices() {
         ...paymentForm,
         amount: parseFloat(paymentForm.amount)
       });
-      toast.success('Payment added successfully');
+      toast.success('Payment added successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
       setPaymentDialogOpen(false);
       resetPaymentForm();
       fetchInvoices();
