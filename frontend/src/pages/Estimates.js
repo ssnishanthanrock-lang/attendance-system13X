@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { Plus, FileText, ArrowRight, Trash2 } from 'lucide-react';
+import { Plus, FileText, ArrowRight, Trash2, Archive } from 'lucide-react';
 
 export default function Estimates() {
   const [estimates, setEstimates] = useState([]);
