@@ -65,14 +65,14 @@ export default function InvoiceCustomers() {
       toast.success('Customer restored successfully', {
         style: { background: '#10b981', color: 'white' }
       });
-      setLoading(true);
-      await fetchCustomers();
-      setLoading(false);
+      // Remove from current list immediately
+      setCustomers(customers.filter(c => c.id !== customerId));
+      // Update deleted count
+      setDeletedCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       toast.error('Failed to restore customer', {
         style: { background: '#ef4444', color: 'white' }
       });
-      setLoading(false);
     }
   };
 
