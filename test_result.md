@@ -466,6 +466,30 @@ frontend:
         agent: "testing"
         comment: "✅ TESTED: Logo & Branding section found in Company Settings. Both logo and favicon file upload inputs present (2 file inputs total). Working Days Calculator section also verified with month/year selectors, though data loading fails due to authentication."
 
+  - task: "Invoice Form Date Fields Layout"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Invoices.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed duplicate date columns issue. Removed duplicate disabled inputs for Invoice Date and Due Date. Now showing clean 3x3 layout: Invoice Date (label + input) in col-span-3, Due Date (label + input) in col-span-3."
+
+  - task: "Estimate Form Date Fields Layout"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Estimates.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Fixed duplicate date columns issue. Removed duplicate disabled inputs for Estimate Date and Valid Until. Now showing clean 3x3 layout: Estimate Date (label + input) in col-span-3, Valid Until (label + input) in col-span-3."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
