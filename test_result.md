@@ -498,7 +498,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Live Current Month Payroll View with Real-time Updates"
+    - "Invoice Form Date Fields Layout"
+    - "Estimate Form Date Fields Layout"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
