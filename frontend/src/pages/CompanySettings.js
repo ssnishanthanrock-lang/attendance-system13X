@@ -444,6 +444,22 @@ export default function CompanySettings() {
               </div>
             </CardContent>
           </Card>
+        ) : (
+          <Card>
+            <CardContent className="p-6 text-center">
+              <p className="text-sm text-gray-600">
+                Invoice Settings are not available. Invoicing feature is not enabled for your company.
+              </p>
+              <p className="text-xs text-gray-500 mt-2">
+                Contact your administrator to enable invoicing features.
+              </p>
+              {company && (
+                <p className="text-xs text-gray-400 mt-2">
+                  Debug: invoicing_enabled = {company.invoicing_enabled ? 'true' : 'false'}
+                </p>
+              )}
+            </CardContent>
+          </Card>
         )}
       </div>
     </Layout>
