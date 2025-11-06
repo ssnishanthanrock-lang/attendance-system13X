@@ -41,7 +41,7 @@ export default function Estimates() {
     estimate_date: new Date().toISOString().split('T')[0],
     valid_until: getDefaultValidUntil(),
     notes: '',
-    items: [{ product_id: '', product_name: '', description: '', quantity: 1, unit_price: 0 }]
+    items: [{ product_id: '', product_name: '', description: '', quantity: '', unit_price: '' }]
   });
 
   useEffect(() => {
