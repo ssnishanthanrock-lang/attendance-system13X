@@ -2108,6 +2108,7 @@ async def create_invoice(invoice_data: dict, current_user: User = Depends(get_cu
 async def get_invoices(
     status: Optional[str] = None,
     customer_id: Optional[str] = None,
+    include_deleted: bool = False,
     current_user: User = Depends(get_current_user)
 ):
     """Get all invoices for company"""
@@ -2115,6 +2116,8 @@ async def get_invoices(
         raise HTTPException(status_code=403, detail="Admin or Manager access required")
     
     query = {"company_id": current_user.company_id}
+    if not include_deleted:
+        query["deleted"] = {"$ne": True}
     if status:
         query["status"] = status
     if customer_id:
