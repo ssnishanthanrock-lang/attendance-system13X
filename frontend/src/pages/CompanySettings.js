@@ -510,13 +510,10 @@ function WorkingDaysCalculator({ settings }) {
                 })}
               </SelectContent>
             </Select>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Year</label>
-            <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
+          <Select value={selectedYear.toString()} onValueChange={(value) => setSelectedYear(parseInt(value))}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select Year" />
+            </SelectTrigger>
               <SelectContent>
                 {[2024, 2025, 2026, 2027].map((year) => (
                   <SelectItem key={year} value={year.toString()}>
