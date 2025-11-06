@@ -48,11 +48,14 @@ export default function InvoiceCustomers() {
       toast.success('Customer restored successfully', {
         style: { background: '#10b981', color: 'white' }
       });
-      fetchCustomers();
+      setLoading(true);
+      await fetchCustomers();
+      setLoading(false);
     } catch (error) {
       toast.error('Failed to restore customer', {
         style: { background: '#ef4444', color: 'white' }
       });
+      setLoading(false);
     }
   };
 
