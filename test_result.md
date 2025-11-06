@@ -480,6 +480,9 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Invoice form date fields layout fix verified successfully. Found exactly 1 'Invoice Date' label, 1 'Due Date' label, and 2 total date inputs (no duplicates). Date inputs are fully functional and editable. Layout uses correct 3-column grid structure with both date fields positioned side by side. Default dates populate correctly (current date for Invoice Date, +1 month for Due Date). All requirements from review request met: clean layout, no duplicate disabled inputs, proper 3x3 grid spacing."
+      - working: "NA"
+        agent: "main"
+        comment: "Updated layout structure per user request: Date section now takes 1/2 width of form (col-span-6). Within that half-width container, implemented nested 6-column grid with 3x3 layout for each date field (label: col-span-3, input: col-span-3). Structure: Outer container (col-span-6) → Inner grid (grid-cols-6) → Invoice Date label (col-span-3) + input (col-span-3) → Due Date label (col-span-3) + input (col-span-3)."
 
   - task: "Estimate Form Date Fields Layout"
     implemented: true
