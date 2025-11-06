@@ -23,6 +23,7 @@ export default function Invoices() {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleted, setShowDeleted] = useState(false);
   
   // Inline creation states
   const [addCustomerDialogOpen, setAddCustomerDialogOpen] = useState(false);
