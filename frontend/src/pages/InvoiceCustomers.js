@@ -193,40 +193,36 @@ export default function InvoiceCustomers() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-6">
-                      <label className="block text-sm font-medium mb-1">Customer Name *</label>
                       <Input
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Enter customer name"
+                        placeholder="Customer Name *"
                         required
                       />
                     </div>
                     <div className="col-span-6">
-                      <label className="block text-sm font-medium mb-1">Company Name</label>
                       <Input
                         value={formData.company_name}
                         onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
-                        placeholder="Enter company name"
+                        placeholder="Company Name"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-6">
-                      <label className="block text-sm font-medium mb-1">Email</label>
                       <Input
                         type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="customer@example.com"
+                        placeholder="Email"
                       />
                     </div>
                     <div className="col-span-6">
-                      <label className="block text-sm font-medium mb-1">Phone Number</label>
                       <Input
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                        placeholder="Enter 10-digit phone"
+                        placeholder="Phone Number (10 digits)"
                         maxLength={10}
                       />
                     </div>
@@ -234,30 +230,27 @@ export default function InvoiceCustomers() {
 
                   <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-6">
-                      <label className="block text-sm font-medium mb-1">WhatsApp Number</label>
                       <Input
                         value={formData.whatsapp}
                         onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                        placeholder="Enter 10-digit WhatsApp"
+                        placeholder="WhatsApp Number (10 digits)"
                         maxLength={10}
                       />
                     </div>
                     <div className="col-span-6">
-                      <label className="block text-sm font-medium mb-1">City</label>
                       <Input
                         value={formData.city}
                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        placeholder="Enter city"
+                        placeholder="City"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium mb-1">Address</label>
                     <Textarea
                       value={formData.address}
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                      placeholder="Enter full address"
+                      placeholder="Full Address"
                       rows={3}
                     />
                   </div>
