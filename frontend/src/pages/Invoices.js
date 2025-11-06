@@ -612,7 +612,7 @@ export default function Invoices() {
                       />
                     </div>
                     <div className="col-span-1">
-                      <p className="text-sm font-semibold text-center">Rs {(item.quantity * item.unit_price).toFixed(2)}</p>
+                      <p className="text-sm font-semibold text-center">Rs {((parseFloat(item.quantity) || 0) * (parseFloat(item.unit_price) || 0)).toFixed(2)}</p>
                     </div>
                     <div className="col-span-1">
                       {invoiceForm.items.length > 1 && (
