@@ -949,6 +949,13 @@ class SettingsUpdate(BaseModel):
     saturday_start_time: Optional[str] = None
     saturday_end_time: Optional[str] = None
     working_days_per_month: Optional[int] = None
+    invoice_address: Optional[str] = None
+    invoice_mobile: Optional[str] = None
+    invoice_hotline: Optional[str] = None
+    bank_name: Optional[str] = None
+    bank_account_name: Optional[str] = None
+    bank_account_number: Optional[str] = None
+    bank_branch: Optional[str] = None
 
 class Holiday(BaseModel):
     date: str
