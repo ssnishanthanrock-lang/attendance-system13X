@@ -43,6 +43,16 @@ export default function InvoiceProducts() {
     try {
       const response = await api.get(`/products?include_deleted=${showDeleted}`);
       setProducts(response.data);
+      
+      // Fetch deleted count when viewing active products
+      if (!showDeleted) {
+        try {
+          const deletedResponse = await api.get('/products?include_deleted=true&deleted_only=true');
+          setDeletedCount(deletedResponse.data.length);
+        } catch (error) {
+          console.error('Failed to fetch deleted count');
+        }
+      }
     } catch (error) {
       toast.error('Failed to fetch products');
     } finally {
