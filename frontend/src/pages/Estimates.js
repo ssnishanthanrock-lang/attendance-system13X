@@ -286,14 +286,39 @@ export default function Estimates() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    {estimate.status !== 'converted' && (
-                      <Button
-                        size="sm"
-                        onClick={() => handleConvertToInvoice(estimate.id)}
-                      >
-                        <ArrowRight className="w-4 h-4 mr-1" />
-                        Convert to Invoice
-                      </Button>
+                    {showDeleted ? (
+                      <>
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => handleRestoreEstimate(estimate.id)}
+                        >
+                          Restore
+                        </Button>
+                        <div className="text-xs text-gray-500 flex items-center">
+                          Deleted {estimate.deleted_at ? new Date(estimate.deleted_at).toLocaleDateString() : ''}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        {estimate.status !== 'converted' && (
+                          <Button
+                            size="sm"
+                            onClick={() => handleConvertToInvoice(estimate.id)}
+                          >
+                            <ArrowRight className="w-4 h-4 mr-1" />
+                            Convert to Invoice
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDeleteEstimate(estimate.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
