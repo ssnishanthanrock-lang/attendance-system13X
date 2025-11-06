@@ -555,6 +555,7 @@ export default function Invoices() {
                       <Input
                         value={item.product_name}
                         onChange={(e) => updateInvoiceItem(index, 'product_name', e.target.value)}
+                        placeholder="Product name"
                         required
                       />
                     </div>
@@ -565,6 +566,7 @@ export default function Invoices() {
                         step="0.01"
                         value={item.quantity}
                         onChange={(e) => updateInvoiceItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                        placeholder="1"
                         required
                       />
                     </div>
@@ -575,6 +577,7 @@ export default function Invoices() {
                         step="0.01"
                         value={item.unit_price}
                         onChange={(e) => updateInvoiceItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                        placeholder="0.00"
                         required
                       />
                     </div>
