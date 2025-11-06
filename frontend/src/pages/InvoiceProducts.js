@@ -207,6 +207,9 @@ export default function InvoiceProducts() {
               title={showDeleted ? "View Active Products" : "View Deleted Products"}
             >
               <Archive className="w-4 h-4" />
+              {!showDeleted && deletedCount > 0 && (
+                <span className="ml-1 text-xs">({deletedCount})</span>
+              )}
             </Button>
             <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
               <DialogTrigger asChild>
