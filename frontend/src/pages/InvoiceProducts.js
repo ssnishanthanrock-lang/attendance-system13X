@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { api } from '../App';
 import Layout from '../components/Layout';
 import { Button } from '../components/ui/button';
@@ -11,7 +12,11 @@ import { toast } from 'sonner';
 import { Plus, Edit, Trash2, Package, FolderPlus, Archive } from 'lucide-react';
 
 export default function InvoiceProducts() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showDeleted = searchParams.get('view') === 'deleted';
+  
   const [products, setProducts] = useState([]);
+  const [deletedCount, setDeletedCount] = useState(0);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -19,7 +24,6 @@ export default function InvoiceProducts() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
-  const [showDeleted, setShowDeleted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     category_id: '',
