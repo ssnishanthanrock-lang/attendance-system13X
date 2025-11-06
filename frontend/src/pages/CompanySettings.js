@@ -527,17 +527,19 @@ function WorkingDaysCalculator({ settings }) {
             <div>
               <label className="text-sm font-medium">Mobile Number</label>
               <Input
-                placeholder="Enter mobile number"
+                placeholder="Enter 10-digit mobile number"
                 value={settings?.invoice_mobile || ''}
-                onChange={(e) => handleUpdateSettings({ invoice_mobile: e.target.value })}
+                onChange={(e) => handleUpdateSettings({ invoice_mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                maxLength={10}
               />
             </div>
             <div>
               <label className="text-sm font-medium">Hotline</label>
               <Input
-                placeholder="Enter hotline number"
+                placeholder="Enter 10-digit hotline"
                 value={settings?.invoice_hotline || ''}
-                onChange={(e) => handleUpdateSettings({ invoice_hotline: e.target.value })}
+                onChange={(e) => handleUpdateSettings({ invoice_hotline: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                maxLength={10}
               />
             </div>
           </div>
