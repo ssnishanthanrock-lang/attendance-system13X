@@ -257,11 +257,11 @@ export default function InvoiceProducts() {
                         required
                       />
                     </div>
-                    <div>
+                    <div className="col-span-4">
                       <label className="block text-sm font-medium mb-1">Unit *</label>
                       <Select value={formData.unit} onValueChange={(value) => setFormData({ ...formData, unit: value })}>
                         <SelectTrigger>
-                          <SelectValue />
+                          <SelectValue placeholder="Select unit" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="pcs">Pieces</SelectItem>
@@ -272,13 +272,14 @@ export default function InvoiceProducts() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
+                    <div className="col-span-4">
                       <label className="block text-sm font-medium mb-1">Stock Qty</label>
                       <Input
                         type="number"
                         step="0.01"
                         value={formData.stock_quantity}
                         onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
+                        placeholder="0"
                       />
                     </div>
                   </div>
