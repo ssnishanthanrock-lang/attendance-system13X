@@ -157,7 +157,7 @@ export default function InvoiceCustomers() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-            Customers
+            {showDeleted ? 'Deleted Customers' : 'Customers'}
           </h1>
           <div className="flex gap-2">
             {(deletedCount > 0 || showDeleted) && (
