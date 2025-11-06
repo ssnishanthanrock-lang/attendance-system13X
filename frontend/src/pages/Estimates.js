@@ -375,7 +375,6 @@ export default function Estimates() {
             <form onSubmit={handleCreateEstimate} className="space-y-4">
               <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-6">
-                  <label className="block text-sm font-medium mb-1">Customer *</label>
                   <Select 
                     value={estimateForm.customer_id} 
                     onValueChange={(value) => {
@@ -387,7 +386,7 @@ export default function Estimates() {
                     }}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select or add customer" />
+                      <SelectValue placeholder="Customer *" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="add_new" className="text-blue-600 font-semibold">
@@ -400,12 +399,11 @@ export default function Estimates() {
                   </Select>
                 </div>
                 <div className="col-span-6">
-                  <label className="block text-sm font-medium mb-1">Estimate Date *</label>
                   <Input
                     type="date"
                     value={estimateForm.estimate_date}
                     onChange={(e) => setEstimateForm({ ...estimateForm, estimate_date: e.target.value })}
-                    placeholder="Select estimate date"
+                    placeholder="Estimate Date *"
                     required
                   />
                 </div>
@@ -413,20 +411,18 @@ export default function Estimates() {
 
               <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-6">
-                  <label className="block text-sm font-medium mb-1">Valid Until</label>
                   <Input
                     type="date"
                     value={estimateForm.valid_until}
                     onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
-                    placeholder="Valid until (default: 1 month)"
+                    placeholder="Valid Until (default: 1 month)"
                   />
                 </div>
                 <div className="col-span-6">
-                  <label className="block text-sm font-medium mb-1">Notes</label>
                   <Textarea
                     value={estimateForm.notes}
                     onChange={(e) => setEstimateForm({ ...estimateForm, notes: e.target.value })}
-                    placeholder="Add any notes or terms..."
+                    placeholder="Notes / Terms"
                     rows={1}
                   />
                 </div>
