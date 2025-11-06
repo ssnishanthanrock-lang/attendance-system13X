@@ -74,16 +74,31 @@ export default function Estimates() {
     }
   };
 
+  // Inline customer creation
+  const handleAddNewCustomer = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/customers', newCustomerData);
+      toast.success('Customer added successfully', { style: { background: '#10b981', color: 'white' } });
+      setAddCustomerDialogOpen(false);
+      setNewCustomerData({ name: '', company_name: '', email: '', phone: '', whatsapp: '', city: '', address: '' });
+      await fetchCustomers();
+      setEstimateForm({ ...estimateForm, customer_id: response.data.id });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to add customer', { style: { background: '#ef4444', color: 'white' } });
+    }
+  };
+
   const handleCreateEstimate = async (e) => {
     e.preventDefault();
     try {
       await api.post('/estimates', estimateForm);
-      toast.success('Estimate created successfully');
+      toast.success('Estimate created successfully', { style: { background: '#10b981', color: 'white' } });
       setCreateDialogOpen(false);
       resetForm();
       fetchEstimates();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to create estimate');
+      toast.error(error.response?.data?.detail || 'Failed to create estimate', { style: { background: '#ef4444', color: 'white' } });
     }
   };
 
