@@ -2609,6 +2609,13 @@ class ERPTester:
         auth_success = self.test_authentication()
         
         if auth_success:
+            # Run Super Admin Tests (REVIEW REQUEST FOCUS)
+            print("\n" + "="*80)
+            print("👑 TESTING SUPER ADMIN FUNCTIONALITY (REVIEW REQUEST FOCUS)")
+            print("="*80)
+            
+            self.test_super_admin_functionality()
+            
             # Run Invoicing System Tests (REVIEW REQUEST FOCUS)
             print("\n" + "="*80)
             print("🧾 TESTING INVOICING SYSTEM (REVIEW REQUEST FOCUS)")
