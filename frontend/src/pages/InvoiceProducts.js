@@ -33,15 +33,33 @@ export default function InvoiceProducts() {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
-  }, []);
+  }, [showDeleted]);
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get('/products');
+      const response = await api.get(`/products?include_deleted=${showDeleted}`);
       setProducts(response.data);
     } catch (error) {
       toast.error('Failed to fetch products');
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRestore = async (productId) => {
+    if (!window.confirm('Are you sure you want to restore this product?')) return;
+    try {
+      await api.put(`/products/${productId}/restore`);
+      toast.success('Product restored successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
+      setLoading(true);
+      await fetchProducts();
+      setLoading(false);
+    } catch (error) {
+      toast.error('Failed to restore product', {
+        style: { background: '#ef4444', color: 'white' }
+      });
       setLoading(false);
     }
   };
