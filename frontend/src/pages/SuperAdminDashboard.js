@@ -264,23 +264,6 @@ export default function SuperAdminDashboard() {
                       <Eye className="w-4 h-4 mr-1" />
                       View Portal
                     </Button>
-                    {company.status === 'pending' && (
-                      <Button size="sm" onClick={() => handleStatusChange(company.company_id, 'active')} className="bg-green-600">
-                        <CheckCircle className="w-4 h-4 mr-1" />
-                        Activate
-                      </Button>
-                    )}
-                    {company.status === 'active' && (
-                      <Button size="sm" onClick={() => handleStatusChange(company.company_id, 'suspended')} variant="outline" className="text-red-600">
-                        <XCircle className="w-4 h-4 mr-1" />
-                        Suspend
-                      </Button>
-                    )}
-                    {company.status === 'suspended' && (
-                      <Button size="sm" onClick={() => handleStatusChange(company.company_id, 'active')} className="bg-green-600">
-                        Reactivate
-                      </Button>
-                    )}
                     <Button size="sm" variant="outline" onClick={() => navigate(`/superadmin/companies/${company.company_id}`)}>
                       <Settings className="w-4 h-4 mr-1" />
                       Manage
