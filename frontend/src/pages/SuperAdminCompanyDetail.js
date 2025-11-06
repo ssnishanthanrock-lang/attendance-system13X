@@ -262,9 +262,13 @@ export default function SuperAdminCompanyDetail() {
                     setCompany({ ...company, invoicing_enabled: checked });
                     
                     await api.put(`/superadmin/companies/${companyId}/invoicing`, { enabled: checked });
-                    toast.success(`Invoicing ${checked ? 'enabled' : 'disabled'} successfully`);
+                    toast.success(`Invoicing ${checked ? 'enabled' : 'disabled'} successfully`, {
+                      style: { background: '#10b981', color: 'white' }
+                    });
                   } catch (error) {
-                    toast.error('Failed to update invoicing status');
+                    toast.error('Failed to update invoicing status', {
+                      style: { background: '#ef4444', color: 'white' }
+                    });
                     // Revert on error
                     fetchCompany();
                   }
