@@ -1886,12 +1886,16 @@ async def create_customer(customer_data: dict, current_user: User = Depends(get_
     return customer.model_dump()
 
 @api_router.get("/customers")
-async def get_customers(current_user: User = Depends(get_current_user)):
+async def get_customers(include_deleted: bool = False, current_user: User = Depends(get_current_user)):
     """Get all customers for company"""
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or Manager access required")
     
-    customers = await db.customers.find({"company_id": current_user.company_id}, {"_id": 0}).sort("created_at", -1).to_list(length=None)
+    query = {"company_id": current_user.company_id}
+    if not include_deleted:
+        query["deleted"] = {"$ne": True}
+    
+    customers = await db.customers.find(query, {"_id": 0}).sort("created_at", -1).to_list(length=None)
     return customers
 
 @api_router.put("/customers/{customer_id}")
