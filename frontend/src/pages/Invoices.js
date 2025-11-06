@@ -115,6 +115,31 @@ export default function Invoices() {
     }
   };
 
+  const fetchCategories = async () => {
+    try {
+      const response = await api.get('/product-categories');
+      setCategories(response.data);
+    } catch (error) {
+      console.error('Failed to fetch categories');
+    }
+  };
+
+  // Inline category creation
+  const handleAddNewCategory = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/product-categories', { name: newCategoryName });
+      toast.success('Category added successfully', { style: { background: '#10b981', color: 'white' } });
+      setAddCategoryDialogOpen(false);
+      setNewCategoryName('');
+      await fetchCategories();
+      // Auto-select the new category
+      setNewProductData({ ...newProductData, category_id: response.data.id });
+    } catch (error) {
+      toast.error('Failed to add category', { style: { background: '#ef4444', color: 'white' } });
+    }
+  };
+
   // Inline customer creation
   const handleAddNewCustomer = async (e) => {
     e.preventDefault();
