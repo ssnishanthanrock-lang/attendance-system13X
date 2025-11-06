@@ -1421,6 +1421,35 @@ agent_communication:
       - Layout menu dropdowns (Apply vs Invoicing) - no conflict
       - Super Admin company detail status change buttons functionality
 
+  - agent: "main"
+    message: |
+      ✅ BUG FIX COMPLETED - Company Settings Runtime Error
+      
+      ISSUE: "company is not defined" error when opening Company Settings page
+      - Error occurred in WorkingDaysCalculator component
+      - Invoice Settings card was incorrectly placed inside WorkingDaysCalculator component
+      - WorkingDaysCalculator didn't have access to `company` variable from parent scope
+      
+      ROOT CAUSE:
+      - Invoice Settings card (with company.invoicing_enabled check) was inside WorkingDaysCalculator component's return statement
+      - The `company` variable is defined in CompanySettings component, not passed to WorkingDaysCalculator
+      - This caused "ReferenceError: company is not defined" when component tried to render
+      
+      FIX APPLIED:
+      1. ✅ Moved Invoice Settings card OUT of WorkingDaysCalculator component
+      2. ✅ Placed Invoice Settings card in main CompanySettings component (after Logo & Branding card)
+      3. ✅ Now Invoice Settings card has proper access to `company` variable
+      4. ✅ Conditional rendering {company && company.invoicing_enabled} now works correctly
+      
+      FILES MODIFIED:
+      - /app/frontend/src/pages/CompanySettings.js
+      
+      NEEDS TESTING:
+      - Company Settings page loads without runtime errors
+      - Invoice Settings card displays when invoicing is enabled
+      - WorkingDaysCalculator functions correctly
+      - All other Company Settings features work as expected
+
   - agent: "testing"
     message: |
       🎯 BUG FIX VALIDATION COMPLETED - ALL 4 FIXES WORKING (14/14 TESTS PASSED - 100% SUCCESS)
