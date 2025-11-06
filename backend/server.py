@@ -2059,6 +2059,24 @@ async def delete_product(product_id: str, current_user: User = Depends(get_curre
     
     return {"message": "Product deleted successfully"}
 
+@api_router.put("/products/{product_id}/restore")
+async def restore_product(product_id: str, current_user: User = Depends(get_current_user)):
+    """Restore deleted product"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    product = await db.products.find_one({"id": product_id, "company_id": current_user.company_id, "deleted": True})
+    if not product:
+        raise HTTPException(status_code=404, detail="Deleted product not found")
+    
+    await db.products.update_one(
+        {"id": product_id, "company_id": current_user.company_id},
+        {"$set": {"deleted": False}, "$unset": {"deleted_at": "", "deleted_by": ""}}
+    )
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "RESTORE_PRODUCT", f"Restored product: {product['name']}")
+    
+    return {"message": "Product restored successfully"}
+
 # Invoice endpoints
 def generate_invoice_number():
     """Generate invoice number: INV-25-MMDD-XX"""
