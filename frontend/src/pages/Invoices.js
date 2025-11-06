@@ -718,32 +718,29 @@ export default function Invoices() {
               </DialogHeader>
               <form onSubmit={handleAddPayment} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Amount (Rs) *</label>
                   <Input
                     type="number"
                     step="0.01"
                     value={paymentForm.amount}
                     onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
-                    placeholder="Enter payment amount"
+                    placeholder="Amount (Rs) *"
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">Outstanding: Rs {(selectedInvoice.total - selectedInvoice.amount_paid).toFixed(2)}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Payment Date *</label>
                   <Input
                     type="date"
                     value={paymentForm.payment_date}
                     onChange={(e) => setPaymentForm({ ...paymentForm, payment_date: e.target.value })}
-                    placeholder="Select date"
+                    placeholder="Payment Date *"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Payment Method *</label>
                   <Select value={paymentForm.payment_method} onValueChange={(value) => setPaymentForm({ ...paymentForm, payment_method: value })}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select payment method" />
+                      <SelectValue placeholder="Payment Method *" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="cash">Cash</SelectItem>
@@ -754,11 +751,10 @@ export default function Invoices() {
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Notes</label>
                   <Textarea
                     value={paymentForm.notes}
                     onChange={(e) => setPaymentForm({ ...paymentForm, notes: e.target.value })}
-                    placeholder="Add payment notes (optional)"
+                    placeholder="Payment Notes (Optional)"
                     rows={2}
                   />
                 </div>
