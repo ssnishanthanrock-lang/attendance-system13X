@@ -160,14 +160,22 @@ export default function InvoiceCustomers() {
             Customers
           </h1>
           <div className="flex gap-2">
-            <Button 
-              variant={showDeleted ? "default" : "outline"} 
-              size="sm" 
-              onClick={() => setShowDeleted(!showDeleted)}
-              title={showDeleted ? "View Active Customers" : "View Deleted Customers"}
-            >
-              <Archive className="w-4 h-4" />
-            </Button>
+            {(deletedCount > 0 || showDeleted) && (
+              <Button 
+                variant={showDeleted ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => {
+                  if (showDeleted) {
+                    setSearchParams({});
+                  } else {
+                    setSearchParams({ view: 'deleted' });
+                  }
+                }}
+                title={showDeleted ? "View Active Customers" : `View Deleted Customers (${deletedCount})`}
+              >
+                <Archive className="w-4 h-4" />
+              </Button>
+            )}
             <Dialog open={dialogOpen} onOpenChange={(open) => {
               setDialogOpen(open);
               if (!open) resetForm();
