@@ -1987,12 +1987,16 @@ async def create_product(product_data: dict, current_user: User = Depends(get_cu
     return product.model_dump()
 
 @api_router.get("/products")
-async def get_products(current_user: User = Depends(get_current_user)):
+async def get_products(include_deleted: bool = False, current_user: User = Depends(get_current_user)):
     """Get all products for company"""
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or Manager access required")
     
-    products = await db.products.find({"company_id": current_user.company_id}, {"_id": 0}).sort("name", 1).to_list(length=None)
+    query = {"company_id": current_user.company_id}
+    if not include_deleted:
+        query["deleted"] = {"$ne": True}
+    
+    products = await db.products.find(query, {"_id": 0}).sort("name", 1).to_list(length=None)
     return products
 
 @api_router.put("/products/{product_id}")
