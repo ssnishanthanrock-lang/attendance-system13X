@@ -187,7 +187,13 @@ export default function InvoiceProducts() {
             <Button 
               variant={showDeleted ? "default" : "outline"} 
               size="sm" 
-              onClick={() => setShowDeleted(!showDeleted)}
+              onClick={() => {
+                if (showDeleted) {
+                  setSearchParams({});
+                } else {
+                  setSearchParams({ view: 'deleted' });
+                }
+              }}
               title={showDeleted ? "View Active Products" : "View Deleted Products"}
             >
               <Archive className="w-4 h-4" />
