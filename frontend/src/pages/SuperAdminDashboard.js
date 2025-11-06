@@ -216,20 +216,13 @@ export default function SuperAdminDashboard() {
           }).map((company) => (
             <Card key={company.company_id}>
               <CardContent className="p-6">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div className="flex flex-col lg:flex-row justify-between gap-4">
                   <div className="flex-1">
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="mb-3">
                       <div>
                         <h3 className="text-lg font-bold" style={{ fontFamily: 'Work Sans, sans-serif' }}>{company.name}</h3>
                         <p className="text-sm text-gray-600">Admin: {company.admin_name} | {company.admin_mobile}</p>
                       </div>
-                      <Badge className={
-                        company.status === 'active' ? 'bg-green-100 text-green-700' :
-                        company.status === 'suspended' ? 'bg-red-100 text-red-700' :
-                        'bg-yellow-100 text-yellow-700'
-                      }>
-                        {company.status}
-                      </Badge>
                     </div>
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-sm">
                       <div>
