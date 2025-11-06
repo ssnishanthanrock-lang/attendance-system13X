@@ -2238,12 +2238,16 @@ async def create_estimate(estimate_data: dict, current_user: User = Depends(get_
     return estimate.model_dump()
 
 @api_router.get("/estimates")
-async def get_estimates(current_user: User = Depends(get_current_user)):
+async def get_estimates(include_deleted: bool = False, current_user: User = Depends(get_current_user)):
     """Get all estimates for company"""
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or Manager access required")
     
-    estimates = await db.estimates.find({"company_id": current_user.company_id}, {"_id": 0}).sort("created_at", -1).to_list(length=None)
+    query = {"company_id": current_user.company_id}
+    if not include_deleted:
+        query["deleted"] = {"$ne": True}
+    
+    estimates = await db.estimates.find(query, {"_id": 0}).sort("created_at", -1).to_list(length=None)
     return estimates
 
 @api_router.post("/estimates/{estimate_id}/convert")
