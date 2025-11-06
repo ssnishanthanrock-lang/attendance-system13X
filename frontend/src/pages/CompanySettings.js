@@ -36,10 +36,11 @@ export default function CompanySettings() {
 
   const fetchCompanyInfo = async () => {
     try {
-      const response = await api.get('/company');
+      const response = await api.get('/company/info');
       setCompany(response.data);
+      console.log('Company data:', response.data); // Debug log
     } catch (error) {
-      console.error('Failed to fetch company info');
+      console.error('Failed to fetch company info:', error);
     }
   };
 
