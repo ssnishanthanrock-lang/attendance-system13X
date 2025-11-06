@@ -28,6 +28,7 @@ export default function Layout({ children }) {
   const [companyInfo, setCompanyInfo] = useState(null);
   const [impersonationState, setImpersonationState] = useState(null);
   const [applyMenuOpen, setApplyMenuOpen] = useState(false);
+  const [invoicingMenuOpen, setInvoicingMenuOpen] = useState(false);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
