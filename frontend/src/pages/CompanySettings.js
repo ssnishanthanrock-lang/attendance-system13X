@@ -380,30 +380,21 @@ export default function CompanySettings() {
               <div className="border-t pt-4 mt-4">
                 <h3 className="font-semibold mb-3">Bank Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Bank Name</label>
-                    <Input
-                      placeholder="e.g., Commercial Bank"
-                      value={settings?.bank_name || ''}
-                      onChange={(e) => handleUpdateSettings({ bank_name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Account Name</label>
-                    <Input
-                      placeholder="Account holder name"
-                      value={settings?.bank_account_name || ''}
-                      onChange={(e) => handleUpdateSettings({ bank_account_name: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Account Number</label>
-                    <Input
-                      placeholder="Bank account number"
-                      value={settings?.bank_account_number || ''}
-                      onChange={(e) => handleUpdateSettings({ bank_account_number: e.target.value })}
-                    />
-                  </div>
+                  <Input
+                    placeholder="Bank Name (e.g., Commercial Bank)"
+                    value={settings?.bank_name || ''}
+                    onChange={(e) => handleUpdateSettings({ bank_name: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Account Holder Name"
+                    value={settings?.bank_account_name || ''}
+                    onChange={(e) => handleUpdateSettings({ bank_account_name: e.target.value })}
+                  />
+                  <Input
+                    placeholder="Bank Account Number"
+                    value={settings?.bank_account_number || ''}
+                    onChange={(e) => handleUpdateSettings({ bank_account_number: e.target.value })}
+                  />
                 </div>
               </div>
 
