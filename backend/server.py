@@ -2220,6 +2220,46 @@ async def add_payment(invoice_id: str, payment_data: dict, current_user: User = 
     
     return {"message": "Payment added successfully"}
 
+@api_router.delete("/invoices/{invoice_id}")
+async def delete_invoice(invoice_id: str, current_user: User = Depends(get_current_user)):
+    """Soft delete invoice"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    invoice = await db.invoices.find_one({"id": invoice_id, "company_id": current_user.company_id})
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+    
+    await db.invoices.update_one(
+        {"id": invoice_id, "company_id": current_user.company_id},
+        {"$set": {
+            "deleted": True,
+            "deleted_at": datetime.now(timezone.utc).isoformat(),
+            "deleted_by": current_user.name
+        }}
+    )
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_INVOICE", f"Deleted invoice: {invoice['invoice_number']}")
+    
+    return {"message": "Invoice deleted successfully"}
+
+@api_router.put("/invoices/{invoice_id}/restore")
+async def restore_invoice(invoice_id: str, current_user: User = Depends(get_current_user)):
+    """Restore deleted invoice"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    invoice = await db.invoices.find_one({"id": invoice_id, "company_id": current_user.company_id, "deleted": True})
+    if not invoice:
+        raise HTTPException(status_code=404, detail="Deleted invoice not found")
+    
+    await db.invoices.update_one(
+        {"id": invoice_id, "company_id": current_user.company_id},
+        {"$set": {"deleted": False}, "$unset": {"deleted_at": "", "deleted_by": ""}}
+    )
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "RESTORE_INVOICE", f"Restored invoice: {invoice['invoice_number']}")
+    
+    return {"message": "Invoice restored successfully"}
+
 # Estimate endpoints
 def generate_estimate_number():
     """Generate estimate number: EST-25-MMDD-XX"""
