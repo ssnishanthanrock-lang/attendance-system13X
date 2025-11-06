@@ -341,8 +341,9 @@ export default function InvoiceCustomers() {
                         >
                           Restore
                         </Button>
-                        <div className="text-xs text-gray-500 flex items-center">
-                          Deleted {customer.deleted_at ? new Date(customer.deleted_at).toLocaleDateString() : ''}
+                        <div className="text-xs text-gray-500 flex flex-col items-end">
+                          <span>Deleted: {customer.deleted_at ? new Date(customer.deleted_at).toLocaleDateString() : ''}</span>
+                          {customer.deleted_by && <span>By: {customer.deleted_by}</span>}
                         </div>
                       </>
                     ) : (
