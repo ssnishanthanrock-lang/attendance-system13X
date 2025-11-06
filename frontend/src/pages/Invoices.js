@@ -31,6 +31,7 @@ export default function Invoices() {
   // Inline creation states
   const [addCustomerDialogOpen, setAddCustomerDialogOpen] = useState(false);
   const [addProductDialogOpen, setAddProductDialogOpen] = useState(false);
+  const [productFormKey, setProductFormKey] = useState(0);
   const [addCategoryDialogOpen, setAddCategoryDialogOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState('');
