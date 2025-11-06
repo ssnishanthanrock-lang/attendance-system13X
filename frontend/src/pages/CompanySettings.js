@@ -513,85 +513,87 @@ function WorkingDaysCalculator({ settings }) {
         </div>
       ) : null}
 
-      {/* Invoice Settings */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="w-5 h-5" />
-            Invoice Settings
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm text-gray-600 mb-4">
-            These details will appear on your invoices and estimates
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="text-sm font-medium">Company Address</label>
-              <Input
-                placeholder="Enter company address"
-                value={settings?.invoice_address || ''}
-                onChange={(e) => handleUpdateSettings({ invoice_address: e.target.value })}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Mobile Number</label>
-              <Input
-                placeholder="Enter 10-digit mobile number"
-                value={settings?.invoice_mobile || ''}
-                onChange={(e) => handleUpdateSettings({ invoice_mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                maxLength={10}
-              />
-            </div>
-            <div>
-              <label className="text-sm font-medium">Hotline</label>
-              <Input
-                placeholder="Enter 10-digit hotline"
-                value={settings?.invoice_hotline || ''}
-                onChange={(e) => handleUpdateSettings({ invoice_hotline: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                maxLength={10}
-              />
-            </div>
-          </div>
-
-          <div className="border-t pt-4 mt-4">
-            <h3 className="font-semibold mb-3">Bank Details</h3>
+      {/* Invoice Settings - Only show if invoicing is enabled */}
+      {company?.invoicing_enabled && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="w-5 h-5" />
+              Invoice Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-gray-600 mb-4">
+              These details will appear on your invoices and estimates
+            </p>
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Bank Name</label>
+                <label className="text-sm font-medium">Company Address</label>
                 <Input
-                  placeholder="e.g., Commercial Bank"
-                  value={settings?.bank_name || ''}
-                  onChange={(e) => handleUpdateSettings({ bank_name: e.target.value })}
+                  placeholder="Enter company address"
+                  value={settings?.invoice_address || ''}
+                  onChange={(e) => handleUpdateSettings({ invoice_address: e.target.value })}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Account Name</label>
+                <label className="text-sm font-medium">Mobile Number</label>
                 <Input
-                  placeholder="Account holder name"
-                  value={settings?.bank_account_name || ''}
-                  onChange={(e) => handleUpdateSettings({ bank_account_name: e.target.value })}
+                  placeholder="Enter 10-digit mobile number"
+                  value={settings?.invoice_mobile || ''}
+                  onChange={(e) => handleUpdateSettings({ invoice_mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                  maxLength={10}
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Account Number</label>
+                <label className="text-sm font-medium">Hotline</label>
                 <Input
-                  placeholder="Bank account number"
-                  value={settings?.bank_account_number || ''}
-                  onChange={(e) => handleUpdateSettings({ bank_account_number: e.target.value })}
+                  placeholder="Enter 10-digit hotline"
+                  value={settings?.invoice_hotline || ''}
+                  onChange={(e) => handleUpdateSettings({ invoice_hotline: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                  maxLength={10}
                 />
               </div>
             </div>
-          </div>
 
-          <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mt-4">
-            <p className="text-xs text-blue-700">
-              💡 These details are optional but recommended for professional invoices
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="border-t pt-4 mt-4">
+              <h3 className="font-semibold mb-3">Bank Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium">Bank Name</label>
+                  <Input
+                    placeholder="e.g., Commercial Bank"
+                    value={settings?.bank_name || ''}
+                    onChange={(e) => handleUpdateSettings({ bank_name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Account Name</label>
+                  <Input
+                    placeholder="Account holder name"
+                    value={settings?.bank_account_name || ''}
+                    onChange={(e) => handleUpdateSettings({ bank_account_name: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Account Number</label>
+                  <Input
+                    placeholder="Bank account number"
+                    value={settings?.bank_account_number || ''}
+                    onChange={(e) => handleUpdateSettings({ bank_account_number: e.target.value })}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mt-4">
+              <p className="text-xs text-blue-700">
+                💡 These details are optional but recommended for professional invoices
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
