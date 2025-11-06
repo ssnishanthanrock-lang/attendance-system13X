@@ -374,7 +374,7 @@ export default function Estimates() {
             </DialogHeader>
             <form onSubmit={handleCreateEstimate} className="space-y-4">
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6">
+                <div className="col-span-12">
                   <Select 
                     value={estimateForm.customer_id} 
                     onValueChange={(value) => {
@@ -398,6 +398,9 @@ export default function Estimates() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-3">
                   <label className="block text-xs font-medium mb-1">Estimate Date *</label>
                   <Input
@@ -408,6 +411,15 @@ export default function Estimates() {
                   />
                 </div>
                 <div className="col-span-3">
+                  <Input
+                    type="date"
+                    value={estimateForm.estimate_date}
+                    onChange={(e) => setEstimateForm({ ...estimateForm, estimate_date: e.target.value })}
+                    disabled
+                    className="bg-gray-50"
+                  />
+                </div>
+                <div className="col-span-3">
                   <label className="block text-xs font-medium mb-1">Valid Until</label>
                   <Input
                     type="date"
@@ -415,15 +427,13 @@ export default function Estimates() {
                     onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12">
-                  <Textarea
-                    value={estimateForm.notes}
-                    onChange={(e) => setEstimateForm({ ...estimateForm, notes: e.target.value })}
-                    placeholder="Notes / Terms"
-                    rows={1}
+                <div className="col-span-3">
+                  <Input
+                    type="date"
+                    value={estimateForm.valid_until}
+                    onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
+                    disabled
+                    className="bg-gray-50"
                   />
                 </div>
               </div>
