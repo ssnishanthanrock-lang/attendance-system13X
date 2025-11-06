@@ -2020,7 +2020,7 @@ async def update_product(product_id: str, product_data: dict, current_user: User
 
 @api_router.delete("/products/{product_id}")
 async def delete_product(product_id: str, current_user: User = Depends(get_current_user)):
-    """Delete product"""
+    """Soft delete product"""
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or Manager access required")
     
@@ -2028,7 +2028,15 @@ async def delete_product(product_id: str, current_user: User = Depends(get_curre
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     
-    await db.products.delete_one({"id": product_id, "company_id": current_user.company_id})
+    # Soft delete
+    await db.products.update_one(
+        {"id": product_id, "company_id": current_user.company_id},
+        {"$set": {
+            "deleted": True,
+            "deleted_at": datetime.now(timezone.utc).isoformat(),
+            "deleted_by": current_user.name
+        }}
+    )
     await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_PRODUCT", f"Deleted product: {product['name']}")
     
     return {"message": "Product deleted successfully"}
