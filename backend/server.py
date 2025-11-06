@@ -1919,7 +1919,7 @@ async def update_customer(customer_id: str, customer_data: dict, current_user: U
 
 @api_router.delete("/customers/{customer_id}")
 async def delete_customer(customer_id: str, current_user: User = Depends(get_current_user)):
-    """Delete customer"""
+    """Soft delete customer"""
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or Manager access required")
     
@@ -1927,7 +1927,15 @@ async def delete_customer(customer_id: str, current_user: User = Depends(get_cur
     if not customer:
         raise HTTPException(status_code=404, detail="Customer not found")
     
-    await db.customers.delete_one({"id": customer_id, "company_id": current_user.company_id})
+    # Soft delete
+    await db.customers.update_one(
+        {"id": customer_id, "company_id": current_user.company_id},
+        {"$set": {
+            "deleted": True,
+            "deleted_at": datetime.now(timezone.utc).isoformat(),
+            "deleted_by": current_user.name
+        }}
+    )
     await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_CUSTOMER", f"Deleted customer: {customer['name']}")
     
     return {"message": "Customer deleted successfully"}
