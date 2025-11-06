@@ -495,10 +495,11 @@ function WorkingDaysCalculator({ settings }) {
     <div className="space-y-4">
       <div className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select Month" />
-            </SelectTrigger>
+          <div>
+            <Select value={selectedMonth.toString()} onValueChange={(value) => setSelectedMonth(parseInt(value))}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Month" />
+              </SelectTrigger>
               <SelectContent className="max-h-96">
                 {months.map((month, index) => {
                   const monthNum = index + 1;
