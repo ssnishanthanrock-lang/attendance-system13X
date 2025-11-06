@@ -401,22 +401,30 @@ export default function Estimates() {
               </div>
 
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-3">
-                  <label className="block text-xs font-medium mb-1">Estimate Date *</label>
-                  <Input
-                    type="date"
-                    value={estimateForm.estimate_date}
-                    onChange={(e) => setEstimateForm({ ...estimateForm, estimate_date: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="col-span-3">
-                  <label className="block text-xs font-medium mb-1">Valid Until</label>
-                  <Input
-                    type="date"
-                    value={estimateForm.valid_until}
-                    onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
-                  />
+                <div className="col-span-6">
+                  <div className="grid grid-cols-6 gap-4">
+                    <div className="col-span-3">
+                      <label className="block text-xs font-medium mb-1">Estimate Date *</label>
+                    </div>
+                    <div className="col-span-3">
+                      <Input
+                        type="date"
+                        value={estimateForm.estimate_date}
+                        onChange={(e) => setEstimateForm({ ...estimateForm, estimate_date: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div className="col-span-3">
+                      <label className="block text-xs font-medium mb-1">Valid Until</label>
+                    </div>
+                    <div className="col-span-3">
+                      <Input
+                        type="date"
+                        value={estimateForm.valid_until}
+                        onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
