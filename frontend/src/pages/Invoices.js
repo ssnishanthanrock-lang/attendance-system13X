@@ -595,8 +595,8 @@ export default function Invoices() {
                       <Input
                         type="number"
                         step="0.01"
-                        value={item.quantity}
-                        onChange={(e) => updateInvoiceItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                        value={item.quantity === '' ? undefined : item.quantity}
+                        onChange={(e) => updateInvoiceItem(index, 'quantity', e.target.value)}
                         placeholder="Qty *"
                         required
                       />
@@ -605,8 +605,8 @@ export default function Invoices() {
                       <Input
                         type="number"
                         step="0.01"
-                        value={item.unit_price}
-                        onChange={(e) => updateInvoiceItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                        value={item.unit_price === '' ? undefined : item.unit_price}
+                        onChange={(e) => updateInvoiceItem(index, 'unit_price', e.target.value)}
                         placeholder="Price *"
                         required
                       />
