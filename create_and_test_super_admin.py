@@ -15,7 +15,7 @@ import subprocess
 
 # Load environment variables
 load_dotenv('/app/frontend/.env')
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://payroll-plus-9.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://invoice-erp.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 def create_super_admin_in_db():
