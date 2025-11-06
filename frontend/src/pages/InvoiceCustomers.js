@@ -28,16 +28,31 @@ export default function InvoiceCustomers() {
 
   useEffect(() => {
     fetchCustomers();
-  }, []);
+  }, [showDeleted]);
 
   const fetchCustomers = async () => {
     try {
-      const response = await api.get('/customers');
+      const response = await api.get(`/customers?include_deleted=${showDeleted}`);
       setCustomers(response.data);
     } catch (error) {
       toast.error('Failed to fetch customers');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRestore = async (customerId) => {
+    if (!window.confirm('Are you sure you want to restore this customer?')) return;
+    try {
+      await api.put(`/customers/${customerId}/restore`);
+      toast.success('Customer restored successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
+      fetchCustomers();
+    } catch (error) {
+      toast.error('Failed to restore customer', {
+        style: { background: '#ef4444', color: 'white' }
+      });
     }
   };
 
