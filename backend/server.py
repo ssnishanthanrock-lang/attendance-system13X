@@ -1875,8 +1875,11 @@ async def create_customer(customer_data: dict, current_user: User = Depends(get_
     customer = Customer(
         company_id=current_user.company_id,
         name=customer_data["name"],
+        company_name=customer_data.get("company_name"),
         email=customer_data.get("email"),
         phone=customer_data.get("phone"),
+        whatsapp=customer_data.get("whatsapp"),
+        city=customer_data.get("city"),
         address=customer_data.get("address")
     )
     
