@@ -465,6 +465,7 @@ export default function Estimates() {
                       <Input
                         value={item.product_name}
                         onChange={(e) => updateEstimateItem(index, 'product_name', e.target.value)}
+                        placeholder="Product name"
                         required
                       />
                     </div>
@@ -475,6 +476,7 @@ export default function Estimates() {
                         step="0.01"
                         value={item.quantity}
                         onChange={(e) => updateEstimateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
+                        placeholder="1"
                         required
                       />
                     </div>
@@ -485,6 +487,7 @@ export default function Estimates() {
                         step="0.01"
                         value={item.unit_price}
                         onChange={(e) => updateEstimateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                        placeholder="0.00"
                         required
                       />
                     </div>
