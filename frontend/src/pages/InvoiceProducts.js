@@ -415,8 +415,9 @@ export default function InvoiceProducts() {
                         >
                           Restore
                         </Button>
-                        <div className="text-xs text-gray-500 flex items-center">
-                          Deleted {product.deleted_at ? new Date(product.deleted_at).toLocaleDateString() : ''}
+                        <div className="text-xs text-gray-500 flex flex-col items-end">
+                          <span>Deleted: {product.deleted_at ? new Date(product.deleted_at).toLocaleDateString() : ''}</span>
+                          {product.deleted_by && <span>By: {product.deleted_by}</span>}
                         </div>
                       </>
                     ) : (
