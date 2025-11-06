@@ -64,6 +64,9 @@ export default function Invoices() {
     fetchInvoices();
     fetchCustomers();
     fetchProducts();
+    if (!showDeleted) {
+      fetchDeletedCount();
+    }
   }, [showDeleted]);
 
   const fetchInvoices = async () => {
@@ -74,6 +77,16 @@ export default function Invoices() {
       toast.error('Failed to fetch invoices');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDeletedCount = async () => {
+    try {
+      const response = await api.get('/invoices?include_deleted=true');
+      const deleted = response.data.filter(i => i.deleted === true);
+      setDeletedCount(deleted.length);
+    } catch (error) {
+      console.error('Failed to fetch deleted count');
     }
   };
 
