@@ -18,6 +18,12 @@ export default function Estimates() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Inline creation states
+  const [addCustomerDialogOpen, setAddCustomerDialogOpen] = useState(false);
+  const [newCustomerData, setNewCustomerData] = useState({
+    name: '', company_name: '', email: '', phone: '', whatsapp: '', city: '', address: ''
+  });
+  
   // Helper function to get default valid until date (1 month from today)
   function getDefaultValidUntil() {
     const today = new Date();
