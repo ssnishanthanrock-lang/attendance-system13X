@@ -1176,6 +1176,50 @@ agent_communication:
       
       The invoicing system implementation is excellent and ready for production use with only one missing endpoint.
 
+  - agent: "main"
+    message: |
+      ✅ CRITICAL BUGS FIXED - Day 1 Priorities Completed
+      
+      BUGS FIXED:
+      1. ✅ Super Admin Dashboard - Company List Status Display:
+         - Fixed missing `invoicing_enabled` field in /api/superadmin/dashboard/stats response
+         - Backend now returns both `sms_enabled` and `invoicing_enabled` status for each company
+         - Company list will now show correct SMS and Invoicing status
+      
+      2. ✅ Super Admin Company Detail - Invoicing Toggle:
+         - Added proper success/error toast messages with green/red styling
+         - Toggle now shows "Invoicing enabled successfully" or "Invoicing disabled successfully"
+         - Immediate update with optimistic UI
+      
+      3. ✅ Super Admin Company Detail - SMS Toggle:
+         - Changed from "Save button only" to "Immediate toggle" like invoicing
+         - Toggle now immediately saves to backend when switched
+         - Shows "SMS enabled successfully" or "SMS disabled successfully" toast
+         - Proper error handling with revert on failure
+      
+      4. ✅ Layout.js Menu Conflict:
+         - Fixed "Invoicing" menu opening "Apply" menu issue
+         - Added separate state variable `invoicingMenuOpen` for Invoicing dropdown
+         - Each dropdown menu now has its own unique state
+         - Clicking Invoicing now only opens Invoicing submenu
+      
+      5. ✅ Super Admin Dashboard UI Improvements:
+         - Removed "Companies" text header next to +Add Company button
+         - Button now right-aligned for cleaner look
+      
+      6. ✅ Suspend/Reactivate Button Location:
+         - Moved Suspend/Reactivate buttons from company list to Manage module
+         - Added status change actions to SuperAdminCompanyDetail page
+         - Buttons now appear in Company Information card with proper styling
+         - Prevents accidental clicks from company list view
+         - Shows: "Activate Company" (pending), "Suspend Company" (active), "Reactivate Company" (suspended)
+      
+      NEEDS TESTING:
+      - Super Admin dashboard company list status display (SMS & Invoicing)
+      - Super Admin company detail toggles (Invoicing & SMS) with proper success messages
+      - Layout menu dropdowns (Apply vs Invoicing) - no conflict
+      - Super Admin company detail status change buttons functionality
+
   - agent: "testing"
     message: |
       🎯 BUG FIX VALIDATION COMPLETED - ALL 4 FIXES WORKING (14/14 TESTS PASSED - 100% SUCCESS)
