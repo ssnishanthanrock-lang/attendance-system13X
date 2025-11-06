@@ -72,7 +72,11 @@ export default function Invoices() {
   const fetchInvoices = async () => {
     try {
       const response = await api.get(`/invoices?include_deleted=${showDeleted}`);
-      setInvoices(response.data);
+      // When viewing deleted, filter to show only deleted items
+      const filteredData = showDeleted 
+        ? response.data.filter(i => i.deleted === true)
+        : response.data;
+      setInvoices(filteredData);
     } catch (error) {
       toast.error('Failed to fetch invoices');
     } finally {
