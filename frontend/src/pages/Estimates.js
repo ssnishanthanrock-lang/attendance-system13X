@@ -124,7 +124,7 @@ export default function Estimates() {
     setEstimateForm({
       customer_id: '',
       estimate_date: new Date().toISOString().split('T')[0],
-      valid_until: '',
+      valid_until: getDefaultValidUntil(),
       notes: '',
       items: [{ product_id: '', product_name: '', description: '', quantity: 1, unit_price: 0 }]
     });
