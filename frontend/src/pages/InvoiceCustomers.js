@@ -7,7 +7,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, User } from 'lucide-react';
+import { Plus, Edit, Trash2, User, Archive } from 'lucide-react';
 
 export default function InvoiceCustomers() {
   const [customers, setCustomers] = useState([]);
@@ -17,8 +17,11 @@ export default function InvoiceCustomers() {
   const [searchTerm, setSearchTerm] = useState('');
   const [formData, setFormData] = useState({
     name: '',
+    company_name: '',
     email: '',
     phone: '',
+    whatsapp: '',
+    city: '',
     address: ''
   });
 
@@ -42,16 +45,22 @@ export default function InvoiceCustomers() {
     try {
       if (editingCustomer) {
         await api.put(`/customers/${editingCustomer.id}`, formData);
-        toast.success('Customer updated successfully');
+        toast.success('Customer updated successfully', {
+          style: { background: '#10b981', color: 'white' }
+        });
       } else {
         await api.post('/customers', formData);
-        toast.success('Customer created successfully');
+        toast.success('Customer created successfully', {
+          style: { background: '#10b981', color: 'white' }
+        });
       }
       setDialogOpen(false);
       resetForm();
       fetchCustomers();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to save customer');
+      toast.error(error.response?.data?.detail || 'Failed to save customer', {
+        style: { background: '#ef4444', color: 'white' }
+      });
     }
   };
 
@@ -59,8 +68,11 @@ export default function InvoiceCustomers() {
     setEditingCustomer(customer);
     setFormData({
       name: customer.name,
+      company_name: customer.company_name || '',
       email: customer.email || '',
       phone: customer.phone || '',
+      whatsapp: customer.whatsapp || '',
+      city: customer.city || '',
       address: customer.address || ''
     });
     setDialogOpen(true);
@@ -71,22 +83,27 @@ export default function InvoiceCustomers() {
     
     try {
       await api.delete(`/customers/${customerId}`);
-      toast.success('Customer deleted successfully');
+      toast.success('Customer deleted successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
       fetchCustomers();
     } catch (error) {
-      toast.error('Failed to delete customer');
+      toast.error('Failed to delete customer', {
+        style: { background: '#ef4444', color: 'white' }
+      });
     }
   };
 
   const resetForm = () => {
-    setFormData({ name: '', email: '', phone: '', address: '' });
+    setFormData({ name: '', company_name: '', email: '', phone: '', whatsapp: '', city: '', address: '' });
     setEditingCustomer(null);
   };
 
   const filteredCustomers = customers.filter(customer =>
     customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     customer.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    customer.phone?.includes(searchTerm)
+    customer.phone?.includes(searchTerm) ||
+    customer.company_name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -106,73 +123,120 @@ export default function InvoiceCustomers() {
           <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
             Customers
           </h1>
-          <Dialog open={dialogOpen} onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) resetForm();
-          }}>
-            <DialogTrigger asChild>
-              <Button className="flex items-center gap-2">
-                <Plus className="w-4 h-4" />
-                Add Customer
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{editingCustomer ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Name *</label>
-                  <Input
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Email</label>
-                  <Input
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Phone</label>
-                  <Input
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Address</label>
-                  <Textarea
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    rows={3}
-                  />
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button type="submit">
-                    {editingCustomer ? 'Update' : 'Create'}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" title="View Deleted Customers">
+              <Archive className="w-4 h-4" />
+            </Button>
+            <Dialog open={dialogOpen} onOpenChange={(open) => {
+              setDialogOpen(open);
+              if (!open) resetForm();
+            }}>
+              <DialogTrigger asChild>
+                <Button className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  Add Customer
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>{editingCustomer ? 'Edit Customer' : 'Add New Customer'}</DialogTitle>
+                </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-6">
+                      <label className="block text-sm font-medium mb-1">Customer Name *</label>
+                      <Input
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Enter customer name"
+                        required
+                      />
+                    </div>
+                    <div className="col-span-6">
+                      <label className="block text-sm font-medium mb-1">Company Name</label>
+                      <Input
+                        value={formData.company_name}
+                        onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
+                        placeholder="Enter company name"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-6">
+                      <label className="block text-sm font-medium mb-1">Email</label>
+                      <Input
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        placeholder="customer@example.com"
+                      />
+                    </div>
+                    <div className="col-span-6">
+                      <label className="block text-sm font-medium mb-1">Phone Number</label>
+                      <Input
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                        placeholder="Enter 10-digit phone"
+                        maxLength={10}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-6">
+                      <label className="block text-sm font-medium mb-1">WhatsApp Number</label>
+                      <Input
+                        value={formData.whatsapp}
+                        onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                        placeholder="Enter 10-digit WhatsApp"
+                        maxLength={10}
+                      />
+                    </div>
+                    <div className="col-span-6">
+                      <label className="block text-sm font-medium mb-1">City</label>
+                      <Input
+                        value={formData.city}
+                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                        placeholder="Enter city"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Address</label>
+                    <Textarea
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      placeholder="Enter full address"
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit">
+                      {editingCustomer ? 'Update' : 'Create'}
+                    </Button>
+                  </div>
+                </form>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
-        <div className="mb-4">
-          <Input
-            placeholder="Search customers by name, email, or phone..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md"
-          />
-        </div>
+        {customers.length >= 5 && (
+          <div className="mb-4">
+            <Input
+              placeholder="Search customers by name, company, email, or phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-md"
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredCustomers.map((customer) => (
@@ -186,6 +250,9 @@ export default function InvoiceCustomers() {
                       </div>
                       <div>
                         <h3 className="font-bold text-gray-900">{customer.name}</h3>
+                        {customer.company_name && (
+                          <p className="text-xs text-gray-500">{customer.company_name}</p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -199,6 +266,18 @@ export default function InvoiceCustomers() {
                   {customer.phone && (
                     <p className="text-sm text-gray-600">
                       <span className="font-medium">Phone:</span> {customer.phone}
+                    </p>
+                  )}
+
+                  {customer.whatsapp && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">WhatsApp:</span> {customer.whatsapp}
+                    </p>
+                  )}
+
+                  {customer.city && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">City:</span> {customer.city}
                     </p>
                   )}
                   
