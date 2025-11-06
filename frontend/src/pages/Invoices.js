@@ -24,6 +24,16 @@ export default function Invoices() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Inline creation states
+  const [addCustomerDialogOpen, setAddCustomerDialogOpen] = useState(false);
+  const [addProductDialogOpen, setAddProductDialogOpen] = useState(false);
+  const [newCustomerData, setNewCustomerData] = useState({
+    name: '', company_name: '', email: '', phone: '', whatsapp: '', city: '', address: ''
+  });
+  const [newProductData, setNewProductData] = useState({
+    name: '', description: '', price: '', unit: 'pcs', stock_quantity: '0'
+  });
+  
   const [invoiceForm, setInvoiceForm] = useState({
     customer_id: '',
     invoice_date: new Date().toISOString().split('T')[0],
