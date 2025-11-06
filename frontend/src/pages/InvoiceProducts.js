@@ -67,14 +67,12 @@ export default function InvoiceProducts() {
       toast.success('Product restored successfully', {
         style: { background: '#10b981', color: 'white' }
       });
-      setLoading(true);
-      await fetchProducts();
-      setLoading(false);
+      setProducts(products.filter(p => p.id !== productId));
+      setDeletedCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       toast.error('Failed to restore product', {
         style: { background: '#ef4444', color: 'white' }
       });
-      setLoading(false);
     }
   };
 
