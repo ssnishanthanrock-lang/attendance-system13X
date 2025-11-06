@@ -202,11 +202,16 @@ export default function Layout({ children }) {
 
     // Dropdown menu item
     if (item.isDropdown) {
+      // Determine which menu state to use based on the menu label
+      const isInvoicingMenu = item.label === 'Invoicing';
+      const menuOpen = isInvoicingMenu ? invoicingMenuOpen : applyMenuOpen;
+      const setMenuOpen = isInvoicingMenu ? setInvoicingMenuOpen : setApplyMenuOpen;
+      
       return (
         <div className="w-full">
           <button
             data-testid={`nav-${item.label.toLowerCase()}`}
-            onClick={() => setApplyMenuOpen(!applyMenuOpen)}
+            onClick={() => setMenuOpen(!menuOpen)}
             className={`w-full flex items-center justify-between px-3 py-2 rounded-lg font-medium transition-all ${textSize} ${
               isChildActive
                 ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg'
@@ -217,9 +222,9 @@ export default function Layout({ children }) {
               <Icon className="w-4 h-4" />
               <span>{item.label}</span>
             </div>
-            {applyMenuOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+            {menuOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           </button>
-          {applyMenuOpen && (
+          {menuOpen && (
             <div className="ml-6 mt-1 space-y-1">
               {item.children.map((child) => {
                 const ChildIcon = child.icon;
