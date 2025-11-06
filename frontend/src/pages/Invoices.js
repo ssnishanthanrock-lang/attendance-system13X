@@ -359,22 +359,46 @@ export default function Invoices() {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => handleViewInvoice(invoice.id)}>
-                      <Eye className="w-4 h-4 mr-1" />
-                      View
-                    </Button>
-                    {invoice.status !== 'paid' && (
-                      <Button
-                        size="sm"
-                        onClick={() => {
-                          setSelectedInvoice(invoice);
-                          setPaymentForm({ ...paymentForm, amount: (invoice.total - invoice.amount_paid).toString() });
-                          setPaymentDialogOpen(true);
-                        }}
-                      >
-                        <DollarSign className="w-4 h-4 mr-1" />
-                        Add Payment
-                      </Button>
+                    {showDeleted ? (
+                      <>
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => handleRestoreInvoice(invoice.id)}
+                        >
+                          Restore
+                        </Button>
+                        <div className="text-xs text-gray-500 flex items-center">
+                          Deleted {invoice.deleted_at ? new Date(invoice.deleted_at).toLocaleDateString() : ''}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Button size="sm" variant="outline" onClick={() => handleViewInvoice(invoice.id)}>
+                          <Eye className="w-4 h-4 mr-1" />
+                          View
+                        </Button>
+                        {invoice.status !== 'paid' && (
+                          <Button
+                            size="sm"
+                            onClick={() => {
+                              setSelectedInvoice(invoice);
+                              setPaymentForm({ ...paymentForm, amount: (invoice.total - invoice.amount_paid).toString() });
+                              setPaymentDialogOpen(true);
+                            }}
+                          >
+                            Add Payment
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDeleteInvoice(invoice.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>
