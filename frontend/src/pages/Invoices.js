@@ -520,29 +520,11 @@ export default function Invoices() {
                   />
                 </div>
                 <div className="col-span-3">
-                  <Input
-                    type="date"
-                    value={invoiceForm.invoice_date}
-                    onChange={(e) => setInvoiceForm({ ...invoiceForm, invoice_date: e.target.value })}
-                    disabled
-                    className="bg-gray-50"
-                  />
-                </div>
-                <div className="col-span-3">
                   <label className="block text-xs font-medium mb-1">Due Date</label>
                   <Input
                     type="date"
                     value={invoiceForm.due_date}
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
-                  />
-                </div>
-                <div className="col-span-3">
-                  <Input
-                    type="date"
-                    value={invoiceForm.due_date}
-                    onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
-                    disabled
-                    className="bg-gray-50"
                   />
                 </div>
               </div>
