@@ -121,8 +121,8 @@ user_problem_statement: |
 
 backend:
   - task: "Super Admin Invoicing Toggle"
-    implemented: false
-    working: false
+    implemented: true
+    working: "NA"
     file: "/app/backend/server.py"
     stuck_count: 1
     priority: "high"
@@ -131,6 +131,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "❌ TESTED: Super admin invoicing toggle endpoints not implemented. PUT /api/superadmin/companies/{company_id}/invoicing returns 401 Invalid token. The endpoint for enabling/disabling invoicing per company is missing from the backend implementation."
+      - working: "NA"
+        agent: "testing"
+        comment: "✅ ENDPOINT IMPLEMENTED: All Super Admin endpoints are implemented in backend code (lines 2284-2295 for invoicing toggle, 688-704 for SMS toggle, 667-686 for status change, 764-800 for dashboard stats). Access control working correctly (403 for non-super-admin users). Issue: No super admin users exist in system - this is a data/setup issue, not implementation issue. Endpoints include all required fields: invoicing_enabled, sms_enabled in company stats, proper response messages, database updates. Cannot test functionality without valid super admin user."
 
   - task: "Product Categories CRUD"
     implemented: true
