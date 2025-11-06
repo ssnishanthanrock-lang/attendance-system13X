@@ -438,15 +438,14 @@ export default function Estimates() {
                 </div>
 
                 {estimateForm.items.map((item, index) => (
-                  <div key={index} className="grid grid-cols-12 gap-2 mb-3 items-end">
+                  <div key={index} className="grid grid-cols-12 gap-2 mb-3 items-center">
                     <div className="col-span-3">
-                      <label className="block text-xs font-medium mb-1">Product</label>
                       <Select
                         value={item.product_id || "custom"}
                         onValueChange={(value) => updateEstimateItem(index, 'product_id', value === "custom" ? "" : value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Select" />
+                          <SelectValue placeholder="Product" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="custom">Custom Item</SelectItem>
@@ -457,39 +456,35 @@ export default function Estimates() {
                       </Select>
                     </div>
                     <div className="col-span-3">
-                      <label className="block text-xs font-medium mb-1">Name *</label>
                       <Input
                         value={item.product_name}
                         onChange={(e) => updateEstimateItem(index, 'product_name', e.target.value)}
-                        placeholder="Product name"
+                        placeholder="Name *"
                         required
                       />
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-xs font-medium mb-1">Qty *</label>
                       <Input
                         type="number"
                         step="0.01"
                         value={item.quantity}
                         onChange={(e) => updateEstimateItem(index, 'quantity', parseFloat(e.target.value) || 0)}
-                        placeholder="1"
+                        placeholder="Qty *"
                         required
                       />
                     </div>
                     <div className="col-span-2">
-                      <label className="block text-xs font-medium mb-1">Price *</label>
                       <Input
                         type="number"
                         step="0.01"
                         value={item.unit_price}
                         onChange={(e) => updateEstimateItem(index, 'unit_price', parseFloat(e.target.value) || 0)}
-                        placeholder="0.00"
+                        placeholder="Price *"
                         required
                       />
                     </div>
                     <div className="col-span-1">
-                      <label className="block text-xs font-medium mb-1">Total</label>
-                      <p className="text-sm font-semibold">Rs {(item.quantity * item.unit_price).toFixed(2)}</p>
+                      <p className="text-sm font-semibold text-center">Rs {(item.quantity * item.unit_price).toFixed(2)}</p>
                     </div>
                     <div className="col-span-1">
                       {estimateForm.items.length > 1 && (
