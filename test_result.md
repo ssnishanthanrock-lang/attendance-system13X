@@ -1450,6 +1450,35 @@ agent_communication:
       - WorkingDaysCalculator functions correctly
       - All other Company Settings features work as expected
 
+  - agent: "main"
+    message: |
+      ✅ ADDITIONAL FIX - Invoice Settings Not Showing Issue
+      
+      ISSUE: Invoice Settings card not displaying even when invoicing is enabled
+      - User reported Invoice Settings not showing despite invoicing being enabled
+      
+      ROOT CAUSE IDENTIFIED:
+      - Frontend was calling wrong endpoint: `/company` instead of `/company/info`
+      - The `/company` endpoint doesn't exist in backend
+      - Backend only has `/company/info` endpoint (line 952 in server.py)
+      - This caused the company data fetch to fail silently
+      - Without company data, the conditional check `company && company.invoicing_enabled` always failed
+      
+      FIX APPLIED:
+      1. ✅ Changed API call from `/company` to `/company/info` in fetchCompanyInfo()
+      2. ✅ Added console.log for debugging company data
+      3. ✅ Added else clause to show message when invoicing is not enabled
+      4. ✅ Added debug info showing invoicing_enabled status
+      
+      FILES MODIFIED:
+      - /app/frontend/src/pages/CompanySettings.js
+      
+      NEEDS TESTING:
+      - Company Settings page now fetches company data correctly
+      - Invoice Settings card displays when invoicing_enabled is true
+      - Fallback message shows when invoicing_enabled is false
+      - Debug info helps identify invoicing status
+
   - agent: "testing"
     message: |
       🎯 BUG FIX VALIDATION COMPLETED - ALL 4 FIXES WORKING (14/14 TESTS PASSED - 100% SUCCESS)
