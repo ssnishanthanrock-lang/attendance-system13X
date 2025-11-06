@@ -227,7 +227,12 @@ export default function Estimates() {
             Estimates
           </h1>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" title="View Deleted Estimates">
+            <Button 
+              variant={showDeleted ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setShowDeleted(!showDeleted)}
+              title={showDeleted ? "View Active Estimates" : "View Deleted Estimates"}
+            >
               <Archive className="w-4 h-4" />
             </Button>
             <Button onClick={() => setCreateDialogOpen(true)} className="flex items-center gap-2">
