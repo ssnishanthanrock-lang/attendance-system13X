@@ -313,12 +313,12 @@ export default function Invoices() {
               <DialogTitle>Create New Invoice</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleCreateInvoice} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
                   <label className="block text-sm font-medium mb-1">Customer *</label>
                   <Select value={invoiceForm.customer_id} onValueChange={(value) => setInvoiceForm({ ...invoiceForm, customer_id: value })}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select customer" />
+                      <SelectValue placeholder="Select or add customer" />
                     </SelectTrigger>
                     <SelectContent>
                       {customers.map(customer => (
@@ -327,24 +327,37 @@ export default function Invoices() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
+                <div className="col-span-6">
                   <label className="block text-sm font-medium mb-1">Invoice Date *</label>
                   <Input
                     type="date"
                     value={invoiceForm.invoice_date}
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, invoice_date: e.target.value })}
+                    placeholder="Select invoice date"
                     required
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Due Date</label>
-                <Input
-                  type="date"
-                  value={invoiceForm.due_date}
-                  onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
-                />
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">Due Date</label>
+                  <Input
+                    type="date"
+                    value={invoiceForm.due_date}
+                    onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
+                    placeholder="Due date (default: 1 month)"
+                  />
+                </div>
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">Notes</label>
+                  <Textarea
+                    value={invoiceForm.notes}
+                    onChange={(e) => setInvoiceForm({ ...invoiceForm, notes: e.target.value })}
+                    placeholder="Add any notes or terms..."
+                    rows={1}
+                  />
+                </div>
               </div>
 
               <div className="border-t pt-4">
