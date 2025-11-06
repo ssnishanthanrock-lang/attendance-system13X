@@ -154,8 +154,7 @@ export default function SuperAdminDashboard() {
         </div>
 
         {/* Actions */}
-        <div className="mb-6 flex justify-between items-center">
-          <h2 className="text-2xl font-bold" style={{ fontFamily: 'Work Sans, sans-serif' }}>Companies</h2>
+        <div className="mb-6 flex justify-end items-center">
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-gradient-to-r from-blue-600 to-indigo-600">
