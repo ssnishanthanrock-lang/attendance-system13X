@@ -897,6 +897,32 @@ export default function Invoices() {
                 />
               </div>
               <div>
+                <label className="block text-sm font-medium mb-1">Category</label>
+                <Select 
+                  value={newProductData.category_id || "none"} 
+                  onValueChange={(value) => {
+                    if (value === 'add_new') {
+                      setAddCategoryDialogOpen(true);
+                    } else {
+                      setNewProductData({ ...newProductData, category_id: value === "none" ? "" : value });
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="add_new" className="text-blue-600 font-semibold">
+                      + Add New Category
+                    </SelectItem>
+                    <SelectItem value="none">None</SelectItem>
+                    {categories.map(cat => (
+                      <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
                 <label className="block text-sm font-medium mb-1">Description</label>
                 <Textarea
                   value={newProductData.description}
