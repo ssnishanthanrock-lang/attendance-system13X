@@ -979,7 +979,8 @@ export default function Invoices() {
                   <Input
                     type="number"
                     step="0.01"
-                    {...(newProductData.stock_quantity !== '' && { value: newProductData.stock_quantity })}
+                    min="0"
+                    value={newProductData.stock_quantity === '' ? undefined : newProductData.stock_quantity}
                     onChange={(e) => setNewProductData({ ...newProductData, stock_quantity: e.target.value })}
                     placeholder="Enter stock quantity"
                     required
