@@ -904,13 +904,14 @@ export default function Invoices() {
                   </Select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Stock</label>
+                  <label className="block text-sm font-medium mb-1">Stock *</label>
                   <Input
                     type="number"
                     step="0.01"
                     value={newProductData.stock_quantity}
                     onChange={(e) => setNewProductData({ ...newProductData, stock_quantity: e.target.value })}
-                    placeholder="0"
+                    placeholder="Stock qty"
+                    required
                   />
                 </div>
               </div>
