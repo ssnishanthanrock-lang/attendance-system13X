@@ -135,6 +135,42 @@ backend:
         agent: "testing"
         comment: "✅ ENDPOINT IMPLEMENTED: All Super Admin endpoints are implemented in backend code (lines 2284-2295 for invoicing toggle, 688-704 for SMS toggle, 667-686 for status change, 764-800 for dashboard stats). Access control working correctly (403 for non-super-admin users). Issue: No super admin users exist in system - this is a data/setup issue, not implementation issue. Endpoints include all required fields: invoicing_enabled, sms_enabled in company stats, proper response messages, database updates. Cannot test functionality without valid super admin user."
 
+  - task: "Super Admin Dashboard Stats"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "✅ IMPLEMENTED: GET /api/superadmin/dashboard/stats endpoint implemented (lines 764-800). Returns correct structure with total_companies, active_companies, pending_companies, total_employees, company_stats array. Company stats include all required fields: company_id, name, admin_name, admin_mobile, status, employee_count, last_login, sms_enabled, invoicing_enabled, created_at. Access control working (403 for non-super-admin). Cannot test without super admin user."
+
+  - task: "Super Admin SMS Toggle"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "✅ IMPLEMENTED: PUT /api/superadmin/companies/{company_id}/sms endpoint implemented (lines 688-704). Accepts SMS settings with sms_enabled boolean, updates database, returns 'SMS settings updated' message. Creates activity log. Access control working. Cannot test without super admin user."
+
+  - task: "Super Admin Company Status Change"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "testing"
+        comment: "✅ IMPLEMENTED: PUT /api/superadmin/companies/{company_id}/status endpoint implemented (lines 667-686). Supports status changes between 'pending', 'active', 'suspended'. Validates status values (400 for invalid). Updates database and returns appropriate message. Creates activity log. Access control working. Cannot test without super admin user."
+
   - task: "Product Categories CRUD"
     implemented: true
     working: true
