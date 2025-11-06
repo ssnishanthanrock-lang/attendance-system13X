@@ -164,10 +164,15 @@ export default function Estimates() {
           <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
             Estimates
           </h1>
-          <Button onClick={() => setCreateDialogOpen(true)} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Create Estimate
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" title="View Deleted Estimates">
+              <Archive className="w-4 h-4" />
+            </Button>
+            <Button onClick={() => setCreateDialogOpen(true)} className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Create Estimate
+            </Button>
+          </div>
         </div>
 
         {estimates.length >= 5 && (
