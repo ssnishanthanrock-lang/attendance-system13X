@@ -170,6 +170,37 @@ export default function SuperAdminCompanyDetail() {
                 <p className="font-semibold">{new Date(company?.created_at).toLocaleDateString()}</p>
               </div>
             </div>
+            {/* Status Change Actions */}
+            <div className="mt-6 pt-4 border-t border-gray-200 flex gap-3">
+              {company?.status === 'pending' && (
+                <Button 
+                  onClick={() => handleStatusChange('active')} 
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Activate Company
+                </Button>
+              )}
+              {company?.status === 'active' && (
+                <Button 
+                  onClick={() => handleStatusChange('suspended')} 
+                  variant="outline" 
+                  className="text-red-600 border-red-300 hover:bg-red-50"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Suspend Company
+                </Button>
+              )}
+              {company?.status === 'suspended' && (
+                <Button 
+                  onClick={() => handleStatusChange('active')} 
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Reactivate Company
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
 
