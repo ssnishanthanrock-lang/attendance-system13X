@@ -444,6 +444,88 @@ export default function Estimates() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Add Customer Dialog (Inline) */}
+        <Dialog open={addCustomerDialogOpen} onOpenChange={setAddCustomerDialogOpen}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Add New Customer</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddNewCustomer} className="space-y-4">
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">Customer Name *</label>
+                  <Input
+                    value={newCustomerData.name}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, name: e.target.value })}
+                    placeholder="Enter customer name"
+                    required
+                  />
+                </div>
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">Company Name</label>
+                  <Input
+                    value={newCustomerData.company_name}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, company_name: e.target.value })}
+                    placeholder="Enter company name"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">Phone</label>
+                  <Input
+                    value={newCustomerData.phone}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, phone: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    placeholder="10-digit phone"
+                    maxLength={10}
+                  />
+                </div>
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">WhatsApp</label>
+                  <Input
+                    value={newCustomerData.whatsapp}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, whatsapp: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    placeholder="10-digit WhatsApp"
+                    maxLength={10}
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">Email</label>
+                  <Input
+                    type="email"
+                    value={newCustomerData.email}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, email: e.target.value })}
+                    placeholder="customer@example.com"
+                  />
+                </div>
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">City</label>
+                  <Input
+                    value={newCustomerData.city}
+                    onChange={(e) => setNewCustomerData({ ...newCustomerData, city: e.target.value })}
+                    placeholder="Enter city"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Address</label>
+                <Textarea
+                  value={newCustomerData.address}
+                  onChange={(e) => setNewCustomerData({ ...newCustomerData, address: e.target.value })}
+                  placeholder="Enter full address"
+                  rows={2}
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setAddCustomerDialogOpen(false)}>Cancel</Button>
+                <Button type="submit">Add Customer</Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
