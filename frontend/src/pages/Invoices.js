@@ -303,20 +303,22 @@ export default function Invoices() {
             {showDeleted ? 'Deleted Invoices' : 'Invoices'}
           </h1>
           <div className="flex gap-2">
-            <Button 
-              variant={showDeleted ? "default" : "outline"} 
-              size="sm" 
-              onClick={() => {
-                if (showDeleted) {
-                  setSearchParams({});
-                } else {
-                  setSearchParams({ view: 'deleted' });
-                }
-              }}
-              title={showDeleted ? "View Active Invoices" : "View Deleted Invoices"}
-            >
-              <Archive className="w-4 h-4" />
-            </Button>
+            {(deletedCount > 0 || showDeleted) && (
+              <Button 
+                variant={showDeleted ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => {
+                  if (showDeleted) {
+                    setSearchParams({});
+                  } else {
+                    setSearchParams({ view: 'deleted' });
+                  }
+                }}
+                title={showDeleted ? "View Active Invoices" : `View Deleted Invoices (${deletedCount})`}
+              >
+                <Archive className="w-4 h-4" />
+              </Button>
+            )}
             <Button onClick={() => setCreateDialogOpen(true)} className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
               Create Invoice
