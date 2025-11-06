@@ -192,23 +192,22 @@ export default function InvoiceProducts() {
             {showDeleted ? 'Deleted Products' : 'Products'}
           </h1>
           <div className="flex gap-2">
-            <Button 
-              variant={showDeleted ? "default" : "outline"} 
-              size="sm" 
-              onClick={() => {
-                if (showDeleted) {
-                  setSearchParams({});
-                } else {
-                  setSearchParams({ view: 'deleted' });
-                }
-              }}
-              title={showDeleted ? "View Active Products" : "View Deleted Products"}
-            >
-              <Archive className="w-4 h-4" />
-              {!showDeleted && deletedCount > 0 && (
-                <span className="ml-1 text-xs">({deletedCount})</span>
-              )}
-            </Button>
+            {(deletedCount > 0 || showDeleted) && (
+              <Button 
+                variant={showDeleted ? "default" : "outline"} 
+                size="sm" 
+                onClick={() => {
+                  if (showDeleted) {
+                    setSearchParams({});
+                  } else {
+                    setSearchParams({ view: 'deleted' });
+                  }
+                }}
+                title={showDeleted ? "View Active Products" : `View Deleted Products (${deletedCount})`}
+              >
+                <Archive className="w-4 h-4" />
+              </Button>
+            )}
             <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-2">
