@@ -260,12 +260,12 @@ export default function Estimates() {
               <DialogTitle>Create New Estimate</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleCreateEstimate} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
                   <label className="block text-sm font-medium mb-1">Customer *</label>
                   <Select value={estimateForm.customer_id} onValueChange={(value) => setEstimateForm({ ...estimateForm, customer_id: value })}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select customer" />
+                      <SelectValue placeholder="Select or add customer" />
                     </SelectTrigger>
                     <SelectContent>
                       {customers.map(customer => (
@@ -274,24 +274,37 @@ export default function Estimates() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
+                <div className="col-span-6">
                   <label className="block text-sm font-medium mb-1">Estimate Date *</label>
                   <Input
                     type="date"
                     value={estimateForm.estimate_date}
                     onChange={(e) => setEstimateForm({ ...estimateForm, estimate_date: e.target.value })}
+                    placeholder="Select estimate date"
                     required
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-1">Valid Until</label>
-                <Input
-                  type="date"
-                  value={estimateForm.valid_until}
-                  onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
-                />
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">Valid Until</label>
+                  <Input
+                    type="date"
+                    value={estimateForm.valid_until}
+                    onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
+                    placeholder="Valid until (default: 1 month)"
+                  />
+                </div>
+                <div className="col-span-6">
+                  <label className="block text-sm font-medium mb-1">Notes</label>
+                  <Textarea
+                    value={estimateForm.notes}
+                    onChange={(e) => setEstimateForm({ ...estimateForm, notes: e.target.value })}
+                    placeholder="Add any notes or terms..."
+                    rows={1}
+                  />
+                </div>
               </div>
 
               <div className="border-t pt-4">
