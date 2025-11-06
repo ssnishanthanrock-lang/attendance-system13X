@@ -225,6 +225,9 @@ class Product(BaseModel):
     unit: str = "pcs"  # pcs, kg, hrs, etc
     stock_quantity: float = 0
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    deleted: bool = False
+    deleted_at: Optional[str] = None
+    deleted_by: Optional[str] = None
 
 class InvoiceItem(BaseModel):
     model_config = ConfigDict(extra="ignore")
