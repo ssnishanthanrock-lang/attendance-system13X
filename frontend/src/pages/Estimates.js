@@ -44,15 +44,48 @@ export default function Estimates() {
     fetchEstimates();
     fetchCustomers();
     fetchProducts();
-  }, []);
+  }, [showDeleted]);
 
   const fetchEstimates = async () => {
     try {
-      const response = await api.get('/estimates');
+      const response = await api.get(`/estimates?include_deleted=${showDeleted}`);
       setEstimates(response.data);
     } catch (error) {
       toast.error('Failed to fetch estimates');
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteEstimate = async (estimateId) => {
+    if (!window.confirm('Are you sure you want to delete this estimate?')) return;
+    try {
+      await api.delete(`/estimates/${estimateId}`);
+      toast.success('Estimate deleted successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
+      fetchEstimates();
+    } catch (error) {
+      toast.error('Failed to delete estimate', {
+        style: { background: '#ef4444', color: 'white' }
+      });
+    }
+  };
+
+  const handleRestoreEstimate = async (estimateId) => {
+    if (!window.confirm('Are you sure you want to restore this estimate?')) return;
+    try {
+      await api.put(`/estimates/${estimateId}/restore`);
+      toast.success('Estimate restored successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
+      setLoading(true);
+      await fetchEstimates();
+      setLoading(false);
+    } catch (error) {
+      toast.error('Failed to restore estimate', {
+        style: { background: '#ef4444', color: 'white' }
+      });
       setLoading(false);
     }
   };
