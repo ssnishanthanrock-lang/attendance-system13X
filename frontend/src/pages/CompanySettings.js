@@ -13,12 +13,14 @@ import { Settings, Clock, Calendar, Plus, Trash2 } from 'lucide-react';
 
 export default function CompanySettings() {
   const [settings, setSettings] = useState(null);
+  const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [holidayForm, setHolidayForm] = useState({ date: '', name: '', type: 'public' });
 
   useEffect(() => {
     fetchSettings();
+    fetchCompanyInfo();
   }, []);
 
   const fetchSettings = async () => {
@@ -29,6 +31,15 @@ export default function CompanySettings() {
       toast.error('Failed to fetch settings');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCompanyInfo = async () => {
+    try {
+      const response = await api.get('/company');
+      setCompany(response.data);
+    } catch (error) {
+      console.error('Failed to fetch company info');
     }
   };
 
