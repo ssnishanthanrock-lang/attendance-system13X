@@ -1342,3 +1342,38 @@ agent_communication:
       - Verified all endpoints use correct HTTP status codes and error handling
       
       All 4 bug fixes are production-ready and working correctly. No critical issues found.
+
+  - agent: "main"
+    message: |
+      ✅ BUG FIX COMPLETED - Invoice/Estimate Date Fields Layout Issue
+      
+      ISSUE: Duplicate date columns showing in Invoice and Estimate forms
+      - User reported seeing extra date columns for Invoice Date and Due Date
+      - Forms were showing duplicate disabled inputs alongside the actual inputs
+      
+      ROOT CAUSE:
+      - Both Invoices.js and Estimates.js had duplicate date input fields
+      - Each date field had 2 inputs: one with label (active) and one disabled (duplicate)
+      - Layout was: col-span-3 (label+input) + col-span-3 (duplicate) = 6 columns per field
+      - Total: 4 × 3 = 12 columns showing duplicate fields
+      
+      FIX APPLIED:
+      1. ✅ Removed duplicate disabled inputs for Invoice Date and Due Date in Invoices.js
+      2. ✅ Removed duplicate disabled inputs for Estimate Date and Valid Until in Estimates.js
+      3. ✅ Cleaned up grid layout to show only one input per date field
+      4. ✅ Maintained proper 3x3 layout: 3 columns for Invoice/Estimate Date, 3 columns for Due/Valid Until Date
+      
+      CURRENT LAYOUT:
+      - Invoice Date (label + input): col-span-3
+      - Due Date (label + input): col-span-3
+      - Total: 6 columns used, clean 3x3 by 3x3 layout
+      
+      FILES MODIFIED:
+      - /app/frontend/src/pages/Invoices.js (lines 512-547 → lines 512-529)
+      - /app/frontend/src/pages/Estimates.js (lines 403-438 → lines 403-420)
+      
+      NEEDS TESTING:
+      - Invoice form date fields display correctly (no duplicates)
+      - Estimate form date fields display correctly (no duplicates)
+      - Date inputs are functional and editable
+      - Layout appears clean with proper spacing
