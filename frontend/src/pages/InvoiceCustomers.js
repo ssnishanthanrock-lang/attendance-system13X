@@ -32,6 +32,9 @@ export default function InvoiceCustomers() {
 
   useEffect(() => {
     fetchCustomers();
+    if (!showDeleted) {
+      fetchDeletedCount();
+    }
   }, [showDeleted]);
 
   const fetchCustomers = async () => {
@@ -42,6 +45,16 @@ export default function InvoiceCustomers() {
       toast.error('Failed to fetch customers');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDeletedCount = async () => {
+    try {
+      const response = await api.get('/customers?include_deleted=true');
+      const deleted = response.data.filter(c => c.deleted === true);
+      setDeletedCount(deleted.length);
+    } catch (error) {
+      console.error('Failed to fetch deleted count');
     }
   };
 
