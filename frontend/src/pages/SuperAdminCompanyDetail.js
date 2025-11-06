@@ -291,7 +291,23 @@ export default function SuperAdminCompanyDetail() {
               </div>
               <Switch
                 checked={smsSettings.sms_enabled}
-                onCheckedChange={(checked) => setSmsSettings({...smsSettings, sms_enabled: checked})}
+                onCheckedChange={async (checked) => {
+                  try {
+                    // Optimistically update UI
+                    setSmsSettings({...smsSettings, sms_enabled: checked});
+                    
+                    await api.put(`/superadmin/companies/${companyId}/sms`, {...smsSettings, sms_enabled: checked});
+                    toast.success(`SMS ${checked ? 'enabled' : 'disabled'} successfully`, {
+                      style: { background: '#10b981', color: 'white' }
+                    });
+                  } catch (error) {
+                    toast.error('Failed to update SMS status', {
+                      style: { background: '#ef4444', color: 'white' }
+                    });
+                    // Revert on error
+                    fetchCompany();
+                  }
+                }}
               />
             </div>
 
