@@ -96,14 +96,12 @@ export default function Estimates() {
       toast.success('Estimate restored successfully', {
         style: { background: '#10b981', color: 'white' }
       });
-      setLoading(true);
-      await fetchEstimates();
-      setLoading(false);
+      setEstimates(estimates.filter(e => e.id !== estimateId));
+      setDeletedCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       toast.error('Failed to restore estimate', {
         style: { background: '#ef4444', color: 'white' }
       });
-      setLoading(false);
     }
   };
 
