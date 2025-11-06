@@ -161,6 +161,9 @@ export default function InvoiceProducts() {
             Products
           </h1>
           <div className="flex gap-2">
+            <Button variant="outline" size="sm" title="View Deleted Products">
+              <Archive className="w-4 h-4" />
+            </Button>
             <Dialog open={categoryDialogOpen} onOpenChange={setCategoryDialogOpen}>
               <DialogTrigger asChild>
                 <Button variant="outline" className="flex items-center gap-2">
