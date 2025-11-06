@@ -48,22 +48,29 @@ export default function Estimates() {
     fetchEstimates();
     fetchCustomers();
     fetchProducts();
+    if (!showDeleted) {
+      fetchDeletedCount();
+    }
   }, [showDeleted]);
 
   const fetchEstimates = async () => {
     try {
       const response = await api.get(`/estimates?include_deleted=${showDeleted}`);
       setEstimates(response.data);
-      
-      // Fetch deleted count when viewing active estimates
-      if (!showDeleted) {
-        const deletedResponse = await api.get('/estimates?include_deleted=true&deleted_only=true');
-        setDeletedCount(deletedResponse.data.length);
-      }
     } catch (error) {
       toast.error('Failed to fetch estimates');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDeletedCount = async () => {
+    try {
+      const response = await api.get('/estimates?include_deleted=true');
+      const deleted = response.data.filter(e => e.deleted === true);
+      setDeletedCount(deleted.length);
+    } catch (error) {
+      console.error('Failed to fetch deleted count');
     }
   };
 
