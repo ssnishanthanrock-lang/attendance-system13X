@@ -140,8 +140,14 @@ export default function InvoiceCustomers() {
             Customers
           </h1>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" title="View Deleted Customers">
-              <Archive className="w-4 h-4" />
+            <Button 
+              variant={showDeleted ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setShowDeleted(!showDeleted)}
+              title={showDeleted ? "View Active Customers" : "View Deleted Customers"}
+            >
+              <Archive className="w-4 h-4 mr-1" />
+              {showDeleted ? 'Show Active' : 'Show Deleted'}
             </Button>
             <Dialog open={dialogOpen} onOpenChange={(open) => {
               setDialogOpen(open);
