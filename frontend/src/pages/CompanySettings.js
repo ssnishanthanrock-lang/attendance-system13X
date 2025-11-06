@@ -141,39 +141,32 @@ export default function CompanySettings() {
 
             {settings?.saturday_enabled && (
               <>
-                <div>
-                  <label className="text-sm font-medium">Saturday Type</label>
-                  <Select
-                    value={settings?.saturday_type || 'full'}
-                    onValueChange={(value) => handleUpdateSettings({ saturday_type: value })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="full">Full Day</SelectItem>
-                      <SelectItem value="half">Half Day</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                <Select
+                  value={settings?.saturday_type || 'full'}
+                  onValueChange={(value) => handleUpdateSettings({ saturday_type: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Saturday Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full">Full Day</SelectItem>
+                    <SelectItem value="half">Half Day</SelectItem>
+                  </SelectContent>
+                </Select>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Saturday Start</label>
-                    <Input
-                      type="time"
-                      value={settings?.saturday_start_time || '09:00'}
-                      onChange={(e) => handleUpdateSettings({ saturday_start_time: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Saturday End</label>
-                    <Input
-                      type="time"
-                      value={settings?.saturday_end_time || '14:00'}
-                      onChange={(e) => handleUpdateSettings({ saturday_end_time: e.target.value })}
-                    />
-                  </div>
+                  <Input
+                    type="time"
+                    placeholder="Saturday Start Time"
+                    value={settings?.saturday_start_time || '09:00'}
+                    onChange={(e) => handleUpdateSettings({ saturday_start_time: e.target.value })}
+                  />
+                  <Input
+                    type="time"
+                    placeholder="Saturday End Time"
+                    value={settings?.saturday_end_time || '14:00'}
+                    onChange={(e) => handleUpdateSettings({ saturday_end_time: e.target.value })}
+                  />
                 </div>
               </>
             )}
