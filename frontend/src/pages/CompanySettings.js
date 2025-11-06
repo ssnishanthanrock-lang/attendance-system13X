@@ -106,22 +106,18 @@ export default function CompanySettings() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium">Start Time</label>
-                <Input
-                  type="time"
-                  value={settings?.office_start_time || '09:00'}
-                  onChange={(e) => handleUpdateSettings({ office_start_time: e.target.value })}
-                />
-              </div>
-              <div>
-                <label className="text-sm font-medium">End Time</label>
-                <Input
-                  type="time"
-                  value={settings?.office_end_time || '17:00'}
-                  onChange={(e) => handleUpdateSettings({ office_end_time: e.target.value })}
-                />
-              </div>
+              <Input
+                type="time"
+                placeholder="Start Time"
+                value={settings?.office_start_time || '09:00'}
+                onChange={(e) => handleUpdateSettings({ office_start_time: e.target.value })}
+              />
+              <Input
+                type="time"
+                placeholder="End Time"
+                value={settings?.office_end_time || '17:00'}
+                onChange={(e) => handleUpdateSettings({ office_end_time: e.target.value })}
+              />
             </div>
           </CardContent>
         </Card>
