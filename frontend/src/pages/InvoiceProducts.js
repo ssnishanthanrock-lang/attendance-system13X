@@ -30,7 +30,7 @@ export default function InvoiceProducts() {
     description: '',
     price: '',
     unit: 'pcs',
-    stock_quantity: '0'
+    stock_quantity: ''
   });
   const [categoryName, setCategoryName] = useState('');
 
