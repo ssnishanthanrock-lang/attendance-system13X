@@ -210,10 +210,15 @@ export default function Invoices() {
           <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
             Invoices
           </h1>
-          <Button onClick={() => setCreateDialogOpen(true)} className="flex items-center gap-2">
-            <Plus className="w-4 h-4" />
-            Create Invoice
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" title="View Deleted Invoices">
+              <Archive className="w-4 h-4" />
+            </Button>
+            <Button onClick={() => setCreateDialogOpen(true)} className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Create Invoice
+            </Button>
+          </div>
         </div>
 
         {invoices.length >= 5 && (
