@@ -19,6 +19,7 @@ export default function InvoiceProducts() {
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [showDeleted, setShowDeleted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     category_id: '',
