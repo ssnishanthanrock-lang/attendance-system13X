@@ -2382,6 +2382,46 @@ async def convert_estimate_to_invoice(estimate_id: str, current_user: User = Dep
     
     return invoice.model_dump()
 
+@api_router.delete("/estimates/{estimate_id}")
+async def delete_estimate(estimate_id: str, current_user: User = Depends(get_current_user)):
+    """Soft delete estimate"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    estimate = await db.estimates.find_one({"id": estimate_id, "company_id": current_user.company_id})
+    if not estimate:
+        raise HTTPException(status_code=404, detail="Estimate not found")
+    
+    await db.estimates.update_one(
+        {"id": estimate_id, "company_id": current_user.company_id},
+        {"$set": {
+            "deleted": True,
+            "deleted_at": datetime.now(timezone.utc).isoformat(),
+            "deleted_by": current_user.name
+        }}
+    )
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "DELETE_ESTIMATE", f"Deleted estimate: {estimate['estimate_number']}")
+    
+    return {"message": "Estimate deleted successfully"}
+
+@api_router.put("/estimates/{estimate_id}/restore")
+async def restore_estimate(estimate_id: str, current_user: User = Depends(get_current_user)):
+    """Restore deleted estimate"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    estimate = await db.estimates.find_one({"id": estimate_id, "company_id": current_user.company_id, "deleted": True})
+    if not estimate:
+        raise HTTPException(status_code=404, detail="Deleted estimate not found")
+    
+    await db.estimates.update_one(
+        {"id": estimate_id, "company_id": current_user.company_id},
+        {"$set": {"deleted": False}, "$unset": {"deleted_at": "", "deleted_by": ""}}
+    )
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "RESTORE_ESTIMATE", f"Restored estimate: {estimate['estimate_number']}")
+    
+    return {"message": "Estimate restored successfully"}
+
 # Company invoice settings
 @api_router.put("/company/invoice-settings")
 async def update_invoice_settings(settings_data: dict, current_user: User = Depends(get_current_user)):
