@@ -318,7 +318,7 @@ export default function InvoiceProducts() {
                       <Input
                         type="number"
                         step="0.01"
-                        value={formData.stock_quantity}
+                        value={formData.stock_quantity === '' ? undefined : formData.stock_quantity}
                         onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
                         placeholder="Stock Qty"
                       />
