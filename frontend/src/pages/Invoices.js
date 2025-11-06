@@ -67,6 +67,7 @@ export default function Invoices() {
     fetchInvoices();
     fetchCustomers();
     fetchProducts();
+    fetchCategories();
     if (!showDeleted) {
       fetchDeletedCount();
     }
