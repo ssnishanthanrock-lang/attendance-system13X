@@ -932,6 +932,13 @@ class CompanySettings(BaseModel):
     saturday_end_time: str = "14:00"
     working_days_per_month: int = 26
     holidays: List[dict] = []
+    invoice_address: Optional[str] = None
+    invoice_mobile: Optional[str] = None
+    invoice_hotline: Optional[str] = None
+    bank_name: Optional[str] = None
+    bank_account_name: Optional[str] = None
+    bank_account_number: Optional[str] = None
+    bank_branch: Optional[str] = None
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class SettingsUpdate(BaseModel):
