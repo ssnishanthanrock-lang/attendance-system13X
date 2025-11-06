@@ -318,8 +318,9 @@ export default function Estimates() {
                         >
                           Restore
                         </Button>
-                        <div className="text-xs text-gray-500 flex items-center">
-                          Deleted {estimate.deleted_at ? new Date(estimate.deleted_at).toLocaleDateString() : ''}
+                        <div className="text-xs text-gray-500 flex flex-col items-end">
+                          <span>Deleted: {estimate.deleted_at ? new Date(estimate.deleted_at).toLocaleDateString() : ''}</span>
+                          {estimate.deleted_by && <span>By: {estimate.deleted_by}</span>}
                         </div>
                       </>
                     ) : (
