@@ -486,11 +486,11 @@ frontend:
 
   - task: "Estimate Form Date Fields Layout"
     implemented: true
-    working: true
+    working: "NA"
     file: "/app/frontend/src/pages/Estimates.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
