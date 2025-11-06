@@ -258,19 +258,17 @@ export default function InvoiceProducts() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-6">
-                      <label className="block text-sm font-medium mb-1">Product Name *</label>
                       <Input
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Enter product name"
+                        placeholder="Product Name *"
                         required
                       />
                     </div>
                     <div className="col-span-6">
-                      <label className="block text-sm font-medium mb-1">Category</label>
                       <Select value={formData.category_id || "none"} onValueChange={(value) => setFormData({ ...formData, category_id: value === "none" ? "" : value })}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
+                          <SelectValue placeholder="Category (Optional)" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="none">None</SelectItem>
@@ -283,32 +281,29 @@ export default function InvoiceProducts() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium mb-1">Description</label>
                     <Textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Enter product description"
+                      placeholder="Product Description"
                       rows={2}
                     />
                   </div>
                   
                   <div className="grid grid-cols-12 gap-4">
                     <div className="col-span-4">
-                      <label className="block text-sm font-medium mb-1">Price (Rs) *</label>
                       <Input
                         type="number"
                         step="0.01"
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                        placeholder="0.00"
+                        placeholder="Price (Rs) *"
                         required
                       />
                     </div>
                     <div className="col-span-4">
-                      <label className="block text-sm font-medium mb-1">Unit *</label>
                       <Select value={formData.unit} onValueChange={(value) => setFormData({ ...formData, unit: value })}>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select unit" />
+                          <SelectValue placeholder="Unit *" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="pcs">Pieces</SelectItem>
@@ -320,13 +315,12 @@ export default function InvoiceProducts() {
                       </Select>
                     </div>
                     <div className="col-span-4">
-                      <label className="block text-sm font-medium mb-1">Stock Qty</label>
                       <Input
                         type="number"
                         step="0.01"
                         value={formData.stock_quantity}
                         onChange={(e) => setFormData({ ...formData, stock_quantity: e.target.value })}
-                        placeholder="0"
+                        placeholder="Stock Qty"
                       />
                     </div>
                   </div>
