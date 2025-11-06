@@ -310,23 +310,40 @@ export default function InvoiceCustomers() {
                   )}
                   
                   <div className="flex gap-2 pt-2 border-t">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="flex-1"
-                      onClick={() => handleEdit(customer)}
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                      onClick={() => handleDelete(customer.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    {showDeleted ? (
+                      <>
+                        <Button
+                          size="sm"
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => handleRestore(customer.id)}
+                        >
+                          Restore
+                        </Button>
+                        <div className="text-xs text-gray-500 flex items-center">
+                          Deleted {customer.deleted_at ? new Date(customer.deleted_at).toLocaleDateString() : ''}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex-1"
+                          onClick={() => handleEdit(customer)}
+                        >
+                          <Edit className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDelete(customer.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </CardContent>
