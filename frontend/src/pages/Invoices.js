@@ -61,11 +61,11 @@ export default function Invoices() {
     fetchInvoices();
     fetchCustomers();
     fetchProducts();
-  }, []);
+  }, [showDeleted]);
 
   const fetchInvoices = async () => {
     try {
-      const response = await api.get('/invoices');
+      const response = await api.get(`/invoices?include_deleted=${showDeleted}`);
       setInvoices(response.data);
     } catch (error) {
       toast.error('Failed to fetch invoices');
