@@ -56,7 +56,11 @@ export default function Estimates() {
   const fetchEstimates = async () => {
     try {
       const response = await api.get(`/estimates?include_deleted=${showDeleted}`);
-      setEstimates(response.data);
+      // When viewing deleted, filter to show only deleted items
+      const filteredData = showDeleted 
+        ? response.data.filter(e => e.deleted === true)
+        : response.data;
+      setEstimates(filteredData);
     } catch (error) {
       toast.error('Failed to fetch estimates');
     } finally {
