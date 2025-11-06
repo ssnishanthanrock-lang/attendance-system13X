@@ -82,6 +82,20 @@ export default function SuperAdminCompanyDetail() {
     }
   };
 
+  const handleStatusChange = async (status) => {
+    try {
+      await api.put(`/superadmin/companies/${companyId}/status?status=${status}`);
+      toast.success(`Company status updated to ${status}`, {
+        style: { background: '#10b981', color: 'white' }
+      });
+      fetchCompany();
+    } catch (error) {
+      toast.error('Failed to update company status', {
+        style: { background: '#ef4444', color: 'white' }
+      });
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
