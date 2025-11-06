@@ -35,7 +35,7 @@ export default function Invoices() {
     name: '', company_name: '', email: '', phone: '', whatsapp: '', city: '', address: ''
   });
   const [newProductData, setNewProductData] = useState({
-    name: '', description: '', price: '', unit: 'pcs', stock_quantity: '0'
+    name: '', description: '', price: '', unit: 'pcs', stock_quantity: ''
   });
   
   const [invoiceForm, setInvoiceForm] = useState({
