@@ -15,6 +15,7 @@ export default function InvoiceCustomers() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showDeleted, setShowDeleted] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     company_name: '',
