@@ -146,8 +146,7 @@ export default function InvoiceCustomers() {
               onClick={() => setShowDeleted(!showDeleted)}
               title={showDeleted ? "View Active Customers" : "View Deleted Customers"}
             >
-              <Archive className="w-4 h-4 mr-1" />
-              {showDeleted ? 'Show Active' : 'Show Deleted'}
+              <Archive className="w-4 h-4" />
             </Button>
             <Dialog open={dialogOpen} onOpenChange={(open) => {
               setDialogOpen(open);
