@@ -256,6 +256,9 @@ class Invoice(BaseModel):
     created_by: str
     created_by_name: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    deleted: bool = False
+    deleted_at: Optional[str] = None
+    deleted_by: Optional[str] = None
 
 class Payment(BaseModel):
     model_config = ConfigDict(extra="ignore")
