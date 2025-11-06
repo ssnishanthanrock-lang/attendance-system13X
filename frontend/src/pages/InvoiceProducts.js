@@ -209,16 +209,17 @@ export default function InvoiceProducts() {
                   <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
+                  <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-6">
                       <label className="block text-sm font-medium mb-1">Product Name *</label>
                       <Input
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        placeholder="Enter product name"
                         required
                       />
                     </div>
-                    <div>
+                    <div className="col-span-6">
                       <label className="block text-sm font-medium mb-1">Category</label>
                       <Select value={formData.category_id || "none"} onValueChange={(value) => setFormData({ ...formData, category_id: value === "none" ? "" : value })}>
                         <SelectTrigger>
@@ -239,18 +240,20 @@ export default function InvoiceProducts() {
                     <Textarea
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Enter product description"
                       rows={2}
                     />
                   </div>
                   
-                  <div className="grid grid-cols-3 gap-4">
-                    <div>
+                  <div className="grid grid-cols-12 gap-4">
+                    <div className="col-span-4">
                       <label className="block text-sm font-medium mb-1">Price (Rs) *</label>
                       <Input
                         type="number"
                         step="0.01"
                         value={formData.price}
                         onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        placeholder="0.00"
                         required
                       />
                     </div>
