@@ -13,7 +13,11 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export default function Invoices() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showDeleted = searchParams.get('view') === 'deleted';
+  
   const [invoices, setInvoices] = useState([]);
+  const [deletedCount, setDeletedCount] = useState(0);
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,7 +27,6 @@ export default function Invoices() {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showDeleted, setShowDeleted] = useState(false);
   
   // Inline creation states
   const [addCustomerDialogOpen, setAddCustomerDialogOpen] = useState(false);
