@@ -265,16 +265,11 @@ export default function InvoiceCustomers() {
               <CardContent className="p-6">
                 <div className="space-y-3">
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <User className="w-6 h-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-gray-900">{customer.name}</h3>
-                        {customer.company_name && (
-                          <p className="text-xs text-gray-500">{customer.company_name}</p>
-                        )}
-                      </div>
+                    <div>
+                      <h3 className="font-bold text-gray-900">{customer.name}</h3>
+                      {customer.company_name && (
+                        <p className="text-xs text-gray-500">{customer.company_name}</p>
+                      )}
                     </div>
                   </div>
                   
