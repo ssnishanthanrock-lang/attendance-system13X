@@ -1940,6 +1940,24 @@ async def delete_customer(customer_id: str, current_user: User = Depends(get_cur
     
     return {"message": "Customer deleted successfully"}
 
+@api_router.put("/customers/{customer_id}/restore")
+async def restore_customer(customer_id: str, current_user: User = Depends(get_current_user)):
+    """Restore deleted customer"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or Manager access required")
+    
+    customer = await db.customers.find_one({"id": customer_id, "company_id": current_user.company_id, "deleted": True})
+    if not customer:
+        raise HTTPException(status_code=404, detail="Deleted customer not found")
+    
+    await db.customers.update_one(
+        {"id": customer_id, "company_id": current_user.company_id},
+        {"$set": {"deleted": False}, "$unset": {"deleted_at": "", "deleted_by": ""}}
+    )
+    await log_activity(current_user.company_id, current_user.id, current_user.name, "RESTORE_CUSTOMER", f"Restored customer: {customer['name']}")
+    
+    return {"message": "Customer restored successfully"}
+
 # Product Category endpoints
 @api_router.post("/product-categories")
 async def create_category(category_data: dict, current_user: User = Depends(get_current_user)):
