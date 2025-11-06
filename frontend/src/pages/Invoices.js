@@ -436,12 +436,21 @@ export default function Invoices() {
                       <label className="block text-xs font-medium mb-1">Product</label>
                       <Select
                         value={item.product_id || "custom"}
-                        onValueChange={(value) => updateInvoiceItem(index, 'product_id', value === "custom" ? "" : value)}
+                        onValueChange={(value) => {
+                          if (value === "add_new") {
+                            setAddProductDialogOpen(true);
+                          } else {
+                            updateInvoiceItem(index, 'product_id', value === "custom" ? "" : value);
+                          }
+                        }}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="add_new" className="text-blue-600 font-semibold">
+                            + Add New Product
+                          </SelectItem>
                           <SelectItem value="custom">Custom Item</SelectItem>
                           {products.map(product => (
                             <SelectItem key={product.id} value={product.id}>{product.name}</SelectItem>
