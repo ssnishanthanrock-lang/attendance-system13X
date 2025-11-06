@@ -363,16 +363,30 @@ export default function Invoices() {
               <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-6">
                   <label className="block text-sm font-medium mb-1">Customer *</label>
-                  <Select value={invoiceForm.customer_id} onValueChange={(value) => setInvoiceForm({ ...invoiceForm, customer_id: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select or add customer" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {customers.map(customer => (
-                        <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex gap-2">
+                    <Select 
+                      value={invoiceForm.customer_id} 
+                      onValueChange={(value) => {
+                        if (value === 'add_new') {
+                          setAddCustomerDialogOpen(true);
+                        } else {
+                          setInvoiceForm({ ...invoiceForm, customer_id: value });
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="flex-1">
+                        <SelectValue placeholder="Select or add customer" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="add_new" className="text-blue-600 font-semibold">
+                          + Add New Customer
+                        </SelectItem>
+                        {customers.map(customer => (
+                          <SelectItem key={customer.id} value={customer.id}>{customer.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
                 <div className="col-span-6">
                   <label className="block text-sm font-medium mb-1">Invoice Date *</label>
