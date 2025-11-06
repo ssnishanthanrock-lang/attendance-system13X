@@ -365,7 +365,7 @@ export default function CompanySettings() {
         </Card>
 
         {/* Invoice Settings - Only show if invoicing is enabled */}
-        {company && company.invoicing_enabled && (
+        {company && company.invoicing_enabled ? (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
