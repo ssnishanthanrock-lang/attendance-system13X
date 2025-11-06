@@ -289,7 +289,12 @@ export default function Invoices() {
             Invoices
           </h1>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" title="View Deleted Invoices">
+            <Button 
+              variant={showDeleted ? "default" : "outline"} 
+              size="sm" 
+              onClick={() => setShowDeleted(!showDeleted)}
+              title={showDeleted ? "View Active Invoices" : "View Deleted Invoices"}
+            >
               <Archive className="w-4 h-4" />
             </Button>
             <Button onClick={() => setCreateDialogOpen(true)} className="flex items-center gap-2">
