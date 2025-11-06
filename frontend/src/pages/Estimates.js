@@ -12,13 +12,16 @@ import { toast } from 'sonner';
 import { Plus, FileText, ArrowRight, Trash2, Archive } from 'lucide-react';
 
 export default function Estimates() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const showDeleted = searchParams.get('view') === 'deleted';
+  
   const [estimates, setEstimates] = useState([]);
+  const [deletedCount, setDeletedCount] = useState(0);
   const [customers, setCustomers] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [showDeleted, setShowDeleted] = useState(false);
   
   // Inline creation states
   const [addCustomerDialogOpen, setAddCustomerDialogOpen] = useState(false);
