@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
 import { Card, CardContent } from '../components/ui/card';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Package, FolderPlus } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, FolderPlus, Archive } from 'lucide-react';
 
 export default function InvoiceProducts() {
   const [products, setProducts] = useState([]);
