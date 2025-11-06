@@ -164,7 +164,7 @@ export default function Invoices() {
       const response = await api.post('/products', newProductData);
       toast.success('Product added successfully', { style: { background: '#10b981', color: 'white' } });
       setAddProductDialogOpen(false);
-      setNewProductData({ name: '', description: '', price: '', unit: 'pcs', stock_quantity: '0' });
+      setNewProductData({ name: '', description: '', price: '', unit: 'pcs', stock_quantity: '', category_id: '' });
       await fetchProducts();
       // Return the new product to be added to the invoice
       return response.data;
