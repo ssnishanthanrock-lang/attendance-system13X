@@ -357,24 +357,30 @@ export default function CompanySettings() {
                 These details will appear on your invoices and estimates
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  placeholder="Company Address"
-                  value={settings?.invoice_address || ''}
-                  onChange={(e) => handleUpdateSettings({ invoice_address: e.target.value })}
-                />
-                <Input
-                  placeholder="Mobile Number (10 digits)"
-                  value={settings?.invoice_mobile || ''}
-                  onChange={(e) => handleUpdateSettings({ invoice_mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                  maxLength={10}
-                />
-                <Input
-                  placeholder="Hotline (10 digits)"
-                  value={settings?.invoice_hotline || ''}
-                  onChange={(e) => handleUpdateSettings({ invoice_hotline: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                  maxLength={10}
-                />
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-6">
+                  <Input
+                    placeholder="Company Address"
+                    value={settings?.invoice_address || ''}
+                    onChange={(e) => handleUpdateSettings({ invoice_address: e.target.value })}
+                  />
+                </div>
+                <div className="col-span-3">
+                  <Input
+                    placeholder="Mobile Number (10 digits)"
+                    value={settings?.invoice_mobile || ''}
+                    onChange={(e) => handleUpdateSettings({ invoice_mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    maxLength={10}
+                  />
+                </div>
+                <div className="col-span-3">
+                  <Input
+                    placeholder="Hotline (10 digits)"
+                    value={settings?.invoice_hotline || ''}
+                    onChange={(e) => handleUpdateSettings({ invoice_hotline: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    maxLength={10}
+                  />
+                </div>
               </div>
 
               <div className="border-t pt-4 mt-4">
