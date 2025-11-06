@@ -977,6 +977,29 @@ export default function Invoices() {
             </form>
           </DialogContent>
         </Dialog>
+
+        {/* Add Category Dialog (Inline) */}
+        <Dialog open={addCategoryDialogOpen} onOpenChange={setAddCategoryDialogOpen}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Add New Category</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddNewCategory} className="space-y-4">
+              <div>
+                <Input
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder="Category Name *"
+                  required
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button type="button" variant="outline" onClick={() => setAddCategoryDialogOpen(false)}>Cancel</Button>
+                <Button type="submit">Add Category</Button>
+              </div>
+            </form>
+          </DialogContent>
+        </Dialog>
       </div>
     </Layout>
   );
