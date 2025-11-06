@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { toast } from 'sonner';
-import { Plus, FileText, Eye, DollarSign, Trash2, Filter } from 'lucide-react';
+import { Plus, FileText, Eye, DollarSign, Trash2, Filter, Archive } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Invoices() {
