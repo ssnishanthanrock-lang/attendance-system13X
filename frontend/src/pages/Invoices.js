@@ -482,7 +482,7 @@ export default function Invoices() {
             </DialogHeader>
             <form onSubmit={handleCreateInvoice} className="space-y-4">
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-6">
+                <div className="col-span-12">
                   <Select 
                     value={invoiceForm.customer_id} 
                     onValueChange={(value) => {
@@ -493,7 +493,7 @@ export default function Invoices() {
                       }
                     }}
                   >
-                    <SelectTrigger className="flex-1">
+                    <SelectTrigger>
                       <SelectValue placeholder="Customer *" />
                     </SelectTrigger>
                     <SelectContent>
@@ -506,6 +506,9 @@ export default function Invoices() {
                     </SelectContent>
                   </Select>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-3">
                   <label className="block text-xs font-medium mb-1">Invoice Date *</label>
                   <Input
@@ -516,6 +519,15 @@ export default function Invoices() {
                   />
                 </div>
                 <div className="col-span-3">
+                  <Input
+                    type="date"
+                    value={invoiceForm.invoice_date}
+                    onChange={(e) => setInvoiceForm({ ...invoiceForm, invoice_date: e.target.value })}
+                    disabled
+                    className="bg-gray-50"
+                  />
+                </div>
+                <div className="col-span-3">
                   <label className="block text-xs font-medium mb-1">Due Date</label>
                   <Input
                     type="date"
@@ -523,15 +535,13 @@ export default function Invoices() {
                     onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
                   />
                 </div>
-              </div>
-
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12">
-                  <Textarea
-                    value={invoiceForm.notes}
-                    onChange={(e) => setInvoiceForm({ ...invoiceForm, notes: e.target.value })}
-                    placeholder="Notes / Terms"
-                    rows={1}
+                <div className="col-span-3">
+                  <Input
+                    type="date"
+                    value={invoiceForm.due_date}
+                    onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
+                    disabled
+                    className="bg-gray-50"
                   />
                 </div>
               </div>
