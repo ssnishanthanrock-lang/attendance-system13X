@@ -196,10 +196,16 @@ class Customer(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     company_id: str
     name: str
+    company_name: Optional[str] = None
     email: Optional[str] = None
     phone: Optional[str] = None
+    whatsapp: Optional[str] = None
+    city: Optional[str] = None
     address: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    deleted: bool = False
+    deleted_at: Optional[str] = None
+    deleted_by: Optional[str] = None
 
 class ProductCategory(BaseModel):
     model_config = ConfigDict(extra="ignore")
