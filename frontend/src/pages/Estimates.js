@@ -170,14 +170,16 @@ export default function Estimates() {
           </Button>
         </div>
 
-        <div>
-          <Input
-            placeholder="Search by estimate number..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="max-w-md"
-          />
-        </div>
+        {estimates.length >= 5 && (
+          <div>
+            <Input
+              placeholder="Search by estimate number..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-md"
+            />
+          </div>
+        )}
 
         <div className="grid grid-cols-1 gap-4">
           {filteredEstimates.map((estimate) => (
