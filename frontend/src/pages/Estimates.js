@@ -411,29 +411,11 @@ export default function Estimates() {
                   />
                 </div>
                 <div className="col-span-3">
-                  <Input
-                    type="date"
-                    value={estimateForm.estimate_date}
-                    onChange={(e) => setEstimateForm({ ...estimateForm, estimate_date: e.target.value })}
-                    disabled
-                    className="bg-gray-50"
-                  />
-                </div>
-                <div className="col-span-3">
                   <label className="block text-xs font-medium mb-1">Valid Until</label>
                   <Input
                     type="date"
                     value={estimateForm.valid_until}
                     onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
-                  />
-                </div>
-                <div className="col-span-3">
-                  <Input
-                    type="date"
-                    value={estimateForm.valid_until}
-                    onChange={(e) => setEstimateForm({ ...estimateForm, valid_until: e.target.value })}
-                    disabled
-                    className="bg-gray-50"
                   />
                 </div>
               </div>
