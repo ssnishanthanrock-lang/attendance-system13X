@@ -91,16 +91,48 @@ export default function Invoices() {
     }
   };
 
+  // Inline customer creation
+  const handleAddNewCustomer = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/customers', newCustomerData);
+      toast.success('Customer added successfully', { style: { background: '#10b981', color: 'white' } });
+      setAddCustomerDialogOpen(false);
+      setNewCustomerData({ name: '', company_name: '', email: '', phone: '', whatsapp: '', city: '', address: '' });
+      await fetchCustomers();
+      // Auto-select the new customer
+      setInvoiceForm({ ...invoiceForm, customer_id: response.data.id });
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to add customer', { style: { background: '#ef4444', color: 'white' } });
+    }
+  };
+
+  // Inline product creation
+  const handleAddNewProduct = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/products', newProductData);
+      toast.success('Product added successfully', { style: { background: '#10b981', color: 'white' } });
+      setAddProductDialogOpen(false);
+      setNewProductData({ name: '', description: '', price: '', unit: 'pcs', stock_quantity: '0' });
+      await fetchProducts();
+      // Return the new product to be added to the invoice
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to add product', { style: { background: '#ef4444', color: 'white' } });
+    }
+  };
+
   const handleCreateInvoice = async (e) => {
     e.preventDefault();
     try {
       await api.post('/invoices', invoiceForm);
-      toast.success('Invoice created successfully');
+      toast.success('Invoice created successfully', { style: { background: '#10b981', color: 'white' } });
       setCreateDialogOpen(false);
       resetInvoiceForm();
       fetchInvoices();
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Failed to create invoice');
+      toast.error(error.response?.data?.detail || 'Failed to create invoice', { style: { background: '#ef4444', color: 'white' } });
     }
   };
 
