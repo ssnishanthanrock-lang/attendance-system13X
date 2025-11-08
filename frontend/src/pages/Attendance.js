@@ -1369,8 +1369,8 @@ export default function Attendance() {
             </div>
 
             {/* Employee List */}
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              <div className="grid grid-cols-12 gap-2 p-3 bg-gray-100 rounded font-semibold text-xs">
+            <div className="space-y-1 max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-12 gap-2 p-2 bg-gray-100 rounded font-semibold text-xs">
                 <div className="col-span-3">Employee</div>
                 <div className="col-span-2">Status</div>
                 <div className="col-span-7">Details</div>
@@ -1379,7 +1379,7 @@ export default function Attendance() {
               {employees.map((employee) => {
                 const empData = bulkAttendance[employee.id] || { status: 'present', check_in: '09:00', check_out: '17:00', leave_type: '' };
                 return (
-                  <div key={employee.id} className="grid grid-cols-12 gap-2 p-3 border rounded hover:bg-gray-50">
+                  <div key={employee.id} className="grid grid-cols-12 gap-2 p-2 border rounded hover:bg-gray-50">
                     <div className="col-span-3 flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
                         <User className="w-4 h-4 text-white" />
