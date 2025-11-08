@@ -560,8 +560,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Invoice Form Date Fields Layout"
-    - "Estimate Form Date Fields Layout"
+    - "AI-Powered Bulk Employee Import - Frontend UI"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
