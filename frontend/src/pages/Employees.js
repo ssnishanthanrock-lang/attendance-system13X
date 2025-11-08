@@ -267,6 +267,87 @@ export default function Employees() {
     });
   };
 
+
+  // Bulk import functions
+  const handleParseBulk = async () => {
+    if (!bulkImportText.trim()) {
+      toast.error('Please paste employee data');
+      return;
+    }
+
+    setParsingLoading(true);
+    try {
+      const response = await api.post('/employees/parse-bulk', { text: bulkImportText });
+      const employees = response.data.employees;
+      
+      // Add default values for missing fields
+      const employeesWithDefaults = employees.map(emp => ({
+        ...emp,
+        basic_salary: emp.basic_salary || 0,
+        allowances: emp.allowances || 0,
+        start_time: emp.start_time || defaultTimes.start_time,
+        finish_time: emp.finish_time || defaultTimes.finish_time,
+        fixed_salary: emp.fixed_salary || false,
+        employee_id: emp.employee_id || ''
+      }));
+      
+      setParsedEmployees(employeesWithDefaults);
+      toast.success(`Parsed ${employees.length} employees successfully!`);
+    } catch (error) {
+      console.error('Parse error:', error);
+      toast.error(error.response?.data?.detail || 'Failed to parse employee data');
+    } finally {
+      setParsingLoading(false);
+    }
+  };
+
+  const handleBulkImport = async () => {
+    if (parsedEmployees.length === 0) {
+      toast.error('No employees to import');
+      return;
+    }
+
+    // Validate that all required fields are filled
+    const missingRequired = parsedEmployees.some(emp => !emp.name || !emp.mobile);
+    if (missingRequired) {
+      toast.error('Please fill in all required fields (Name and Mobile) for all employees');
+      return;
+    }
+
+    setImportingLoading(true);
+    try {
+      const response = await api.post('/employees/bulk-import', { employees: parsedEmployees });
+      
+      toast.success(response.data.message);
+      
+      if (response.data.errors && response.data.errors.length > 0) {
+        console.error('Import errors:', response.data.errors);
+        toast.warning(`${response.data.errors.length} employees failed to import. Check console for details.`);
+      }
+      
+      // Close dialog and refresh employees
+      setBulkImportDialogOpen(false);
+      setBulkImportText('');
+      setParsedEmployees([]);
+      fetchEmployees();
+    } catch (error) {
+      console.error('Import error:', error);
+      toast.error(error.response?.data?.detail || 'Failed to import employees');
+    } finally {
+      setImportingLoading(false);
+    }
+  };
+
+  const updateParsedEmployee = (index, field, value) => {
+    const updated = [...parsedEmployees];
+    updated[index] = { ...updated[index], [field]: value };
+    setParsedEmployees(updated);
+  };
+
+  const removeParsedEmployee = (index) => {
+    setParsedEmployees(parsedEmployees.filter((_, i) => i !== index));
+  };
+
   const filteredEmployees = employees.filter(
     (emp) =>
       emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
