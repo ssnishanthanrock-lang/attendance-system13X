@@ -1391,7 +1391,7 @@ export default function Attendance() {
                         value={empData.status}
                         onValueChange={(value) => handleBulkAttendanceChange(employee.id, 'status', value)}
                       >
-                        <SelectTrigger className="h-9">
+                        <SelectTrigger className="h-8">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
