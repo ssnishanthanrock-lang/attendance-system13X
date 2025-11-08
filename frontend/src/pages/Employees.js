@@ -1018,10 +1018,10 @@ export default function Employees() {
 
       {/* Bulk Import Dialog */}
       <Dialog open={bulkImportDialogOpen} onOpenChange={setBulkImportDialogOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto relative">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           {/* Loading Overlay */}
           {parsingLoading && (
-            <div className="absolute inset-0 bg-blue-600 bg-opacity-90 flex items-center justify-center z-50 rounded-lg">
+            <div className="fixed inset-0 bg-blue-600 bg-opacity-90 flex items-center justify-center z-[60] rounded-lg">
               <div className="text-center">
                 <Loader2 className="w-16 h-16 text-white animate-spin mx-auto mb-4" />
                 <div className="text-white text-2xl font-bold">{parseCountdown}s</div>
