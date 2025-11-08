@@ -1548,17 +1548,17 @@ export default function Attendance() {
                   {Object.entries(monthlyAttendance).map(([date, data]) => {
                     const dateObj = new Date(date + 'T00:00:00');
                     const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-                    const dayNum = dateObj.getDate();
+                    const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     
                     return (
                       <div key={date} className="border rounded p-2 hover:bg-gray-50">
-                        <div className="flex items-center gap-2">
-                          <div className="w-16">
+                        <div className="grid grid-cols-12 gap-2 items-center">
+                          <div className="col-span-2">
                             <div className="font-semibold text-sm">{dayName}</div>
-                            <div className="text-xs text-gray-500">Day {dayNum}</div>
+                            <div className="text-xs text-gray-500">{formattedDate}</div>
                           </div>
                           
-                          <div className="flex-1">
+                          <div className="col-span-2">
                             <Select
                               value={data.status}
                               onValueChange={(value) => handleMonthlyAttendanceChange(date, 'status', value)}
@@ -1576,8 +1576,29 @@ export default function Attendance() {
                             </Select>
                           </div>
                           
-                          {data.status === 'leave' && (
-                            <div className="flex-1">
+                          <div className="col-span-8">
+                            {data.status === 'present' || data.status === 'half_day' ? (
+                              <div className="flex gap-2">
+                                <div className="flex-1">
+                                  <Input
+                                    type="time"
+                                    value={data.check_in}
+                                    onChange={(e) => handleMonthlyAttendanceChange(date, 'check_in', e.target.value)}
+                                    placeholder="Check In"
+                                    className="h-8 text-xs"
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <Input
+                                    type="time"
+                                    value={data.check_out}
+                                    onChange={(e) => handleMonthlyAttendanceChange(date, 'check_out', e.target.value)}
+                                    placeholder="Check Out"
+                                    className="h-8 text-xs"
+                                  />
+                                </div>
+                              </div>
+                            ) : data.status === 'leave' ? (
                               <Select
                                 value={data.leave_type}
                                 onValueChange={(value) => handleMonthlyAttendanceChange(date, 'leave_type', value)}
@@ -1592,8 +1613,12 @@ export default function Attendance() {
                                   <SelectItem value="other">Other</SelectItem>
                                 </SelectContent>
                               </Select>
-                            </div>
-                          )}
+                            ) : (
+                              <div className="text-xs text-gray-500 italic flex items-center h-8">
+                                No details
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     );
