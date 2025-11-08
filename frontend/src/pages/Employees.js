@@ -277,9 +277,26 @@ export default function Employees() {
     }
 
     setParsingLoading(true);
+    setParseCountdown(10); // Start from 10 seconds
+    
+    // Countdown timer
+    const countdownInterval = setInterval(() => {
+      setParseCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
     try {
       const response = await api.post('/employees/parse-bulk', { text: bulkImportText });
       const employees = response.data.employees;
+      
+      // Clear countdown immediately on success
+      clearInterval(countdownInterval);
+      setParseCountdown(0);
       
       // Add default values for missing fields
       const employeesWithDefaults = employees.map(emp => ({
@@ -295,6 +312,8 @@ export default function Employees() {
       setParsedEmployees(employeesWithDefaults);
       toast.success(`Parsed ${employees.length} employees successfully!`);
     } catch (error) {
+      clearInterval(countdownInterval);
+      setParseCountdown(0);
       console.error('Parse error:', error);
       toast.error(error.response?.data?.detail || 'Failed to parse employee data');
     } finally {
