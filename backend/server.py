@@ -129,6 +129,25 @@ class UserCreate(BaseModel):
     finish_time: Optional[str] = None
     fixed_salary: Optional[bool] = False
 
+
+class BulkEmployeeParsed(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    mobile: Optional[str] = None
+    role: Optional[str] = None
+    position: Optional[str] = None
+    department: Optional[str] = None
+    join_date: Optional[str] = None
+    basic_salary: Optional[float] = None
+    allowances: Optional[float] = None
+    start_time: Optional[str] = None
+    finish_time: Optional[str] = None
+    fixed_salary: Optional[bool] = False
+    error: Optional[str] = None  # To track any parsing errors
+
+class BulkEmployeeImportRequest(BaseModel):
+    employees: List[dict]  # List of employee dictionaries to import
+
 class OTPRequest(BaseModel):
     mobile: str
 
