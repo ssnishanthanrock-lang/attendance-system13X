@@ -1540,28 +1540,28 @@ export default function Attendance() {
             </div>
 
             {/* Calendar Grid */}
-            {monthlyEmployee && Object.keys(monthlyAttendance).length > 0 && (
-              <div className="space-y-4">
-                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            {Object.keys(monthlyAttendance).length > 0 && (
+              <div className="space-y-2">
+                <div className="space-y-1 max-h-[450px] overflow-y-auto">
                   {Object.entries(monthlyAttendance).map(([date, data]) => {
-                    const day = new Date(date).getDate();
-                    const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
-                    const fullDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    const dateObj = new Date(date + 'T00:00:00');
+                    const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+                    const dayNum = dateObj.getDate();
                     
                     return (
-                      <div key={date} className="border rounded p-3 hover:bg-gray-50">
-                        <div className="grid grid-cols-12 gap-3 items-center">
-                          <div className="col-span-2">
+                      <div key={date} className="border rounded p-2 hover:bg-gray-50">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16">
                             <div className="font-semibold text-sm">{dayName}</div>
-                            <div className="text-xs text-gray-500">{fullDate}</div>
+                            <div className="text-xs text-gray-500">Day {dayNum}</div>
                           </div>
                           
-                          <div className="col-span-2">
+                          <div className="flex-1">
                             <Select
                               value={data.status}
                               onValueChange={(value) => handleMonthlyAttendanceChange(date, 'status', value)}
                             >
-                              <SelectTrigger className="h-9">
+                              <SelectTrigger className="h-8">
                                 <SelectValue />
                               </SelectTrigger>
                               <SelectContent>
@@ -1574,52 +1574,24 @@ export default function Attendance() {
                             </Select>
                           </div>
                           
-                          <div className="col-span-8">
-                            {data.status === 'present' || data.status === 'half_day' ? (
-                              <div className="flex gap-2">
-                                <div className="flex-1">
-                                  <label className="text-xs text-gray-600">Check In</label>
-                                  <Input
-                                    type="time"
-                                    value={data.check_in}
-                                    onChange={(e) => handleMonthlyAttendanceChange(date, 'check_in', e.target.value)}
-                                    className="h-9 text-sm"
-                                  />
-                                </div>
-                                <div className="flex-1">
-                                  <label className="text-xs text-gray-600">Check Out</label>
-                                  <Input
-                                    type="time"
-                                    value={data.check_out}
-                                    onChange={(e) => handleMonthlyAttendanceChange(date, 'check_out', e.target.value)}
-                                    className="h-9 text-sm"
-                                  />
-                                </div>
-                              </div>
-                            ) : data.status === 'leave' ? (
-                              <div>
-                                <label className="text-xs text-gray-600">Leave Type</label>
-                                <Select
-                                  value={data.leave_type}
-                                  onValueChange={(value) => handleMonthlyAttendanceChange(date, 'leave_type', value)}
-                                >
-                                  <SelectTrigger className="h-9">
-                                    <SelectValue placeholder="Select Leave Type" />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="sick">Sick Leave</SelectItem>
-                                    <SelectItem value="casual">Casual Leave</SelectItem>
-                                    <SelectItem value="annual">Annual Leave</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-                            ) : (
-                              <div className="text-sm text-gray-500 italic flex items-center h-9">
-                                No details required
-                              </div>
-                            )}
-                          </div>
+                          {data.status === 'leave' && (
+                            <div className="flex-1">
+                              <Select
+                                value={data.leave_type}
+                                onValueChange={(value) => handleMonthlyAttendanceChange(date, 'leave_type', value)}
+                              >
+                                <SelectTrigger className="h-8">
+                                  <SelectValue placeholder="Leave Type" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="sick">Sick</SelectItem>
+                                  <SelectItem value="casual">Casual</SelectItem>
+                                  <SelectItem value="annual">Annual</SelectItem>
+                                  <SelectItem value="other">Other</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                          )}
                         </div>
                       </div>
                     );
