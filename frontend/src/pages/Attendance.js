@@ -600,8 +600,8 @@ export default function Attendance() {
         employee_id: monthlyEmployee,
         date: date,
         status: data.status,
-        check_in: '',
-        check_out: '',
+        check_in: data.check_in || '',
+        check_out: data.check_out || '',
         leave_type: data.leave_type || ''
       }));
 
