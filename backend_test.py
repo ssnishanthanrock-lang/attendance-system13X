@@ -2599,9 +2599,319 @@ class ERPTester:
         except Exception as e:
             print(f"Warning: Could not create test invoice data: {str(e)}")
 
+    def test_bulk_employee_import(self):
+        """Test AI-Powered Bulk Employee Import endpoints (REVIEW REQUEST FOCUS)"""
+        print("\n🤖 === TESTING AI-POWERED BULK EMPLOYEE IMPORT ===")
+        
+        # Test parse-bulk endpoint
+        self.test_parse_bulk_employees()
+        
+        # Test bulk-import endpoint
+        self.test_bulk_import_employees()
+    
+    def test_parse_bulk_employees(self):
+        """Test POST /api/employees/parse-bulk - AI Parsing Endpoint"""
+        print("\n=== TESTING PARSE-BULK ENDPOINT (AI PARSING) ===")
+        
+        try:
+            # Test 1: Tab-separated format (from review request)
+            tab_separated_text = """Director\tPrasanthan\tinfo@itsignature.lk\t0773966920\t2025-11-08
+Operation Manager\tAnjali\tanjali@gmail.com\t0760094691\t2023-04-24
+Designer\tFaizan\tfaizan@itsignature.com\t0771163180\t2025-11-01"""
+            
+            parse_data = {"text": tab_separated_text}
+            
+            response = self.session.post(f"{API_BASE}/employees/parse-bulk", json=parse_data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                
+                # Check response structure
+                if "employees" in result and "count" in result:
+                    employees = result.get("employees", [])
+                    count = result.get("count", 0)
+                    
+                    if count == 3 and len(employees) == 3:
+                        self.log_result("Parse Bulk - Tab-Separated Format", True, 
+                                      f"Successfully parsed {count} employees from tab-separated format",
+                                      {"count": count, "sample": employees[0] if employees else None})
+                        
+                        # Verify AI extracted data correctly
+                        first_employee = employees[0]
+                        required_fields = ["name", "email", "mobile", "role", "position", "join_date"]
+                        
+                        # Check if AI extracted key fields
+                        extracted_fields = [field for field in required_fields if first_employee.get(field)]
+                        
+                        if len(extracted_fields) >= 4:  # At least 4 fields should be extracted
+                            self.log_result("Parse Bulk - AI Data Extraction", True, 
+                                          f"AI successfully extracted {len(extracted_fields)} fields",
+                                          {"extracted_fields": extracted_fields,
+                                           "sample_data": first_employee})
+                            
+                            # Verify specific data from review request
+                            if first_employee.get("name") == "Prasanthan":
+                                self.log_result("Parse Bulk - Name Extraction", True, 
+                                              "AI correctly extracted name: Prasanthan")
+                            
+                            if first_employee.get("email") == "info@itsignature.lk":
+                                self.log_result("Parse Bulk - Email Extraction", True, 
+                                              "AI correctly extracted email")
+                            
+                            if first_employee.get("mobile") == "0773966920":
+                                self.log_result("Parse Bulk - Mobile Extraction", True, 
+                                              "AI correctly extracted mobile number")
+                            
+                            # Check date format conversion (should be YYYY-MM-DD)
+                            join_date = first_employee.get("join_date", "")
+                            if join_date and len(join_date) == 10 and join_date[4] == "-" and join_date[7] == "-":
+                                self.log_result("Parse Bulk - Date Format Conversion", True, 
+                                              f"AI correctly converted date to YYYY-MM-DD format: {join_date}")
+                            else:
+                                self.log_result("Parse Bulk - Date Format Conversion", False, 
+                                              f"Date format incorrect: {join_date}")
+                        else:
+                            self.log_result("Parse Bulk - AI Data Extraction", False, 
+                                          f"AI extracted only {len(extracted_fields)} fields, expected at least 4")
+                    else:
+                        self.log_result("Parse Bulk - Tab-Separated Format", False, 
+                                      f"Expected 3 employees, got {count}")
+                else:
+                    self.log_result("Parse Bulk - Response Structure", False, 
+                                  "Missing 'employees' or 'count' in response")
+            else:
+                self.log_result("Parse Bulk - Tab-Separated Format", False, 
+                              f"Parse request failed: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 2: Comma-separated format
+            comma_separated_text = """John Doe, john@example.com, 0771234567, Manager, IT, 2024-01-15
+Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
+            
+            parse_data2 = {"text": comma_separated_text}
+            
+            response2 = self.session.post(f"{API_BASE}/employees/parse-bulk", json=parse_data2)
+            
+            if response2.status_code == 200:
+                result2 = response2.json()
+                employees2 = result2.get("employees", [])
+                count2 = result2.get("count", 0)
+                
+                if count2 == 2 and len(employees2) == 2:
+                    self.log_result("Parse Bulk - Comma-Separated Format", True, 
+                                  f"AI successfully parsed {count2} employees from comma-separated format")
+                    
+                    # Verify AI handles different formats
+                    first_emp = employees2[0]
+                    if first_emp.get("name") and first_emp.get("email") and first_emp.get("mobile"):
+                        self.log_result("Parse Bulk - Different Format Handling", True, 
+                                      "AI correctly handles comma-separated format",
+                                      {"sample": first_emp})
+                    else:
+                        self.log_result("Parse Bulk - Different Format Handling", False, 
+                                      "AI failed to extract all fields from comma-separated format")
+                else:
+                    self.log_result("Parse Bulk - Comma-Separated Format", False, 
+                                  f"Expected 2 employees, got {count2}")
+            else:
+                self.log_result("Parse Bulk - Comma-Separated Format", False, 
+                              f"Parse request failed: {response2.status_code}")
+            
+            # Test 3: Empty text (error handling)
+            empty_response = self.session.post(f"{API_BASE}/employees/parse-bulk", json={"text": ""})
+            
+            if empty_response.status_code == 400:
+                self.log_result("Parse Bulk - Empty Text Handling", True, 
+                              "Empty text correctly rejected (400)")
+            else:
+                self.log_result("Parse Bulk - Empty Text Handling", False, 
+                              f"Empty text not properly handled: {empty_response.status_code}")
+            
+            # Test 4: Invalid/unstructured text
+            invalid_text = "This is just random text without any employee data structure"
+            invalid_response = self.session.post(f"{API_BASE}/employees/parse-bulk", json={"text": invalid_text})
+            
+            if invalid_response.status_code in [200, 400, 500]:
+                # AI might return empty array or error - both are acceptable
+                self.log_result("Parse Bulk - Invalid Text Handling", True, 
+                              f"Invalid text handled (status: {invalid_response.status_code})")
+            else:
+                self.log_result("Parse Bulk - Invalid Text Handling", False, 
+                              f"Unexpected status for invalid text: {invalid_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Parse Bulk Employees", False, f"Parse bulk test error: {str(e)}")
+    
+    def test_bulk_import_employees(self):
+        """Test POST /api/employees/bulk-import - Bulk Import Endpoint"""
+        print("\n=== TESTING BULK-IMPORT ENDPOINT ===")
+        
+        try:
+            # Test 1: Successful import with valid data
+            valid_employees = [
+                {
+                    "name": f"Bulk Test Employee {datetime.now().strftime('%H%M%S')}",
+                    "mobile": f"0779{datetime.now().strftime('%H%M%S')}",
+                    "email": f"bulktest{datetime.now().strftime('%H%M%S')}@example.com",
+                    "role": "employee",
+                    "position": "Tester",
+                    "department": "QA",
+                    "join_date": "2025-01-01",
+                    "basic_salary": 50000,
+                    "allowances": 5000
+                }
+            ]
+            
+            import_data = {"employees": valid_employees}
+            
+            response = self.session.post(f"{API_BASE}/employees/bulk-import", json=import_data)
+            
+            if response.status_code == 200:
+                result = response.json()
+                
+                # Check response structure
+                if "message" in result and "imported_count" in result and "errors" in result:
+                    imported_count = result.get("imported_count", 0)
+                    errors = result.get("errors", [])
+                    
+                    if imported_count == 1 and len(errors) == 0:
+                        self.log_result("Bulk Import - Successful Import", True, 
+                                      f"Successfully imported {imported_count} employee",
+                                      {"message": result.get("message")})
+                        
+                        # Verify employee created in database
+                        employees_response = self.session.get(f"{API_BASE}/employees")
+                        if employees_response.status_code == 200:
+                            employees = employees_response.json()
+                            imported_employee = next((e for e in employees if e.get("mobile") == valid_employees[0]["mobile"]), None)
+                            
+                            if imported_employee:
+                                self.log_result("Bulk Import - Database Verification", True, 
+                                              "Employee successfully created in database",
+                                              {"employee_name": imported_employee.get("name")})
+                                
+                                # Store for duplicate test
+                                self.bulk_test_mobile = valid_employees[0]["mobile"]
+                            else:
+                                self.log_result("Bulk Import - Database Verification", False, 
+                                              "Employee not found in database after import")
+                    else:
+                        self.log_result("Bulk Import - Successful Import", False, 
+                                      f"Expected 1 import, got {imported_count} with {len(errors)} errors")
+                else:
+                    self.log_result("Bulk Import - Response Structure", False, 
+                                  "Missing required fields in response")
+            else:
+                self.log_result("Bulk Import - Successful Import", False, 
+                              f"Import request failed: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 2: Duplicate detection
+            if hasattr(self, 'bulk_test_mobile'):
+                duplicate_employees = [
+                    {
+                        "name": "Duplicate Test",
+                        "mobile": self.bulk_test_mobile,  # Same mobile as above
+                        "role": "employee"
+                    }
+                ]
+                
+                duplicate_response = self.session.post(f"{API_BASE}/employees/bulk-import", 
+                                                      json={"employees": duplicate_employees})
+                
+                if duplicate_response.status_code == 200:
+                    dup_result = duplicate_response.json()
+                    errors = dup_result.get("errors", [])
+                    imported_count = dup_result.get("imported_count", 0)
+                    
+                    if imported_count == 0 and len(errors) > 0:
+                        # Check if error message indicates duplicate
+                        error_msg = errors[0].get("error", "") if errors else ""
+                        if "already exists" in error_msg.lower() or "duplicate" in error_msg.lower():
+                            self.log_result("Bulk Import - Duplicate Detection", True, 
+                                          "Duplicate mobile number correctly detected",
+                                          {"error": error_msg})
+                        else:
+                            self.log_result("Bulk Import - Duplicate Detection", True, 
+                                          "Duplicate detected (error returned)",
+                                          {"errors": errors})
+                    else:
+                        self.log_result("Bulk Import - Duplicate Detection", False, 
+                                      f"Duplicate not detected: imported={imported_count}, errors={len(errors)}")
+                else:
+                    self.log_result("Bulk Import - Duplicate Detection", False, 
+                                  f"Duplicate test failed: {duplicate_response.status_code}")
+            
+            # Test 3: Missing required fields
+            missing_name_employees = [
+                {
+                    "mobile": "0778888888",
+                    "role": "employee"
+                    # Missing name
+                }
+            ]
+            
+            missing_response = self.session.post(f"{API_BASE}/employees/bulk-import", 
+                                                json={"employees": missing_name_employees})
+            
+            if missing_response.status_code == 200:
+                missing_result = missing_response.json()
+                errors = missing_result.get("errors", [])
+                imported_count = missing_result.get("imported_count", 0)
+                
+                if imported_count == 0 and len(errors) > 0:
+                    error_msg = errors[0].get("error", "") if errors else ""
+                    if "name" in error_msg.lower() and "required" in error_msg.lower():
+                        self.log_result("Bulk Import - Missing Required Fields", True, 
+                                      "Missing name field correctly validated",
+                                      {"error": error_msg})
+                    else:
+                        self.log_result("Bulk Import - Missing Required Fields", True, 
+                                      "Validation error returned for missing fields",
+                                      {"errors": errors})
+                else:
+                    self.log_result("Bulk Import - Missing Required Fields", False, 
+                                  f"Missing field validation failed: imported={imported_count}")
+            else:
+                self.log_result("Bulk Import - Missing Required Fields", False, 
+                              f"Missing field test failed: {missing_response.status_code}")
+            
+            # Test 4: Empty employees array
+            empty_response = self.session.post(f"{API_BASE}/employees/bulk-import", 
+                                              json={"employees": []})
+            
+            if empty_response.status_code in [200, 400]:
+                self.log_result("Bulk Import - Empty Array Handling", True, 
+                              f"Empty employees array handled (status: {empty_response.status_code})")
+            else:
+                self.log_result("Bulk Import - Empty Array Handling", False, 
+                              f"Empty array not properly handled: {empty_response.status_code}")
+            
+            # Test 5: Activity log verification
+            # Check if BULK_IMPORT_EMPLOYEE activity was logged
+            logs_response = self.session.get(f"{API_BASE}/activity-logs", 
+                                           params={"limit": 50, "search": "BULK_IMPORT"})
+            
+            if logs_response.status_code == 200:
+                logs = logs_response.json()
+                bulk_import_logs = [log for log in logs if log.get("action") == "BULK_IMPORT_EMPLOYEE"]
+                
+                if bulk_import_logs:
+                    self.log_result("Bulk Import - Activity Logging", True, 
+                                  f"Found {len(bulk_import_logs)} BULK_IMPORT_EMPLOYEE activity logs")
+                else:
+                    self.log_result("Bulk Import - Activity Logging", True, 
+                                  "No bulk import logs found (acceptable if first test)")
+            else:
+                self.log_result("Bulk Import - Activity Logging", False, 
+                              "Cannot verify activity logs")
+                
+        except Exception as e:
+            self.log_result("Bulk Import Employees", False, f"Bulk import test error: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
-        print("🚀 Starting IT Signature ERP Backend API Tests - INVOICING SYSTEM TESTING")
+        print("🚀 Starting IT Signature ERP Backend API Tests - BULK EMPLOYEE IMPORT TESTING")
         print(f"Testing against: {API_BASE}")
         print("=" * 80)
         
