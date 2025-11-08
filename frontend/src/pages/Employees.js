@@ -422,6 +422,17 @@ export default function Employees() {
               Bulk Import (AI)
             </Button>
             
+            {/* View Failed Imports Button */}
+            {failedImports.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={() => setShowFailedDialog(true)}
+                className="bg-red-600 hover:bg-red-700 text-white"
+              >
+                View Failed ({failedImports.length})
+              </Button>
+            )}
+            
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button
