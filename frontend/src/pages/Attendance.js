@@ -515,10 +515,13 @@ export default function Attendance() {
     setBulkDate(currentDate.toISOString().split('T')[0]);
   };
 
-  const handleBulkAttendanceChange = (employeeId, status) => {
+  const handleBulkAttendanceChange = (employeeId, field, value) => {
     setBulkAttendance(prev => ({
       ...prev,
-      [employeeId]: status
+      [employeeId]: {
+        ...(prev[employeeId] || { status: 'present', check_in: '09:00', check_out: '17:00', leave_type: '' }),
+        [field]: value
+      }
     }));
   };
 
