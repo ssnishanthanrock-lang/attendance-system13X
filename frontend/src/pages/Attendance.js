@@ -583,10 +583,13 @@ export default function Attendance() {
     setMonthlyAttendance(monthlyData);
   };
 
-  const handleMonthlyAttendanceChange = (date, status) => {
+  const handleMonthlyAttendanceChange = (date, field, value) => {
     setMonthlyAttendance(prev => ({
       ...prev,
-      [date]: status
+      [date]: {
+        ...(prev[date] || { status: 'present', check_in: '09:00', check_out: '17:00', leave_type: '' }),
+        [field]: value
+      }
     }));
   };
 
