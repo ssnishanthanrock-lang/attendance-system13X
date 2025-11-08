@@ -9,7 +9,7 @@ import { Switch } from '../components/ui/switch';
 import { Card, CardContent } from '../components/ui/card';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Search, TrendingUp, History, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, TrendingUp, History, Upload, Loader2 } from 'lucide-react';
 import { capitalizeName } from '../utils/helpers';
 import { canEditInImpersonation, isImpersonating } from '../utils/impersonation';
 
@@ -1017,7 +1017,18 @@ export default function Employees() {
 
       {/* Bulk Import Dialog */}
       <Dialog open={bulkImportDialogOpen} onOpenChange={setBulkImportDialogOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto relative !bg-white z-[100]">
+          {/* Loading Overlay */}
+          {parsingLoading && (
+            <div className="absolute inset-0 bg-blue-600 bg-opacity-90 flex items-center justify-center z-50 rounded-lg">
+              <div className="text-center">
+                <Loader2 className="w-16 h-16 text-white animate-spin mx-auto mb-4" />
+                <div className="text-white text-2xl font-bold">{parseCountdown}s</div>
+                <div className="text-white text-sm mt-2">Parsing with AI...</div>
+              </div>
+            </div>
+          )}
+          
           <DialogHeader>
             <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>
               Bulk Import Employees (AI-Powered)
@@ -1061,7 +1072,7 @@ Operation Manager       Anjali  anjali@gmail.com        0760094691      2023/04/
                     disabled={parsingLoading || !bulkImportText.trim()}
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                   >
-                    {parsingLoading ? 'Parsing with AI...' : 'Parse with AI'}
+                    Parse with AI
                   </Button>
                 </div>
               </>
