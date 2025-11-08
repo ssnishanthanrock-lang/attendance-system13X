@@ -596,13 +596,13 @@ export default function Attendance() {
   const handleSaveMonthlyAttendance = async () => {
     setSavingMonthly(true);
     try {
-      const attendanceRecords = Object.entries(monthlyAttendance).map(([date, status]) => ({
+      const attendanceRecords = Object.entries(monthlyAttendance).map(([date, data]) => ({
         employee_id: monthlyEmployee,
         date: date,
-        status: status,
-        check_in: status === 'present' ? '09:00' : '',
-        check_out: status === 'present' ? '17:00' : '',
-        leave_type: status === 'leave' ? 'casual' : ''
+        status: data.status,
+        check_in: data.check_in || '',
+        check_out: data.check_out || '',
+        leave_type: data.leave_type || ''
       }));
 
       // Save all records
