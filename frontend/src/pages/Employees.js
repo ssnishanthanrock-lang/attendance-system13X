@@ -352,6 +352,8 @@ export default function Employees() {
           index: err.index
         }));
         setFailedImports(failedWithData);
+        // Save to localStorage
+        localStorage.setItem('failedImports', JSON.stringify(failedWithData));
         
         // Show error toast
         toast.error(`${response.data.errors.length} employees failed to import. Opening details...`, {
