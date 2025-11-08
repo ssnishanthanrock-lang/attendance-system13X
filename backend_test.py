@@ -2919,16 +2919,23 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
         auth_success = self.test_authentication()
         
         if auth_success:
-            # Run Super Admin Tests (REVIEW REQUEST FOCUS)
+            # Run Bulk Employee Import Tests (REVIEW REQUEST FOCUS)
             print("\n" + "="*80)
-            print("👑 TESTING SUPER ADMIN FUNCTIONALITY (REVIEW REQUEST FOCUS)")
+            print("🤖 TESTING AI-POWERED BULK EMPLOYEE IMPORT (REVIEW REQUEST FOCUS)")
+            print("="*80)
+            
+            self.test_bulk_employee_import()
+            
+            # Run Super Admin Tests (Previous)
+            print("\n" + "="*80)
+            print("👑 TESTING SUPER ADMIN FUNCTIONALITY (Previous)")
             print("="*80)
             
             self.test_super_admin_functionality()
             
-            # Run Invoicing System Tests (REVIEW REQUEST FOCUS)
+            # Run Invoicing System Tests (Previous)
             print("\n" + "="*80)
-            print("🧾 TESTING INVOICING SYSTEM (REVIEW REQUEST FOCUS)")
+            print("🧾 TESTING INVOICING SYSTEM (Previous)")
             print("="*80)
             
             self.test_invoicing_system()
