@@ -1372,38 +1372,85 @@ export default function Attendance() {
 
             {/* Employee List */}
             <div className="space-y-2 max-h-96 overflow-y-auto">
-              <div className="grid grid-cols-12 gap-4 p-3 bg-gray-100 rounded font-semibold text-sm">
-                <div className="col-span-6">Employee</div>
-                <div className="col-span-6">Status</div>
+              <div className="grid grid-cols-12 gap-2 p-3 bg-gray-100 rounded font-semibold text-xs">
+                <div className="col-span-3">Employee</div>
+                <div className="col-span-2">Status</div>
+                <div className="col-span-7">Details</div>
               </div>
               
-              {employees.map((employee) => (
-                <div key={employee.id} className="grid grid-cols-12 gap-4 p-3 border rounded hover:bg-gray-50">
-                  <div className="col-span-6 flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                      <User className="w-4 h-4 text-white" />
+              {employees.map((employee) => {
+                const empData = bulkAttendance[employee.id] || { status: 'present', check_in: '09:00', check_out: '17:00', leave_type: '' };
+                return (
+                  <div key={employee.id} className="grid grid-cols-12 gap-2 p-3 border rounded hover:bg-gray-50">
+                    <div className="col-span-3 flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="font-medium text-sm">{employee.name}</span>
                     </div>
-                    <span className="font-medium">{employee.name}</span>
+                    <div className="col-span-2">
+                      <Select
+                        value={empData.status}
+                        onValueChange={(value) => handleBulkAttendanceChange(employee.id, 'status', value)}
+                      >
+                        <SelectTrigger className="h-9">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="present">Present</SelectItem>
+                          <SelectItem value="leave">Leave</SelectItem>
+                          <SelectItem value="half_day">Half Day</SelectItem>
+                          <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
+                          <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="col-span-7">
+                      {empData.status === 'present' || empData.status === 'half_day' ? (
+                        <div className="flex gap-2">
+                          <div className="flex-1">
+                            <Input
+                              type="time"
+                              value={empData.check_in}
+                              onChange={(e) => handleBulkAttendanceChange(employee.id, 'check_in', e.target.value)}
+                              placeholder="Check In"
+                              className="h-9 text-sm"
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <Input
+                              type="time"
+                              value={empData.check_out}
+                              onChange={(e) => handleBulkAttendanceChange(employee.id, 'check_out', e.target.value)}
+                              placeholder="Check Out"
+                              className="h-9 text-sm"
+                            />
+                          </div>
+                        </div>
+                      ) : empData.status === 'leave' ? (
+                        <Select
+                          value={empData.leave_type}
+                          onValueChange={(value) => handleBulkAttendanceChange(employee.id, 'leave_type', value)}
+                        >
+                          <SelectTrigger className="h-9">
+                            <SelectValue placeholder="Select Leave Type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="sick">Sick Leave</SelectItem>
+                            <SelectItem value="casual">Casual Leave</SelectItem>
+                            <SelectItem value="annual">Annual Leave</SelectItem>
+                            <SelectItem value="other">Other</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <div className="text-sm text-gray-500 italic flex items-center h-9">
+                          No details required
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="col-span-6">
-                    <Select
-                      value={bulkAttendance[employee.id] || 'present'}
-                      onValueChange={(value) => handleBulkAttendanceChange(employee.id, value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="present">Present</SelectItem>
-                        <SelectItem value="leave">Leave</SelectItem>
-                        <SelectItem value="half_day">Half Day</SelectItem>
-                        <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
-                        <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Action Buttons */}
