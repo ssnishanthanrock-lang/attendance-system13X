@@ -626,21 +626,21 @@ export default function Employees() {
                       onChange={(e) => setFormData({ ...formData, profile_picture: e.target.files[0] })}
                       placeholder="Upload Profile Picture"
                     />
+                    </div>
                   </div>
-                </div>
-                <div className="flex justify-end gap-2 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button
-                    data-testid="save-employee-button"
-                    type="submit"
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                  >
-                    {editingEmployee ? 'Update' : 'Create'}
-                  </Button>
-                </div>
-              </form>
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button
+                      data-testid="save-employee-button"
+                      type="submit"
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                    >
+                      {editingEmployee ? 'Update' : 'Create'}
+                    </Button>
+                  </div>
+                </form>
             </DialogContent>
           </Dialog>
         </div>
