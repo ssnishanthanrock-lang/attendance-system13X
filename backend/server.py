@@ -1087,7 +1087,7 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         today_str = datetime.now(timezone.utc).date().isoformat()
         all_active_employees = await db.users.find({
             "company_id": current_user.company_id,
-            "role": {"$in": ["employee", "staff_member", "manager"]},
+            "role": {"$ne": "super_admin"},  # Exclude only super_admin, include all company users
             "$or": [
                 {"is_active": True},  # is_active = True
                 {"is_active": {"$exists": False}}  # or is_active field doesn't exist (default active)
