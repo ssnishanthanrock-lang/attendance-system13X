@@ -550,11 +550,19 @@ async def send_otp(request: OTPRequest):
 
 @api_router.post("/auth/verify-otp")
 async def verify_otp(request: OTPVerify):
-    otp_doc = await db.otps.find_one(
-        {"mobile": request.mobile, "otp": request.otp, "verified": False},
-        {"_id": 0},
-        sort=[("created_at", -1)]
-    )
+    # If login_as is provided (role selection), allow already verified OTPs
+    if request.login_as:
+        otp_doc = await db.otps.find_one(
+            {"mobile": request.mobile, "otp": request.otp},
+            {"_id": 0},
+            sort=[("created_at", -1)]
+        )
+    else:
+        otp_doc = await db.otps.find_one(
+            {"mobile": request.mobile, "otp": request.otp, "verified": False},
+            {"_id": 0},
+            sort=[("created_at", -1)]
+        )
     
     # Check for multiple roles first to log invalid OTP with correct user context
     users = await db.users.find({"mobile": request.mobile}, {"_id": 0}).to_list(10)
