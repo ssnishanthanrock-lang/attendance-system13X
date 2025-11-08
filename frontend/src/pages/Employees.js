@@ -792,7 +792,6 @@ export default function Employees() {
                     </div>
                   )}
                 </div>
-                </div>
               </CardContent>
             </Card>
           ))}
