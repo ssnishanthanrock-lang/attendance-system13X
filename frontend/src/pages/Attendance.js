@@ -494,6 +494,115 @@ export default function Attendance() {
     }
   };
 
+  // Daily bulk attendance functions
+  const handleDailyBulkOpen = () => {
+    // Initialize bulk attendance with all employees
+    const initialBulk = {};
+    employees.forEach(emp => {
+      initialBulk[emp.id] = 'present';
+    });
+    setBulkAttendance(initialBulk);
+    setDailyBulkOpen(true);
+  };
+
+  const handleBulkDateChange = (direction) => {
+    const currentDate = new Date(bulkDate);
+    if (direction === 'prev') {
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else {
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+    setBulkDate(currentDate.toISOString().split('T')[0]);
+  };
+
+  const handleBulkAttendanceChange = (employeeId, status) => {
+    setBulkAttendance(prev => ({
+      ...prev,
+      [employeeId]: status
+    }));
+  };
+
+  const handleSaveBulkAttendance = async () => {
+    setSavingBulk(true);
+    try {
+      const attendanceRecords = Object.entries(bulkAttendance).map(([employeeId, status]) => ({
+        employee_id: employeeId,
+        date: bulkDate,
+        status: status,
+        check_in: status === 'present' ? '09:00' : '',
+        check_out: status === 'present' ? '17:00' : '',
+        leave_type: status === 'leave' ? 'casual' : ''
+      }));
+
+      // Save all records
+      for (const record of attendanceRecords) {
+        await api.post('/attendance', record);
+      }
+
+      toast.success(`Bulk attendance saved for ${bulkDate}`);
+      setDailyBulkOpen(false);
+      fetchAttendance();
+    } catch (error) {
+      toast.error('Failed to save bulk attendance');
+    } finally {
+      setSavingBulk(false);
+    }
+  };
+
+  // Monthly attendance functions
+  const handleMonthlyOpen = () => {
+    setMonthlyOpen(true);
+    if (monthlyEmployee) {
+      generateMonthlyAttendance();
+    }
+  };
+
+  const generateMonthlyAttendance = () => {
+    const [year, month] = monthlyMonth.split('-');
+    const daysInMonth = new Date(year, month, 0).getDate();
+    const monthlyData = {};
+    
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = `${year}-${month.padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      monthlyData[date] = 'present';
+    }
+    
+    setMonthlyAttendance(monthlyData);
+  };
+
+  const handleMonthlyAttendanceChange = (date, status) => {
+    setMonthlyAttendance(prev => ({
+      ...prev,
+      [date]: status
+    }));
+  };
+
+  const handleSaveMonthlyAttendance = async () => {
+    setSavingMonthly(true);
+    try {
+      const attendanceRecords = Object.entries(monthlyAttendance).map(([date, status]) => ({
+        employee_id: monthlyEmployee,
+        date: date,
+        status: status,
+        check_in: status === 'present' ? '09:00' : '',
+        check_out: status === 'present' ? '17:00' : '',
+        leave_type: status === 'leave' ? 'casual' : ''
+      }));
+
+      // Save all records
+      for (const record of attendanceRecords) {
+        await api.post('/attendance', record);
+      }
+
+      toast.success(`Monthly attendance saved for ${monthlyMonth}`);
+      setMonthlyOpen(false);
+      fetchAttendance();
+    } catch (error) {
+      toast.error('Failed to save monthly attendance');
+    } finally {
+      setSavingMonthly(false);
+    }
+  };
 
   const isAdmin = user?.role === 'admin' || user?.role === 'manager';
 
