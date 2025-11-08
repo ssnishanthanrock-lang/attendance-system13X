@@ -367,6 +367,19 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Employee ID successfully hidden from both desktop and mobile sidebars. Desktop sidebar shows 'Test Admin' and 'Admin' (2 lines only). Mobile sidebar shows 'Test Adminadmin' (name and role only). No employee ID visible in user info sections."
+
+  - task: "AI-Powered Bulk Employee Import - Frontend UI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/Employees.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added Bulk Import (AI) button with green gradient on Employees page. Created modal dialog with two steps: (1) Textarea to paste employee data with 'Parse with AI' button, (2) Editable table showing parsed employees with all fields (name, email, mobile, role, position, department, join_date, salary). Admin can review, edit, and remove employees before confirming import. Missing required fields (name, mobile) highlighted in red. Includes loading states, success/error toasts, and 'Back to Paste' option. Uses Upload icon from lucide-react."
+
   
   - task: "Attendance View Deleted icon button"
     implemented: true
