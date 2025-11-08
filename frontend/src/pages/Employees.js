@@ -626,8 +626,8 @@ export default function Employees() {
                         onChange={(e) => setFormData({ ...formData, profile_picture: e.target.files[0] })}
                         placeholder="Upload Profile Picture"
                       />
-                      </div>
                     </div>
+                  </div>
                   <div className="flex justify-end gap-2 pt-4">
                     <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                       Cancel
