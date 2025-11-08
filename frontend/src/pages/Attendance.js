@@ -636,6 +636,35 @@ export default function Attendance() {
               </Button>
             )}
             
+            {/* Bulk Attendance Buttons */}
+            {isAdmin && (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDailyBulkOpen}
+                  disabled={!canEdit}
+                  title={!canEdit ? "Read-only access" : "Add attendance for all employees on a specific date"}
+                  className="text-blue-600 hover:text-blue-700 border-blue-300 hover:bg-blue-50"
+                >
+                  <Users className="w-4 h-4 mr-2" />
+                  Daily Bulk
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleMonthlyOpen}
+                  disabled={!canEdit}
+                  title={!canEdit ? "Read-only access" : "Add monthly attendance for one employee"}
+                  className="text-green-600 hover:text-green-700 border-green-300 hover:bg-green-50"
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Monthly
+                </Button>
+              </>
+            )}
+            
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
