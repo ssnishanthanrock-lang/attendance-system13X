@@ -503,27 +503,28 @@ export default function Attendance() {
           </h1>
           <div className="flex gap-2">
             {isAdmin && hasDeletedAttendance && (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigate('/deleted-attendance')}
-                  className="text-gray-600 hover:text-gray-800"
-                  title="View Deleted Attendance"
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/deleted-attendance')}
+                className="text-gray-600 hover:text-gray-800"
+                title="View Deleted Attendance"
+              >
+                <Archive className="w-4 h-4" />
+              </Button>
+            )}
+            
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  className="bg-gradient-to-r from-blue-600 to-indigo-600"
+                  disabled={!canEdit}
+                  title={!canEdit ? "Read-only access - Cannot add attendance" : ""}
                 >
-                  <Archive className="w-4 h-4" />
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Manual Attendance
                 </Button>
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button 
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600"
-                      disabled={!canEdit}
-                      title={!canEdit ? "Read-only access - Cannot add attendance" : ""}
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Manual Attendance
-                    </Button>
-                  </DialogTrigger>
+              </DialogTrigger>
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>Add Manual Attendance</DialogTitle>
