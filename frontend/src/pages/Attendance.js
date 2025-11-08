@@ -572,7 +572,12 @@ export default function Attendance() {
     
     for (let day = 1; day <= daysInMonth; day++) {
       const date = `${year}-${month.padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-      monthlyData[date] = 'present';
+      monthlyData[date] = {
+        status: 'present',
+        check_in: '09:00',
+        check_out: '17:00',
+        leave_type: ''
+      };
     }
     
     setMonthlyAttendance(monthlyData);
