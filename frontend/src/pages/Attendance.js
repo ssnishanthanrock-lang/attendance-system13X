@@ -1381,10 +1381,10 @@ export default function Attendance() {
                 return (
                   <div key={employee.id} className="grid grid-cols-12 gap-2 p-2 border rounded hover:bg-gray-50">
                     <div className="col-span-3 flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                        <User className="w-4 h-4 text-white" />
+                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                        <User className="w-3 h-3 text-white" />
                       </div>
-                      <span className="font-medium text-sm">{employee.name}</span>
+                      <span className="font-medium text-xs">{employee.name}</span>
                     </div>
                     <div className="col-span-2">
                       <Select
