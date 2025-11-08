@@ -934,6 +934,69 @@ export default function Employees() {
         </DialogContent>
       </Dialog>
 
+      {/* Failed Imports Dialog */}
+      <Dialog open={showFailedDialog} onOpenChange={setShowFailedDialog}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-red-600" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+              Failed Imports ({failedImports.length})
+            </DialogTitle>
+            <DialogDescription>
+              The following employees could not be imported. Review the errors and try again.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse border border-gray-300">
+              <thead>
+                <tr className="bg-red-50">
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">#</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Name</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Mobile</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Email</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Role</th>
+                  <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Error Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {failedImports.map((emp, idx) => (
+                  <tr key={idx} className="hover:bg-gray-50">
+                    <td className="border border-gray-300 px-3 py-2 text-sm">{idx + 1}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-sm">{emp.name || '-'}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-sm">{emp.mobile || '-'}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-sm">{emp.email || '-'}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-sm">{emp.role || '-'}</td>
+                    <td className="border border-gray-300 px-3 py-2 text-sm text-red-600 font-medium">{emp.error}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          
+          <div className="flex justify-between items-center pt-4 border-t">
+            <p className="text-sm text-gray-600">
+              {failedImports.length} employee(s) failed to import
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowFailedDialog(false);
+                  setFailedImports([]);
+                }}
+              >
+                Clear & Close
+              </Button>
+              <Button
+                onClick={() => setShowFailedDialog(false)}
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Bulk Import Dialog */}
       <Dialog open={bulkImportDialogOpen} onOpenChange={setBulkImportDialogOpen}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
