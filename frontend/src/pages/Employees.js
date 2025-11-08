@@ -336,6 +336,12 @@ export default function Employees() {
       
       toast.success(response.data.message);
       
+      // Close dialog and refresh employees first
+      setBulkImportDialogOpen(false);
+      setBulkImportText('');
+      setParsedEmployees([]);
+      fetchEmployees();
+      
       if (response.data.errors && response.data.errors.length > 0) {
         // Store failed imports with employee data
         const failedWithData = response.data.errors.map(err => ({
@@ -345,16 +351,16 @@ export default function Employees() {
         }));
         setFailedImports(failedWithData);
         
-        toast.error(`${response.data.errors.length} employees failed to import. Click "View Failed" to see details.`, {
-          duration: 5000
+        // Show error toast and open failed dialog automatically
+        toast.error(`${response.data.errors.length} employees failed to import. Opening details...`, {
+          duration: 3000
         });
+        
+        // Auto-open failed dialog after 1 second
+        setTimeout(() => {
+          setShowFailedDialog(true);
+        }, 1000);
       }
-      
-      // Close dialog and refresh employees
-      setBulkImportDialogOpen(false);
-      setBulkImportText('');
-      setParsedEmployees([]);
-      fetchEmployees();
     } catch (error) {
       console.error('Import error:', error);
       toast.error(error.response?.data?.detail || 'Failed to import employees');
