@@ -243,6 +243,19 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Company invoice settings endpoint working. PUT /api/company/invoice-settings accepts address, mobile, hotline, and bank_details. Settings are saved and endpoint is accessible for verification."
 
+
+  - task: "AI-Powered Bulk Employee Import - Backend"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implemented AI-powered bulk employee import using Gemini 2.5 Pro with Emergent LLM key. Added two endpoints: POST /api/employees/parse-bulk (uses AI to parse pasted text and extract employee data) and POST /api/employees/bulk-import (validates and imports multiple employees). AI intelligently extracts name, email, mobile, role, position, department, join_date from any format. Returns structured JSON for admin to review and edit before confirming import. Handles duplicate checking, validation, and error reporting."
+
   - task: "Dashboard stats endpoint for company portal"
     implemented: true
     working: true
