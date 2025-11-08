@@ -470,9 +470,9 @@ export default function Employees() {
                     {editingEmployee ? 'Edit Employee' : 'Add New Employee'}
                   </DialogTitle>
                   <DialogDescription>Fill in the employee details below</DialogDescription>
-                </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  </DialogHeader>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <Input
                       data-testid="employee-id-input"
