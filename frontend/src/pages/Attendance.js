@@ -1542,40 +1542,87 @@ export default function Attendance() {
             </div>
 
             {/* Calendar Grid */}
-            {monthlyEmployee && Object.keys(monthlyAttendance).length > 0 && (
-              <div className="space-y-2">
-                <h4 className="font-semibold text-gray-700">Monthly Calendar</h4>
-                <div className="grid grid-cols-7 gap-2 max-h-96 overflow-y-auto">
-                  {/* Calendar Headers */}
-                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                    <div key={day} className="p-2 text-center font-semibold text-sm bg-gray-100 rounded">
-                      {day}
-                    </div>
-                  ))}
-                  
-                  {/* Calendar Days */}
-                  {Object.entries(monthlyAttendance).map(([date, status]) => {
-                    const dayOfWeek = new Date(date).getDay();
-                    const dayNumber = new Date(date).getDate();
+            {Object.keys(monthlyAttendance).length > 0 && (
+              <div className="space-y-4">
+                <div className="space-y-3 max-h-[400px] overflow-y-auto">
+                  {Object.entries(monthlyAttendance).map(([date, data]) => {
+                    const day = new Date(date).getDate();
+                    const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'short' });
+                    const fullDate = new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     
                     return (
-                      <div key={date} className="p-2 border rounded hover:bg-gray-50">
-                        <div className="text-xs text-gray-500 mb-1">{dayNumber}</div>
-                        <Select
-                          value={status}
-                          onValueChange={(value) => handleMonthlyAttendanceChange(date, value)}
-                        >
-                          <SelectTrigger className="h-8 text-xs">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="present">Present</SelectItem>
-                            <SelectItem value="leave">Leave</SelectItem>
-                            <SelectItem value="half_day">Half Day</SelectItem>
-                            <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
-                            <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <div key={date} className="border rounded p-3 hover:bg-gray-50">
+                        <div className="grid grid-cols-12 gap-3 items-center">
+                          <div className="col-span-2">
+                            <div className="font-semibold text-sm">{dayName}</div>
+                            <div className="text-xs text-gray-500">{fullDate}</div>
+                          </div>
+                          
+                          <div className="col-span-2">
+                            <Select
+                              value={data.status}
+                              onValueChange={(value) => handleMonthlyAttendanceChange(date, 'status', value)}
+                            >
+                              <SelectTrigger className="h-9">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="present">Present</SelectItem>
+                                <SelectItem value="leave">Leave</SelectItem>
+                                <SelectItem value="half_day">Half Day</SelectItem>
+                                <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
+                                <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                          
+                          <div className="col-span-8">
+                            {data.status === 'present' || data.status === 'half_day' ? (
+                              <div className="flex gap-2">
+                                <div className="flex-1">
+                                  <label className="text-xs text-gray-600">Check In</label>
+                                  <Input
+                                    type="time"
+                                    value={data.check_in}
+                                    onChange={(e) => handleMonthlyAttendanceChange(date, 'check_in', e.target.value)}
+                                    className="h-9 text-sm"
+                                  />
+                                </div>
+                                <div className="flex-1">
+                                  <label className="text-xs text-gray-600">Check Out</label>
+                                  <Input
+                                    type="time"
+                                    value={data.check_out}
+                                    onChange={(e) => handleMonthlyAttendanceChange(date, 'check_out', e.target.value)}
+                                    className="h-9 text-sm"
+                                  />
+                                </div>
+                              </div>
+                            ) : data.status === 'leave' ? (
+                              <div>
+                                <label className="text-xs text-gray-600">Leave Type</label>
+                                <Select
+                                  value={data.leave_type}
+                                  onValueChange={(value) => handleMonthlyAttendanceChange(date, 'leave_type', value)}
+                                >
+                                  <SelectTrigger className="h-9">
+                                    <SelectValue placeholder="Select Leave Type" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="sick">Sick Leave</SelectItem>
+                                    <SelectItem value="casual">Casual Leave</SelectItem>
+                                    <SelectItem value="annual">Annual Leave</SelectItem>
+                                    <SelectItem value="other">Other</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            ) : (
+                              <div className="text-sm text-gray-500 italic flex items-center h-9">
+                                No details required
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
