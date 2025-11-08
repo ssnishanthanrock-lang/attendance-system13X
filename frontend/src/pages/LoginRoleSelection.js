@@ -19,7 +19,12 @@ export default function LoginRoleSelection() {
   const handleSelection = async (selection) => {
     setLoading(true);
     try {
+      console.log('Starting login with selection:', selection);
+      console.log('Mobile:', mobile, 'OTP:', otp);
+      
       const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+      console.log('API URL:', API);
+      
       const response = await fetch(`${API}/auth/verify-otp`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -27,19 +32,31 @@ export default function LoginRoleSelection() {
       });
 
       const data = await response.json();
+      console.log('Response:', data);
       
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
-        if (selection === 'super_admin') {
-          navigate('/superadmin');
-        } else {
-          navigate('/');
-        }
+        toast.success('Login successful!');
+        
+        // Add a small delay to ensure state is saved
+        setTimeout(() => {
+          if (selection === 'super_admin') {
+            console.log('Navigating to /superadmin');
+            navigate('/superadmin', { replace: true });
+          } else {
+            console.log('Navigating to /');
+            navigate('/', { replace: true });
+          }
+        }, 500);
+      } else {
+        toast.error(data.detail || 'Login failed. Please try again.');
+        console.error('Login failed:', data);
       }
     } catch (error) {
-      console.error(error);
+      console.error('Error during login:', error);
+      toast.error('Connection error. Please try again.');
     } finally {
       setLoading(false);
     }
