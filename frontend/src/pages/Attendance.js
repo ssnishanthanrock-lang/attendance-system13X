@@ -1304,6 +1304,253 @@ export default function Attendance() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Daily Bulk Attendance Dialog */}
+      <Dialog open={dailyBulkOpen} onOpenChange={setDailyBulkOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>
+              <div className="flex items-center gap-2">
+                <Users className="w-5 h-5 text-blue-600" />
+                Daily Bulk Attendance
+              </div>
+            </DialogTitle>
+            <DialogDescription>
+              Set attendance for all employees on a specific date
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Date Navigation */}
+            <div className="flex items-center justify-center gap-4 p-4 bg-gray-50 rounded-lg">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleBulkDateChange('prev')}
+                className="text-gray-600 hover:text-gray-800"
+              >
+                ← Previous Day
+              </Button>
+              
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-blue-600" />
+                <Input
+                  type="date"
+                  value={bulkDate}
+                  onChange={(e) => setBulkDate(e.target.value)}
+                  max={new Date().toISOString().split('T')[0]}
+                  className="w-40"
+                />
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleBulkDateChange('next')}
+                disabled={bulkDate >= new Date().toISOString().split('T')[0]}
+                className="text-gray-600 hover:text-gray-800 disabled:opacity-50"
+              >
+                Next Day →
+              </Button>
+            </div>
+
+            {/* Employee List */}
+            <div className="space-y-2 max-h-96 overflow-y-auto">
+              <div className="grid grid-cols-12 gap-4 p-3 bg-gray-100 rounded font-semibold text-sm">
+                <div className="col-span-6">Employee</div>
+                <div className="col-span-6">Status</div>
+              </div>
+              
+              {employees.map((employee) => (
+                <div key={employee.id} className="grid grid-cols-12 gap-4 p-3 border rounded hover:bg-gray-50">
+                  <div className="col-span-6 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                      <User className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="font-medium">{employee.name}</span>
+                  </div>
+                  <div className="col-span-6">
+                    <Select
+                      value={bulkAttendance[employee.id] || 'present'}
+                      onValueChange={(value) => handleBulkAttendanceChange(employee.id, value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="present">Present</SelectItem>
+                        <SelectItem value="leave">Leave</SelectItem>
+                        <SelectItem value="half_day">Half Day</SelectItem>
+                        <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
+                        <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setDailyBulkOpen(false)}
+                disabled={savingBulk}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveBulkAttendance}
+                disabled={savingBulk}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {savingBulk ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Users className="w-4 h-4 mr-2" />
+                    Save Bulk Attendance
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Monthly Attendance Dialog */}
+      <Dialog open={monthlyOpen} onOpenChange={setMonthlyOpen}>
+        <DialogContent className="max-w-5xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-green-600" />
+                Monthly Attendance
+              </div>
+            </DialogTitle>
+            <DialogDescription>
+              Set attendance for one employee for the entire month
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Employee and Month Selection */}
+            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Employee *</label>
+                <Select
+                  value={monthlyEmployee}
+                  onValueChange={(value) => {
+                    setMonthlyEmployee(value);
+                    if (value) {
+                      setTimeout(generateMonthlyAttendance, 100);
+                    }
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select Employee" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {employees.map((emp) => (
+                      <SelectItem key={emp.id} value={emp.id}>{emp.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Month *</label>
+                <Input
+                  type="month"
+                  value={monthlyMonth}
+                  onChange={(e) => {
+                    setMonthlyMonth(e.target.value);
+                    if (monthlyEmployee) {
+                      setTimeout(generateMonthlyAttendance, 100);
+                    }
+                  }}
+                  max={new Date().toISOString().slice(0, 7)}
+                />
+              </div>
+            </div>
+
+            {/* Calendar Grid */}
+            {monthlyEmployee && Object.keys(monthlyAttendance).length > 0 && (
+              <div className="space-y-2">
+                <h4 className="font-semibold text-gray-700">Monthly Calendar</h4>
+                <div className="grid grid-cols-7 gap-2 max-h-96 overflow-y-auto">
+                  {/* Calendar Headers */}
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                    <div key={day} className="p-2 text-center font-semibold text-sm bg-gray-100 rounded">
+                      {day}
+                    </div>
+                  ))}
+                  
+                  {/* Calendar Days */}
+                  {Object.entries(monthlyAttendance).map(([date, status]) => {
+                    const dayOfWeek = new Date(date).getDay();
+                    const dayNumber = new Date(date).getDate();
+                    
+                    return (
+                      <div key={date} className="p-2 border rounded hover:bg-gray-50">
+                        <div className="text-xs text-gray-500 mb-1">{dayNumber}</div>
+                        <Select
+                          value={status}
+                          onValueChange={(value) => handleMonthlyAttendanceChange(date, value)}
+                        >
+                          <SelectTrigger className="h-8 text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="present">Present</SelectItem>
+                            <SelectItem value="leave">Leave</SelectItem>
+                            <SelectItem value="half_day">Half Day</SelectItem>
+                            <SelectItem value="allowed_leave">Allowed Leave</SelectItem>
+                            <SelectItem value="allowed_half_day">Allowed Half Day</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setMonthlyOpen(false)}
+                disabled={savingMonthly}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleSaveMonthlyAttendance}
+                disabled={savingMonthly || !monthlyEmployee}
+                className="bg-green-600 hover:bg-green-700"
+              >
+                {savingMonthly ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Calendar className="w-4 h-4 mr-2" />
+                    Save Monthly Attendance
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
