@@ -1551,7 +1551,7 @@ export default function Attendance() {
                     const formattedDate = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                     
                     return (
-                      <div key={date} className="border rounded p-2 hover:bg-gray-50">
+                      <div key={date} className="border-b p-2 hover:bg-gray-50">
                         <div className="grid grid-cols-12 gap-2 items-center">
                           <div className="col-span-2">
                             <div className="font-semibold text-sm">{dayName}</div>
