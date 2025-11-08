@@ -576,6 +576,122 @@ backend:
         agent: "testing"
         comment: "✅ COMPREHENSIVE PAYROLL TESTING COMPLETED (50/51 tests passed - 98% success rate): 1) GET /api/payroll/months: Returns months array with correct structure (month, total_salary, employee_count), sorted descending, includes current month. 2) GET /api/payroll/detailed/{month}: Returns complete employee breakdown with all required fields, accurate calculations (gross=basic+allowances, net=gross-deductions, totals correctly calculated). 3) POST /api/payroll/generate: Successfully generates payroll for all employees. 4) Role-based access: Employees can access GET endpoints for their data. 5) Multi-tenancy verified: All data filtered by company_id. 6) Calculation accuracy: All salary calculations (gross, deductions, net) mathematically correct. 7) Fixed vs variable salary logic working: salary_per_minute=0 for fixed salary employees. Minor: Invalid month format returns data instead of error (acceptable flexible behavior)."
 
+
+
+  - agent: "main"
+    message: |
+      ✅ NEW FEATURE IMPLEMENTED - AI-Powered Bulk Employee Import
+      
+      USER REQUEST: Add ability to bulk import employees using AI to parse pasted data
+      - User can copy-paste employee data from Excel/spreadsheet in any format
+      - AI intelligently parses and extracts employee information
+      - Admin reviews and edits parsed data before confirming import
+      
+      IMPLEMENTATION DETAILS:
+      
+      BACKEND (server.py):
+      1. ✅ Installed emergentintegrations library for Gemini AI integration
+      2. ✅ Added EMERGENT_LLM_KEY to backend/.env
+      3. ✅ Updated requirements.txt with all new dependencies
+      4. ✅ Created BulkEmployeeParsed and BulkEmployeeImportRequest Pydantic models
+      5. ✅ Implemented POST /api/employees/parse-bulk endpoint:
+         - Uses Gemini 2.5 Pro to parse pasted text
+         - Extracts: name, email, mobile, role, position, department, join_date
+         - Returns structured JSON array with extracted employee data
+         - Handles any text format (tab-separated, CSV, free-form)
+         - Cleans response and removes markdown formatting
+      6. ✅ Implemented POST /api/employees/bulk-import endpoint:
+         - Validates all employees before import
+         - Checks for duplicate mobile numbers
+         - Creates employees with auto-generated IDs
+         - Applies company default times if not provided
+         - Returns success count and detailed error list
+         - Logs each import with BULK_IMPORT_EMPLOYEE activity
+      
+      FRONTEND (Employees.js):
+      1. ✅ Added Upload icon import from lucide-react
+      2. ✅ Added bulk import state: bulkImportDialogOpen, bulkImportText, parsedEmployees, loading states
+      3. ✅ Created handleParseBulk() function to call AI parsing endpoint
+      4. ✅ Created handleBulkImport() function to validate and import employees
+      5. ✅ Created updateParsedEmployee() and removeParsedEmployee() helper functions
+      6. ✅ Added green gradient "Bulk Import (AI)" button next to Add Employee button
+      7. ✅ Created comprehensive bulk import dialog with two steps:
+         
+         STEP 1 - Paste & Parse:
+         - Large textarea for pasting employee data
+         - Example format shown in placeholder
+         - "Parse with AI" button with loading state
+         - Cancel button
+         
+         STEP 2 - Review & Edit:
+         - Editable table with all employee fields
+         - Required fields (name, mobile) highlighted in red if empty
+         - Role dropdown with proper values
+         - Remove button for each employee
+         - Count display showing number of employees to import
+         - Three action buttons:
+           * Back to Paste (returns to step 1)
+           * Cancel (closes dialog)
+           * Confirm & Import All (with loading state)
+      
+      USER FLOW:
+      1. Admin clicks "Bulk Import (AI)" button on Employees page
+      2. Admin pastes employee data in any format (Excel copy, CSV, text)
+      3. Admin clicks "Parse with AI" → Gemini analyzes and structures the data
+      4. System displays parsed employees in editable table
+      5. Admin reviews, edits missing fields (salary, department, etc.)
+      6. System validates required fields (name, mobile)
+      7. Admin clicks "Confirm & Import All"
+      8. System imports valid employees, reports errors for duplicates/issues
+      9. Employee list refreshes with newly imported employees
+      
+      EXAMPLE INPUT FORMAT (from user):
+      ```
+      Director  Prasanthan      info@itsignature.lk     0773966920                2025/11/08 12:24                      
+      Operation Manager Anjali  anjaligalappaththi.itsignature@gmail.com        0760094691                2023/04/24 8:29                       
+      Designer  Faizan  faizan@itsignature.com  0771163180                2025/11/01 16:03                      
+      ```
+      
+      AI OUTPUT STRUCTURE:
+      ```json
+      [
+        {
+          "name": "Prasanthan",
+          "email": "info@itsignature.lk",
+          "mobile": "0773966920",
+          "role": "Director",
+          "position": "Director",
+          "join_date": "2025-11-08"
+        },
+        ...
+      ]
+      ```
+      
+      FEATURES:
+      - ✅ Intelligent AI parsing handles any format
+      - ✅ Admin can review and edit all data before import
+      - ✅ Validation for required fields (name, mobile)
+      - ✅ Duplicate checking (mobile number)
+      - ✅ Missing fields set to defaults or left empty for admin to fill
+      - ✅ Individual employee removal from import list
+      - ✅ Detailed error reporting for failed imports
+      - ✅ Activity logging for audit trail
+      - ✅ Multi-tenant safe (uses company_id)
+      
+      NEEDS TESTING:
+      - Parse endpoint with various text formats (tab-separated, CSV, free-form)
+      - AI accuracy in extracting employee data
+      - Frontend UI flow (paste → parse → edit → import)
+      - Validation of required fields
+      - Duplicate detection
+      - Successful bulk import with activity logging
+      - Error handling for partial failures
+      - Table editing functionality (inline edits)
+      - Role dropdown selection
+      - Employee removal from list
+      - Loading states during parse and import
+      - Toast notifications for success/errors
+
   - task: "Live payroll endpoint for current month"
     implemented: true
     working: true
