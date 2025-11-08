@@ -1354,6 +1354,163 @@ async def reactivate_employee(employee_id: str, current_user: User = Depends(get
     return {"message": "Employee reactivated successfully"}
 
 
+
+# ============= BULK EMPLOYEE IMPORT ENDPOINTS =============
+@api_router.post("/employees/parse-bulk")
+async def parse_bulk_employees(data: dict, current_user: User = Depends(get_current_user)):
+    """Use AI to parse pasted employee data and return structured format"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    try:
+        from emergentintegrations.llm.chat import LlmChat, UserMessage
+        from dotenv import load_dotenv
+        load_dotenv()
+        
+        pasted_text = data.get("text", "")
+        if not pasted_text.strip():
+            raise HTTPException(status_code=400, detail="No text provided")
+        
+        # Initialize Gemini chat
+        api_key = os.environ.get("EMERGENT_LLM_KEY")
+        chat = LlmChat(
+            api_key=api_key,
+            session_id=str(uuid.uuid4()),
+            system_message="""You are an expert at parsing employee data from various formats. 
+Extract employee information and return ONLY a valid JSON array. Each employee should be an object with these fields:
+- name: Full name (string)
+- email: Email address (string, can be null)
+- mobile: Phone number (string, can be null)
+- role: Job role/position/designation (string, can be null)
+- position: Position/title (string, can be null)
+- department: Department (string, can be null)
+- join_date: Join date in YYYY-MM-DD format (string, can be null)
+
+Rules:
+1. Return ONLY a JSON array, no other text or explanation
+2. Extract as much information as possible from the text
+3. If a field is not found, use null
+4. Standardize phone numbers to remove spaces and special characters
+5. Convert dates to YYYY-MM-DD format
+6. If role and position seem similar, use the value for both fields
+
+Example output format:
+[{"name":"John Doe","email":"john@example.com","mobile":"0771234567","role":"Manager","position":"Manager","department":"IT","join_date":"2023-01-15"}]"""
+        ).with_model("gemini", "gemini-2.5-pro")
+        
+        # Create user message
+        user_message = UserMessage(text=f"Parse this employee data:\n\n{pasted_text}")
+        
+        # Get AI response
+        response = await chat.send_message(user_message)
+        
+        # Parse the JSON response
+        import json
+        # Clean the response - remove markdown code blocks if present
+        cleaned_response = response.strip()
+        if cleaned_response.startswith("```json"):
+            cleaned_response = cleaned_response[7:]
+        if cleaned_response.startswith("```"):
+            cleaned_response = cleaned_response[3:]
+        if cleaned_response.endswith("```"):
+            cleaned_response = cleaned_response[:-3]
+        cleaned_response = cleaned_response.strip()
+        
+        parsed_employees = json.loads(cleaned_response)
+        
+        # Validate it's a list
+        if not isinstance(parsed_employees, list):
+            raise ValueError("AI response is not a list")
+        
+        return {"employees": parsed_employees, "count": len(parsed_employees)}
+        
+    except Exception as e:
+        logging.error(f"Error parsing bulk employees: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to parse employee data: {str(e)}")
+
+
+@api_router.post("/employees/bulk-import")
+async def bulk_import_employees(data: BulkEmployeeImportRequest, current_user: User = Depends(get_current_user)):
+    """Import multiple employees after admin confirmation and editing"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    try:
+        # Get company settings for default times
+        settings = await db.settings.find_one({"company_id": current_user.company_id})
+        default_start_time = settings.get("office_start_time", "09:00") if settings else "09:00"
+        default_finish_time = settings.get("office_end_time", "17:00") if settings else "17:00"
+        
+        imported_count = 0
+        errors = []
+        
+        for idx, emp_data in enumerate(data.employees):
+            try:
+                # Validate required fields
+                if not emp_data.get("name"):
+                    errors.append({"index": idx, "error": "Name is required"})
+                    continue
+                
+                if not emp_data.get("mobile") and not emp_data.get("email"):
+                    errors.append({"index": idx, "error": "Mobile or email is required"})
+                    continue
+                
+                # Check for duplicate mobile
+                if emp_data.get("mobile"):
+                    existing = await db.users.find_one({
+                        "mobile": emp_data["mobile"],
+                        "company_id": current_user.company_id
+                    })
+                    if existing:
+                        errors.append({"index": idx, "name": emp_data.get("name"), "error": f"Employee with mobile {emp_data['mobile']} already exists"})
+                        continue
+                
+                # Create new employee
+                new_employee = User(
+                    id=str(uuid.uuid4()),
+                    company_id=current_user.company_id,
+                    employee_id=emp_data.get("employee_id") or f"EMP-{str(uuid.uuid4())[:8]}",
+                    mobile=emp_data.get("mobile", ""),
+                    name=capitalize_name(emp_data["name"]),
+                    role=emp_data.get("role", "employee"),
+                    department=emp_data.get("department", ""),
+                    position=emp_data.get("position", ""),
+                    basic_salary=float(emp_data.get("basic_salary", 0)),
+                    allowances=float(emp_data.get("allowances", 0)),
+                    join_date=emp_data.get("join_date", datetime.now(timezone.utc).strftime("%Y-%m-%d")),
+                    start_time=emp_data.get("start_time") or default_start_time,
+                    finish_time=emp_data.get("finish_time") or default_finish_time,
+                    fixed_salary=emp_data.get("fixed_salary", False),
+                    is_active=True,
+                    created_at=datetime.now(timezone.utc).isoformat()
+                )
+                
+                await db.users.insert_one(new_employee.model_dump())
+                imported_count += 1
+                
+                # Log activity
+                await log_activity(
+                    current_user.company_id,
+                    current_user.id,
+                    current_user.name,
+                    "BULK_IMPORT_EMPLOYEE",
+                    f"Bulk imported employee: {capitalize_name(emp_data['name'])}, Role: {emp_data.get('role', 'employee')}"
+                )
+                
+            except Exception as e:
+                errors.append({"index": idx, "name": emp_data.get("name"), "error": str(e)})
+        
+        return {
+            "message": f"Successfully imported {imported_count} employees",
+            "imported_count": imported_count,
+            "errors": errors
+        }
+        
+    except Exception as e:
+        logging.error(f"Error in bulk import: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Bulk import failed: {str(e)}")
+
+
 # ============= INCREMENT ENDPOINTS =============
 @api_router.post("/employees/{employee_id}/increments")
 async def add_increment(employee_id: str, increment_data: dict, current_user: User = Depends(get_current_user)):
