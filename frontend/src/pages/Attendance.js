@@ -567,15 +567,13 @@ export default function Attendance() {
 
   const generateMonthlyAttendance = () => {
     const [year, month] = monthlyMonth.split('-');
-    const daysInMonth = new Date(year, month, 0).getDate();
+    const daysInMonth = new Date(parseInt(year), parseInt(month), 0).getDate();
     const monthlyData = {};
     
     for (let day = 1; day <= daysInMonth; day++) {
-      const date = `${year}-${month.padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+      const date = `${year}-${month}-${day.toString().padStart(2, '0')}`;
       monthlyData[date] = {
         status: 'present',
-        check_in: '09:00',
-        check_out: '17:00',
         leave_type: ''
       };
     }
