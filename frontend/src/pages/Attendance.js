@@ -587,7 +587,7 @@ export default function Attendance() {
     setMonthlyAttendance(prev => ({
       ...prev,
       [date]: {
-        ...(prev[date] || { status: 'present', leave_type: '' }),
+        ...(prev[date] || { status: 'present', check_in: '09:00', check_out: '17:00', leave_type: '' }),
         [field]: value
       }
     }));
