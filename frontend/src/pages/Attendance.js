@@ -1381,7 +1381,7 @@ export default function Attendance() {
               {employees.map((employee) => {
                 const empData = bulkAttendance[employee.id] || { status: 'present', check_in: '09:00', check_out: '17:00', leave_type: '' };
                 return (
-                  <div key={employee.id} className="grid grid-cols-12 gap-2 p-2 border rounded hover:bg-gray-50">
+                  <div key={employee.id} className="grid grid-cols-12 gap-2 p-2 border-b hover:bg-gray-50">
                     <div className="col-span-3 flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
                         <User className="w-3 h-3 text-white" />
