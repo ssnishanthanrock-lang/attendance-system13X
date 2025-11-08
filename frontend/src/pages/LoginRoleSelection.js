@@ -78,8 +78,15 @@ export default function LoginRoleSelection() {
         </div>
 
         <div className="space-y-4">
+          {loading && (
+            <div className="text-center mb-4">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
+              <p className="text-sm text-gray-600 mt-2">Logging in...</p>
+            </div>
+          )}
+          
           <Card 
-            className="cursor-pointer hover:shadow-xl transition-all border-2 hover:border-blue-500"
+            className={`cursor-pointer hover:shadow-xl transition-all border-2 hover:border-red-500 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => !loading && handleSelection('super_admin')}
           >
             <CardContent className="p-6">
@@ -96,7 +103,7 @@ export default function LoginRoleSelection() {
           </Card>
 
           <Card 
-            className="cursor-pointer hover:shadow-xl transition-all border-2 hover:border-blue-500"
+            className={`cursor-pointer hover:shadow-xl transition-all border-2 hover:border-blue-500 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={() => !loading && handleSelection('company')}
           >
             <CardContent className="p-6">
