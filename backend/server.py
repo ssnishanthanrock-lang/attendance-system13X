@@ -1371,7 +1371,7 @@ async def parse_bulk_employees(data: dict, current_user: User = Depends(get_curr
         if not pasted_text.strip():
             raise HTTPException(status_code=400, detail="No text provided")
         
-        # Initialize Gemini chat
+        # Initialize Gemini chat with faster model
         api_key = os.environ.get("EMERGENT_LLM_KEY")
         chat = LlmChat(
             api_key=api_key,
@@ -1396,7 +1396,7 @@ Rules:
 
 Example output format:
 [{"name":"John Doe","email":"john@example.com","mobile":"0771234567","role":"Manager","position":"Manager","department":"IT","join_date":"2023-01-15"}]"""
-        ).with_model("gemini", "gemini-2.5-pro")
+        ).with_model("gemini", "gemini-2.0-flash")
         
         # Create user message
         user_message = UserMessage(text=f"Parse this employee data:\n\n{pasted_text}")
