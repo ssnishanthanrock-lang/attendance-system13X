@@ -59,6 +59,7 @@ export default function Employees() {
   const [parsedEmployees, setParsedEmployees] = useState([]);
   const [parsingLoading, setParsingLoading] = useState(false);
   const [importingLoading, setImportingLoading] = useState(false);
+  const [parseCountdown, setParseCountdown] = useState(0);
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
