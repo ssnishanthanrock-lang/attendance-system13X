@@ -53,6 +53,13 @@ export default function Employees() {
   });
   const [pendingIncrements, setPendingIncrements] = useState({});
 
+  // Bulk import state
+  const [bulkImportDialogOpen, setBulkImportDialogOpen] = useState(false);
+  const [bulkImportText, setBulkImportText] = useState('');
+  const [parsedEmployees, setParsedEmployees] = useState([]);
+  const [parsingLoading, setParsingLoading] = useState(false);
+  const [importingLoading, setImportingLoading] = useState(false);
+
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
 
