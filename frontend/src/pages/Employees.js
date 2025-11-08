@@ -897,6 +897,214 @@ export default function Employees() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Bulk Import Dialog */}
+      <Dialog open={bulkImportDialogOpen} onOpenChange={setBulkImportDialogOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle style={{ fontFamily: 'Work Sans, sans-serif' }}>
+              Bulk Import Employees (AI-Powered)
+            </DialogTitle>
+            <DialogDescription>
+              Paste employee data in any format. AI will intelligently parse it and you can review before importing.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {parsedEmployees.length === 0 ? (
+              // Step 1: Paste and Parse
+              <>
+                <div>
+                  <label className="text-sm font-medium text-gray-700 mb-2 block">
+                    Paste Employee Data
+                  </label>
+                  <Textarea
+                    value={bulkImportText}
+                    onChange={(e) => setBulkImportText(e.target.value)}
+                    placeholder="Paste employee data here (from Excel, spreadsheet, or any format)
+Example:
+Director        Prasanthan      info@itsignature.lk     0773966920      2025/11/08
+Operation Manager       Anjali  anjali@gmail.com        0760094691      2023/04/24"
+                    className="min-h-[300px] font-mono text-sm"
+                  />
+                </div>
+                
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setBulkImportDialogOpen(false);
+                      setBulkImportText('');
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleParseBulk}
+                    disabled={parsingLoading || !bulkImportText.trim()}
+                    className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                  >
+                    {parsingLoading ? 'Parsing with AI...' : 'Parse with AI'}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              // Step 2: Review and Edit
+              <>
+                <div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Review and edit the parsed data. Fill in missing required fields (marked with *). Click "Confirm & Import" when ready.
+                  </p>
+                  
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse border border-gray-300">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Name *</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Mobile *</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Email</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Role</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Position</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Department</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Join Date</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-semibold">Salary</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-semibold">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {parsedEmployees.map((emp, index) => (
+                          <tr key={index} className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-2 py-1">
+                              <Input
+                                value={emp.name || ''}
+                                onChange={(e) => updateParsedEmployee(index, 'name', e.target.value)}
+                                placeholder="Name *"
+                                className={`text-sm ${!emp.name ? 'border-red-300' : ''}`}
+                                required
+                              />
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1">
+                              <Input
+                                value={emp.mobile || ''}
+                                onChange={(e) => updateParsedEmployee(index, 'mobile', e.target.value)}
+                                placeholder="Mobile *"
+                                className={`text-sm ${!emp.mobile ? 'border-red-300' : ''}`}
+                                required
+                              />
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1">
+                              <Input
+                                value={emp.email || ''}
+                                onChange={(e) => updateParsedEmployee(index, 'email', e.target.value)}
+                                placeholder="Email"
+                                className="text-sm"
+                              />
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1">
+                              <Select
+                                value={emp.role || 'employee'}
+                                onValueChange={(value) => updateParsedEmployee(index, 'role', value)}
+                              >
+                                <SelectTrigger className="text-sm">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="employee">Employee</SelectItem>
+                                  <SelectItem value="manager">Manager</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="staff_member">Staff Member</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1">
+                              <Input
+                                value={emp.position || ''}
+                                onChange={(e) => updateParsedEmployee(index, 'position', e.target.value)}
+                                placeholder="Position"
+                                className="text-sm"
+                              />
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1">
+                              <Input
+                                value={emp.department || ''}
+                                onChange={(e) => updateParsedEmployee(index, 'department', e.target.value)}
+                                placeholder="Department"
+                                className="text-sm"
+                              />
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1">
+                              <Input
+                                type="date"
+                                value={emp.join_date || ''}
+                                onChange={(e) => updateParsedEmployee(index, 'join_date', e.target.value)}
+                                className="text-sm"
+                              />
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1">
+                              <Input
+                                type="number"
+                                value={emp.basic_salary || 0}
+                                onChange={(e) => updateParsedEmployee(index, 'basic_salary', parseFloat(e.target.value) || 0)}
+                                placeholder="Salary"
+                                className="text-sm"
+                              />
+                            </td>
+                            <td className="border border-gray-300 px-2 py-1 text-center">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => removeParsedEmployee(index)}
+                                className="text-red-600 hover:text-red-800"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center pt-4 border-t">
+                  <p className="text-sm text-gray-600">
+                    {parsedEmployees.length} employee(s) ready to import
+                  </p>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setParsedEmployees([]);
+                        setBulkImportText('');
+                      }}
+                    >
+                      Back to Paste
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setBulkImportDialogOpen(false);
+                        setBulkImportText('');
+                        setParsedEmployees([]);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      onClick={handleBulkImport}
+                      disabled={importingLoading}
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                    >
+                      {importingLoading ? 'Importing...' : 'Confirm & Import All'}
+                    </Button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
     </Layout>
   );
 }
