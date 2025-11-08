@@ -641,8 +641,8 @@ export default function Employees() {
                     </Button>
                   </div>
                 </form>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
         </div>
 
         {/* Search - Only show if more than 6 employees */}
