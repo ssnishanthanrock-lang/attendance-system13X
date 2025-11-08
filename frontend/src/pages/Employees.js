@@ -9,7 +9,7 @@ import { Switch } from '../components/ui/switch';
 import { Card, CardContent } from '../components/ui/card';
 import { Textarea } from '../components/ui/textarea';
 import { toast } from 'sonner';
-import { Plus, Edit, Trash2, Search, TrendingUp, History, Upload } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, TrendingUp, History, Upload, Loader2 } from 'lucide-react';
 import { capitalizeName } from '../utils/helpers';
 import { canEditInImpersonation, isImpersonating } from '../utils/impersonation';
 
