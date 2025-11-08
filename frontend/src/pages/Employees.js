@@ -802,6 +802,7 @@ export default function Employees() {
             <p className="text-gray-500">No employees found</p>
           </div>
         )}
+        </div>
       </div>
 
       {/* Add Increment Dialog */}
