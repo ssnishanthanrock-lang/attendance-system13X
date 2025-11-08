@@ -60,7 +60,11 @@ export default function Employees() {
   const [parsingLoading, setParsingLoading] = useState(false);
   const [importingLoading, setImportingLoading] = useState(false);
   const [parseCountdown, setParseCountdown] = useState(0);
-  const [failedImports, setFailedImports] = useState([]);
+  const [failedImports, setFailedImports] = useState(() => {
+    // Load failed imports from localStorage on mount
+    const saved = localStorage.getItem('failedImports');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [showFailedDialog, setShowFailedDialog] = useState(false);
 
   // Check if user can edit (not read-only impersonation)
