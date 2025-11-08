@@ -1018,7 +1018,7 @@ export default function Employees() {
 
       {/* Bulk Import Dialog */}
       <Dialog open={bulkImportDialogOpen} onOpenChange={setBulkImportDialogOpen}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto relative bg-white">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto relative !bg-white z-[100]">
           {/* Loading Overlay */}
           {parsingLoading && (
             <div className="absolute inset-0 bg-blue-600 bg-opacity-90 flex items-center justify-center z-50 rounded-lg">
