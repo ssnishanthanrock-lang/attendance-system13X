@@ -1542,7 +1542,7 @@ export default function Attendance() {
             </div>
 
             {/* Calendar Grid */}
-            {Object.keys(monthlyAttendance).length > 0 && (
+            {monthlyEmployee && Object.keys(monthlyAttendance).length > 0 && (
               <div className="space-y-4">
                 <div className="space-y-3 max-h-[400px] overflow-y-auto">
                   {Object.entries(monthlyAttendance).map(([date, data]) => {
