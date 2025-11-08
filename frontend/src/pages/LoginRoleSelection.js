@@ -11,7 +11,13 @@ export default function LoginRoleSelection() {
   const [loading, setLoading] = useState(false);
   const { mobile, otp, options } = location.state || {};
 
+  console.log('LoginRoleSelection loaded');
+  console.log('Location state:', location.state);
+  console.log('Mobile:', mobile, 'OTP:', otp);
+
   if (!mobile || !otp) {
+    console.error('Missing mobile or OTP, redirecting to login');
+    toast.error('Session expired. Please login again.');
     navigate('/login');
     return null;
   }
