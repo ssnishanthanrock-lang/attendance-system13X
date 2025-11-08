@@ -499,7 +499,12 @@ export default function Attendance() {
     // Initialize bulk attendance with all employees
     const initialBulk = {};
     employees.forEach(emp => {
-      initialBulk[emp.id] = 'present';
+      initialBulk[emp.id] = {
+        status: 'present',
+        check_in: '09:00',
+        check_out: '17:00',
+        leave_type: ''
+      };
     });
     setBulkAttendance(initialBulk);
     setDailyBulkOpen(true);
