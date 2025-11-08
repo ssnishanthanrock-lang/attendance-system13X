@@ -1405,14 +1405,14 @@ export default function Attendance() {
                     </div>
                     <div className="col-span-7">
                       {empData.status === 'present' || empData.status === 'half_day' ? (
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                           <div className="flex-1">
                             <Input
                               type="time"
                               value={empData.check_in}
                               onChange={(e) => handleBulkAttendanceChange(employee.id, 'check_in', e.target.value)}
-                              placeholder="Check In"
-                              className="h-9 text-sm"
+                              placeholder="In"
+                              className="h-8 text-xs"
                             />
                           </div>
                           <div className="flex-1">
@@ -1420,8 +1420,8 @@ export default function Attendance() {
                               type="time"
                               value={empData.check_out}
                               onChange={(e) => handleBulkAttendanceChange(employee.id, 'check_out', e.target.value)}
-                              placeholder="Check Out"
-                              className="h-9 text-sm"
+                              placeholder="Out"
+                              className="h-8 text-xs"
                             />
                           </div>
                         </div>
@@ -1430,19 +1430,19 @@ export default function Attendance() {
                           value={empData.leave_type}
                           onValueChange={(value) => handleBulkAttendanceChange(employee.id, 'leave_type', value)}
                         >
-                          <SelectTrigger className="h-9">
-                            <SelectValue placeholder="Select Leave Type" />
+                          <SelectTrigger className="h-8">
+                            <SelectValue placeholder="Leave Type" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="sick">Sick Leave</SelectItem>
-                            <SelectItem value="casual">Casual Leave</SelectItem>
-                            <SelectItem value="annual">Annual Leave</SelectItem>
+                            <SelectItem value="sick">Sick</SelectItem>
+                            <SelectItem value="casual">Casual</SelectItem>
+                            <SelectItem value="annual">Annual</SelectItem>
                             <SelectItem value="other">Other</SelectItem>
                           </SelectContent>
                         </Select>
                       ) : (
-                        <div className="text-sm text-gray-500 italic flex items-center h-9">
-                          No details required
+                        <div className="text-xs text-gray-500 italic flex items-center h-8">
+                          No details
                         </div>
                       )}
                     </div>
