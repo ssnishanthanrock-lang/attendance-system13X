@@ -332,34 +332,40 @@ export default function Employees() {
 
     setImportingLoading(true);
     try {
-      const response = await api.post('/employees/bulk-import', { employees: parsedEmployees });
+      // Keep a copy of parsed employees before clearing
+      const employeesToImport = [...parsedEmployees];
+      
+      const response = await api.post('/employees/bulk-import', { employees: employeesToImport });
       
       toast.success(response.data.message);
       
-      // Close dialog and refresh employees first
-      setBulkImportDialogOpen(false);
-      setBulkImportText('');
-      setParsedEmployees([]);
-      fetchEmployees();
-      
+      // Handle failed imports before closing dialog
       if (response.data.errors && response.data.errors.length > 0) {
         // Store failed imports with employee data
         const failedWithData = response.data.errors.map(err => ({
-          ...parsedEmployees[err.index],
+          ...employeesToImport[err.index],
           error: err.error,
           index: err.index
         }));
         setFailedImports(failedWithData);
         
-        // Show error toast and open failed dialog automatically
+        // Show error toast
         toast.error(`${response.data.errors.length} employees failed to import. Opening details...`, {
           duration: 3000
         });
-        
-        // Auto-open failed dialog after 1 second
+      }
+      
+      // Close dialog and refresh employees
+      setBulkImportDialogOpen(false);
+      setBulkImportText('');
+      setParsedEmployees([]);
+      fetchEmployees();
+      
+      // Auto-open failed dialog after dialog closes
+      if (response.data.errors && response.data.errors.length > 0) {
         setTimeout(() => {
           setShowFailedDialog(true);
-        }, 1000);
+        }, 500);
       }
     } catch (error) {
       console.error('Import error:', error);
