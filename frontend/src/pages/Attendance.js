@@ -44,6 +44,19 @@ export default function Attendance() {
   const [todayAttendanceCount, setTodayAttendanceCount] = useState(0);
   const [activeEmployeesCount, setActiveEmployeesCount] = useState(0);
   const [hasDeletedAttendance, setHasDeletedAttendance] = useState(false);
+  
+  // Daily bulk attendance state
+  const [dailyBulkOpen, setDailyBulkOpen] = useState(false);
+  const [bulkDate, setBulkDate] = useState(new Date().toISOString().split('T')[0]);
+  const [bulkAttendance, setBulkAttendance] = useState({});
+  const [savingBulk, setSavingBulk] = useState(false);
+  
+  // Monthly attendance state
+  const [monthlyOpen, setMonthlyOpen] = useState(false);
+  const [monthlyEmployee, setMonthlyEmployee] = useState('');
+  const [monthlyMonth, setMonthlyMonth] = useState(new Date().toISOString().slice(0, 7)); // YYYY-MM
+  const [monthlyAttendance, setMonthlyAttendance] = useState({});
+  const [savingMonthly, setSavingMonthly] = useState(false);
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
