@@ -964,7 +964,9 @@ Operation Manager       Anjali  anjali@gmail.com        0760094691      2023/04/
                     disabled={parsingLoading || !bulkImportText.trim()}
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
                   >
-                    {parsingLoading ? 'Parsing with AI...' : 'Parse with AI'}
+                    {parsingLoading 
+                      ? `Parsing with AI... ${parseCountdown > 0 ? `(${parseCountdown}s)` : ''}` 
+                      : 'Parse with AI'}
                   </Button>
                 </div>
               </>
