@@ -1001,6 +1001,7 @@ export default function Employees() {
                 onClick={() => {
                   setShowFailedDialog(false);
                   setFailedImports([]);
+                  localStorage.removeItem('failedImports');
                 }}
               >
                 Clear & Close
