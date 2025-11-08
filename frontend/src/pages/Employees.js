@@ -337,8 +337,17 @@ export default function Employees() {
       toast.success(response.data.message);
       
       if (response.data.errors && response.data.errors.length > 0) {
-        console.error('Import errors:', response.data.errors);
-        toast.warning(`${response.data.errors.length} employees failed to import. Check console for details.`);
+        // Store failed imports with employee data
+        const failedWithData = response.data.errors.map(err => ({
+          ...parsedEmployees[err.index],
+          error: err.error,
+          index: err.index
+        }));
+        setFailedImports(failedWithData);
+        
+        toast.error(`${response.data.errors.length} employees failed to import. Click "View Failed" to see details.`, {
+          duration: 5000
+        });
       }
       
       // Close dialog and refresh employees
