@@ -474,160 +474,160 @@ export default function Employees() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                    <Input
-                      data-testid="employee-id-input"
-                      value={formData.employee_id}
-                      onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
-                      placeholder="Employee ID (Auto-generated)"
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      data-testid="mobile-number-input"
-                      type="tel"
-                      value={formData.mobile}
-                      onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
-                      maxLength={10}
-                      placeholder="Mobile Number *"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Input
-                      data-testid="name-input"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      onBlur={(e) => setFormData({ ...formData, name: capitalizeName(e.target.value) })}
-                      placeholder="Full Name *"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                      <SelectTrigger data-testid="role-select">
-                        <SelectValue placeholder="Select Role *" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Admin</SelectItem>
-                        <SelectItem value="manager">Manager</SelectItem>
-                        <SelectItem value="employee">Employee</SelectItem>
-                        <SelectItem value="staff_member">Staff Member</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {/* Department and Position in one line with labels */}
-                  <div className="sm:col-span-2 grid grid-cols-12 gap-2">
-                    <label className="col-span-3 text-sm font-medium flex items-center">Department</label>
-                    <div className="col-span-3">
                       <Input
-                        data-testid="department-input"
-                        value={formData.department}
-                        onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                        placeholder="Enter department"
+                        data-testid="employee-id-input"
+                        value={formData.employee_id}
+                        onChange={(e) => setFormData({ ...formData, employee_id: e.target.value })}
+                        placeholder="Employee ID (Auto-generated)"
                       />
                     </div>
-                    <label className="col-span-3 text-sm font-medium flex items-center">Position</label>
-                    <div className="col-span-3">
+                    <div>
                       <Input
-                        data-testid="position-input"
-                        value={formData.position}
-                        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                        placeholder="Enter position"
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Basic Salary and Allowances in one line with labels */}
-                  <div className="sm:col-span-2 grid grid-cols-12 gap-2">
-                    <label className="col-span-3 text-sm font-medium flex items-center">Basic Salary (Rs.)</label>
-                    <div className="col-span-3">
-                      <Input
-                        data-testid="salary-input"
-                        type="number"
-                        value={formData.basic_salary}
-                        onChange={(e) => setFormData({ ...formData, basic_salary: parseFloat(e.target.value) })}
-                        placeholder="0"
-                      />
-                    </div>
-                    <label className="col-span-3 text-sm font-medium flex items-center">Allowances (Rs.)</label>
-                    <div className="col-span-3">
-                      <Input
-                        data-testid="allowances-input"
-                        type="number"
-                        value={formData.allowances}
-                        onChange={(e) => setFormData({ ...formData, allowances: parseFloat(e.target.value) })}
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-                  {/* Join Date with label - 3x9 */}
-                  <div className="sm:col-span-2 grid grid-cols-12 gap-2">
-                    <label className="col-span-3 text-sm font-medium flex items-center">Join Date *</label>
-                    <div className="col-span-9">
-                      <Input
-                        data-testid="join-date-input"
-                        type="date"
-                        value={formData.join_date}
-                        onChange={(e) => setFormData({ ...formData, join_date: e.target.value })}
+                        data-testid="mobile-number-input"
+                        type="tel"
+                        value={formData.mobile}
+                        onChange={(e) => setFormData({ ...formData, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                        maxLength={10}
+                        placeholder="Mobile Number *"
                         required
                       />
                     </div>
-                  </div>
-                  
-                  {/* Start Time and Finish Time with labels - 3x3 each */}
-                  <div className="sm:col-span-2 grid grid-cols-12 gap-2">
-                    <label className="col-span-3 text-sm font-medium flex items-center">Start Time</label>
-                    <div className="col-span-3">
+                    <div>
                       <Input
-                        type="time"
-                        value={formData.start_time}
-                        onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                        data-testid="name-input"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        onBlur={(e) => setFormData({ ...formData, name: capitalizeName(e.target.value) })}
+                        placeholder="Full Name *"
+                        required
                       />
                     </div>
-                    <label className="col-span-3 text-sm font-medium flex items-center">Finish Time</label>
-                    <div className="col-span-3">
-                      <Input
-                        type="time"
-                        value={formData.finish_time}
-                        onChange={(e) => setFormData({ ...formData, finish_time: e.target.value })}
-                      />
+                    <div>
+                      <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
+                        <SelectTrigger data-testid="role-select">
+                          <SelectValue placeholder="Select Role *" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="manager">Manager</SelectItem>
+                          <SelectItem value="employee">Employee</SelectItem>
+                          <SelectItem value="staff_member">Staff Member</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  </div>
-                  <div className="sm:col-span-2">
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                      <div>
-                        <p className="text-sm font-medium">Fixed Salary</p>
-                        <p className="text-xs text-gray-600">Skip late attendance deductions</p>
-                      </div>
-                      <Switch
-                        checked={formData.fixed_salary}
-                        onCheckedChange={(checked) => setFormData({ ...formData, fixed_salary: checked })}
-                      />
-                    </div>
-                  </div>
-                  {editingEmployee?.profile_pic && (
-                    <div className="sm:col-span-2">
-                      <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                        <img 
-                          src={editingEmployee.profile_pic} 
-                          alt="Current Profile" 
-                          className="w-16 h-16 rounded-full object-cover"
-                          style={{ borderRadius: '50%' }}
+                    {/* Department and Position in one line with labels */}
+                    <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                      <label className="col-span-3 text-sm font-medium flex items-center">Department</label>
+                      <div className="col-span-3">
+                        <Input
+                          data-testid="department-input"
+                          value={formData.department}
+                          onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+                          placeholder="Enter department"
                         />
-                        <span className="text-sm text-gray-600">Current Profile Picture</span>
+                      </div>
+                      <label className="col-span-3 text-sm font-medium flex items-center">Position</label>
+                      <div className="col-span-3">
+                        <Input
+                          data-testid="position-input"
+                          value={formData.position}
+                          onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                          placeholder="Enter position"
+                        />
                       </div>
                     </div>
-                  )}
-                  <div className="sm:col-span-2">
-                    <Input
-                      data-testid="profile-picture-input"
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setFormData({ ...formData, profile_picture: e.target.files[0] })}
-                      placeholder="Upload Profile Picture"
-                    />
+                    
+                    {/* Basic Salary and Allowances in one line with labels */}
+                    <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                      <label className="col-span-3 text-sm font-medium flex items-center">Basic Salary (Rs.)</label>
+                      <div className="col-span-3">
+                        <Input
+                          data-testid="salary-input"
+                          type="number"
+                          value={formData.basic_salary}
+                          onChange={(e) => setFormData({ ...formData, basic_salary: parseFloat(e.target.value) })}
+                          placeholder="0"
+                        />
+                      </div>
+                      <label className="col-span-3 text-sm font-medium flex items-center">Allowances (Rs.)</label>
+                      <div className="col-span-3">
+                        <Input
+                          data-testid="allowances-input"
+                          type="number"
+                          value={formData.allowances}
+                          onChange={(e) => setFormData({ ...formData, allowances: parseFloat(e.target.value) })}
+                          placeholder="0"
+                        />
+                      </div>
                     </div>
-                  </div>
+                    {/* Join Date with label - 3x9 */}
+                    <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                      <label className="col-span-3 text-sm font-medium flex items-center">Join Date *</label>
+                      <div className="col-span-9">
+                        <Input
+                          data-testid="join-date-input"
+                          type="date"
+                          value={formData.join_date}
+                          onChange={(e) => setFormData({ ...formData, join_date: e.target.value })}
+                          required
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* Start Time and Finish Time with labels - 3x3 each */}
+                    <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                      <label className="col-span-3 text-sm font-medium flex items-center">Start Time</label>
+                      <div className="col-span-3">
+                        <Input
+                          type="time"
+                          value={formData.start_time}
+                          onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                        />
+                      </div>
+                      <label className="col-span-3 text-sm font-medium flex items-center">Finish Time</label>
+                      <div className="col-span-3">
+                        <Input
+                          type="time"
+                          value={formData.finish_time}
+                          onChange={(e) => setFormData({ ...formData, finish_time: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium">Fixed Salary</p>
+                          <p className="text-xs text-gray-600">Skip late attendance deductions</p>
+                        </div>
+                        <Switch
+                          checked={formData.fixed_salary}
+                          onCheckedChange={(checked) => setFormData({ ...formData, fixed_salary: checked })}
+                        />
+                      </div>
+                    </div>
+                    {editingEmployee?.profile_pic && (
+                      <div className="sm:col-span-2">
+                        <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                          <img 
+                            src={editingEmployee.profile_pic} 
+                            alt="Current Profile" 
+                            className="w-16 h-16 rounded-full object-cover"
+                            style={{ borderRadius: '50%' }}
+                          />
+                          <span className="text-sm text-gray-600">Current Profile Picture</span>
+                        </div>
+                      </div>
+                    )}
+                    <div className="sm:col-span-2">
+                      <Input
+                        data-testid="profile-picture-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setFormData({ ...formData, profile_picture: e.target.files[0] })}
+                        placeholder="Upload Profile Picture"
+                      />
+                      </div>
+                    </div>
                   <div className="flex justify-end gap-2 pt-4">
                     <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
                       Cancel
