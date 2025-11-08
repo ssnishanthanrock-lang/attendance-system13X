@@ -533,13 +533,13 @@ export default function Attendance() {
   const handleSaveBulkAttendance = async () => {
     setSavingBulk(true);
     try {
-      const attendanceRecords = Object.entries(bulkAttendance).map(([employeeId, status]) => ({
+      const attendanceRecords = Object.entries(bulkAttendance).map(([employeeId, data]) => ({
         employee_id: employeeId,
         date: bulkDate,
-        status: status,
-        check_in: status === 'present' ? '09:00' : '',
-        check_out: status === 'present' ? '17:00' : '',
-        leave_type: status === 'leave' ? 'casual' : ''
+        status: data.status,
+        check_in: data.check_in || '',
+        check_out: data.check_out || '',
+        leave_type: data.leave_type || ''
       }));
 
       // Save all records
