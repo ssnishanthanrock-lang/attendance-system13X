@@ -3879,6 +3879,391 @@ async def upload_profile_pic(file: UploadFile = File(...), current_user: User = 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+# ============= LOCATION TRACKING ENDPOINTS =============
+
+@api_router.post("/location/tracking/start")
+async def start_location_tracking(current_user: User = Depends(get_current_user)):
+    """Start a new location tracking session for the current user"""
+    
+    # Check if there's already an active tracking session
+    existing_session = await db.tracking_sessions.find_one({
+        "company_id": current_user.company_id,
+        "employee_id": current_user.employee_id or current_user.id,
+        "status": "active"
+    })
+    
+    if existing_session:
+        return {
+            "message": "Tracking session already active",
+            "session_id": existing_session["id"],
+            "start_time": existing_session["start_time"]
+        }
+    
+    # Create new tracking session
+    session = {
+        "id": str(uuid.uuid4()),
+        "company_id": current_user.company_id,
+        "employee_id": current_user.employee_id or current_user.id,
+        "employee_name": capitalize_name(current_user.name),
+        "start_time": datetime.now(timezone.utc).isoformat(),
+        "end_time": None,
+        "status": "active",
+        "locations": [],
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.tracking_sessions.insert_one(session)
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "START_LOCATION_TRACKING",
+        f"Started location tracking session"
+    )
+    
+    return {
+        "message": "Location tracking started",
+        "session_id": session["id"],
+        "start_time": session["start_time"]
+    }
+
+@api_router.post("/location/tracking/update")
+async def update_location(location_data: LocationUpdate, current_user: User = Depends(get_current_user)):
+    """Add a location point to an active tracking session"""
+    
+    # Verify session exists and is active
+    session = await db.tracking_sessions.find_one({
+        "id": location_data.session_id,
+        "company_id": current_user.company_id,
+        "employee_id": current_user.employee_id or current_user.id,
+        "status": "active"
+    })
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Active tracking session not found")
+    
+    # Create location point
+    location_point = {
+        "latitude": location_data.latitude,
+        "longitude": location_data.longitude,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "accuracy": location_data.accuracy
+    }
+    
+    # Add location to session
+    await db.tracking_sessions.update_one(
+        {"id": location_data.session_id},
+        {"$push": {"locations": location_point}}
+    )
+    
+    return {
+        "message": "Location updated",
+        "timestamp": location_point["timestamp"]
+    }
+
+@api_router.post("/location/tracking/stop")
+async def stop_location_tracking(session_data: dict, current_user: User = Depends(get_current_user)):
+    """Stop an active location tracking session"""
+    
+    session_id = session_data.get("session_id")
+    if not session_id:
+        raise HTTPException(status_code=400, detail="session_id is required")
+    
+    # Verify session exists and is active
+    session = await db.tracking_sessions.find_one({
+        "id": session_id,
+        "company_id": current_user.company_id,
+        "employee_id": current_user.employee_id or current_user.id,
+        "status": "active"
+    })
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Active tracking session not found")
+    
+    # Stop the session
+    end_time = datetime.now(timezone.utc).isoformat()
+    await db.tracking_sessions.update_one(
+        {"id": session_id},
+        {
+            "$set": {
+                "status": "stopped",
+                "end_time": end_time
+            }
+        }
+    )
+    
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "STOP_LOCATION_TRACKING",
+        f"Stopped location tracking session (Duration: {len(session.get('locations', []))} points)"
+    )
+    
+    return {
+        "message": "Location tracking stopped",
+        "session_id": session_id,
+        "end_time": end_time,
+        "total_locations": len(session.get("locations", []))
+    }
+
+@api_router.post("/attendance/mark-with-location")
+async def mark_attendance_with_location(attendance_data: AttendanceWithLocation, current_user: User = Depends(get_current_user)):
+    """Mark attendance with location snapshot"""
+    
+    # Validate employee
+    employee_id = attendance_data.employee_id or current_user.employee_id or current_user.id
+    employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Check if attendance already exists for this date
+    existing = await db.attendance.find_one({
+        "company_id": current_user.company_id,
+        "employee_id": employee_id,
+        "date": attendance_data.date
+    })
+    
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Attendance already exists for {employee['name']} on {attendance_data.date}")
+    
+    # Create attendance record with location
+    check_in_datetime = None
+    check_out_datetime = None
+    
+    if attendance_data.check_in:
+        check_in_datetime = f"{attendance_data.date}T{attendance_data.check_in}:00"
+    else:
+        # Use current time as check-in if not provided
+        current_time = datetime.now(timezone.utc).strftime("%H:%M")
+        check_in_datetime = f"{attendance_data.date}T{current_time}:00"
+    
+    if attendance_data.check_out:
+        check_out_datetime = f"{attendance_data.date}T{attendance_data.check_out}:00"
+    
+    new_attendance = {
+        "id": str(uuid.uuid4()),
+        "company_id": current_user.company_id,
+        "employee_id": employee_id,
+        "employee_name": capitalize_name(employee["name"]),
+        "date": attendance_data.date,
+        "check_in": check_in_datetime,
+        "check_out": check_out_datetime,
+        "status": attendance_data.status,
+        "leave_type": attendance_data.leave_type,
+        "location": {
+            "latitude": attendance_data.latitude,
+            "longitude": attendance_data.longitude,
+            "accuracy": attendance_data.accuracy,
+            "address": attendance_data.address,
+            "map_snapshot": attendance_data.map_snapshot,
+            "captured_at": datetime.now(timezone.utc).isoformat()
+        },
+        "created_by": current_user.id,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    attendance_response = new_attendance.copy()
+    await db.attendance.insert_one(new_attendance)
+    
+    await log_activity(
+        current_user.company_id,
+        current_user.id,
+        current_user.name,
+        "ADD_ATTENDANCE_WITH_LOCATION",
+        f"Marked attendance with location for {capitalize_name(employee['name'])} on {attendance_data.date} at ({attendance_data.latitude:.4f}, {attendance_data.longitude:.4f})"
+    )
+    
+    return {"message": "Attendance marked with location", "attendance": attendance_response}
+
+@api_router.get("/location/tracking/history")
+async def get_tracking_history(
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get location tracking history for current user"""
+    
+    employee_id = current_user.employee_id or current_user.id
+    
+    # Build query
+    query = {
+        "company_id": current_user.company_id,
+        "employee_id": employee_id
+    }
+    
+    # Add date filtering if provided
+    if from_date or to_date:
+        date_filter = {}
+        if from_date:
+            date_filter["$gte"] = from_date
+        if to_date:
+            date_filter["$lte"] = to_date
+        query["start_time"] = date_filter
+    
+    # Get tracking sessions
+    sessions = await db.tracking_sessions.find(
+        query,
+        {"_id": 0}
+    ).sort("start_time", -1).to_list(length=None)
+    
+    return {"sessions": sessions, "total": len(sessions)}
+
+@api_router.get("/location/reports/employee/{employee_id}")
+async def get_employee_location_report(
+    employee_id: str,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Admin: Get location reports for a specific employee"""
+    
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Verify employee belongs to same company
+    employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+    
+    # Build query
+    query = {
+        "company_id": current_user.company_id,
+        "employee_id": employee_id
+    }
+    
+    # Add date filtering if provided
+    if from_date or to_date:
+        date_filter = {}
+        if from_date:
+            date_filter["$gte"] = from_date
+        if to_date:
+            date_filter["$lte"] = to_date
+        query["start_time"] = date_filter
+    
+    # Get tracking sessions
+    tracking_sessions = await db.tracking_sessions.find(
+        query,
+        {"_id": 0}
+    ).sort("start_time", -1).to_list(length=None)
+    
+    # Get attendance records with location
+    attendance_query = {
+        "company_id": current_user.company_id,
+        "employee_id": employee_id,
+        "location": {"$exists": True}
+    }
+    
+    if from_date or to_date:
+        date_filter = {}
+        if from_date:
+            date_filter["$gte"] = from_date
+        if to_date:
+            date_filter["$lte"] = to_date
+        attendance_query["date"] = date_filter
+    
+    attendance_records = await db.attendance.find(
+        attendance_query,
+        {"_id": 0}
+    ).sort("date", -1).to_list(length=None)
+    
+    return {
+        "employee": {
+            "id": employee["id"],
+            "name": capitalize_name(employee["name"]),
+            "mobile": employee["mobile"],
+            "position": employee.get("position")
+        },
+        "tracking_sessions": tracking_sessions,
+        "attendance_with_location": attendance_records,
+        "summary": {
+            "total_tracking_sessions": len(tracking_sessions),
+            "total_attendance_with_location": len(attendance_records),
+            "total_location_points": sum(len(session.get("locations", [])) for session in tracking_sessions)
+        }
+    }
+
+@api_router.get("/location/reports/all")
+async def get_all_location_reports(
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Admin: Get location reports for all employees"""
+    
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Get all employees in the company
+    employees = await db.users.find(
+        {"company_id": current_user.company_id, "role": {"$in": ["employee", "manager", "admin", "staff_member"]}},
+        {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1}
+    ).to_list(length=None)
+    
+    # Build date filter
+    date_filter = {}
+    if from_date or to_date:
+        if from_date:
+            date_filter["$gte"] = from_date
+        if to_date:
+            date_filter["$lte"] = to_date
+    
+    # Get all tracking sessions
+    tracking_query = {"company_id": current_user.company_id}
+    if date_filter:
+        tracking_query["start_time"] = date_filter
+    
+    all_tracking_sessions = await db.tracking_sessions.find(
+        tracking_query,
+        {"_id": 0}
+    ).sort("start_time", -1).to_list(length=None)
+    
+    # Get all attendance with location
+    attendance_query = {
+        "company_id": current_user.company_id,
+        "location": {"$exists": True}
+    }
+    if date_filter:
+        attendance_query["date"] = date_filter
+    
+    all_attendance = await db.attendance.find(
+        attendance_query,
+        {"_id": 0}
+    ).sort("date", -1).to_list(length=None)
+    
+    # Group by employee
+    employee_reports = []
+    for emp in employees:
+        emp_tracking = [s for s in all_tracking_sessions if s["employee_id"] == emp["id"]]
+        emp_attendance = [a for a in all_attendance if a["employee_id"] == emp["id"]]
+        
+        if emp_tracking or emp_attendance:  # Only include employees with location data
+            employee_reports.append({
+                "employee": {
+                    "id": emp["id"],
+                    "name": capitalize_name(emp["name"]),
+                    "mobile": emp["mobile"],
+                    "position": emp.get("position")
+                },
+                "tracking_sessions_count": len(emp_tracking),
+                "attendance_with_location_count": len(emp_attendance),
+                "total_location_points": sum(len(s.get("locations", [])) for s in emp_tracking),
+                "latest_tracking": emp_tracking[0] if emp_tracking else None,
+                "latest_attendance": emp_attendance[0] if emp_attendance else None
+            })
+    
+    return {
+        "employees": employee_reports,
+        "summary": {
+            "total_employees_with_data": len(employee_reports),
+            "total_tracking_sessions": len(all_tracking_sessions),
+            "total_attendance_with_location": len(all_attendance),
+            "total_location_points": sum(len(s.get("locations", [])) for s in all_tracking_sessions)
+        }
+    }
+
+
 # Include router
 app.include_router(api_router)
 
