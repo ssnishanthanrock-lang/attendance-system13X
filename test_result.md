@@ -654,7 +654,13 @@ metadata:
 
 test_plan:
   current_focus:
-    - "AI-Powered Bulk Employee Import - Frontend UI"
+    - "Location Tracking - Start Session Endpoint"
+    - "Location Tracking - Update Location Endpoint"
+    - "Location Tracking - Stop Session Endpoint"
+    - "Attendance with Location Endpoint"
+    - "Location Tracking History Endpoint"
+    - "Admin - Employee Location Report Endpoint"
+    - "Admin - All Employees Location Report Endpoint"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
