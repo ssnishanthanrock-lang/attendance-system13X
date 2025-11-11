@@ -6,6 +6,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import { Users, Calendar, FileText, DollarSign, Clock, CheckCircle, XCircle, AlertCircle, Radio } from 'lucide-react';
+import LocationTracker from '../components/LocationTracker';
+import AttendanceWithLocation from '../components/AttendanceWithLocation';
 
 export default function Dashboard() {
   const navigate = useNavigate();
