@@ -4210,11 +4210,19 @@ async def get_all_location_reports(
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or manager access required")
     
-    # Get all employees in the company
+    # Get all users in the company (including super admin for testing)
     employees = await db.users.find(
-        {"company_id": current_user.company_id, "role": {"$in": ["employee", "manager", "admin", "staff_member"]}},
-        {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1}
+        {"company_id": current_user.company_id},
+        {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1, "role": 1}
     ).to_list(length=None)
+    
+    # If testing with super admin, also include super admin users who have company_id
+    if current_user.role == "super_admin":
+        super_admins = await db.users.find(
+            {"role": "super_admin", "company_id": current_user.company_id},
+            {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1, "role": 1}
+        ).to_list(length=None)
+        employees.extend(super_admins)
     
     # Build date filter for tracking (start_time is ISO datetime string)
     tracking_date_filter = {}
