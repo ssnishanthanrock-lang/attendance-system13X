@@ -2909,6 +2909,628 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
         except Exception as e:
             self.log_result("Bulk Import Employees", False, f"Bulk import test error: {str(e)}")
 
+    def test_location_tracking_system(self):
+        """Test Location Tracking System - 7 New Endpoints (REVIEW REQUEST FOCUS)"""
+        print("\n=== TESTING LOCATION TRACKING SYSTEM (7 NEW ENDPOINTS) ===")
+        
+        # Test all 7 location tracking endpoints
+        self.test_location_tracking_start_session()
+        self.test_location_tracking_update_location()
+        self.test_location_tracking_stop_session()
+        self.test_attendance_with_location()
+        self.test_location_tracking_history()
+        self.test_admin_employee_location_report()
+        self.test_admin_all_employees_location_report()
+    
+    def test_location_tracking_start_session(self):
+        """Test POST /api/location/tracking/start endpoint"""
+        print("\n=== TESTING LOCATION TRACKING START SESSION ===")
+        
+        try:
+            # Test 1: Create new tracking session
+            response = self.session.post(f"{API_BASE}/location/tracking/start")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check required fields
+                required_fields = ["session_id", "start_time", "message"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    session_id = data.get("session_id")
+                    start_time = data.get("start_time")
+                    
+                    # Store session_id for other tests
+                    self.test_session_id = session_id
+                    
+                    self.log_result("Location Tracking Start - Create Session", True, 
+                                  "Successfully created new tracking session",
+                                  {"session_id": session_id, "start_time": start_time})
+                    
+                    # Test 2: Try to create duplicate session (should fail)
+                    duplicate_response = self.session.post(f"{API_BASE}/location/tracking/start")
+                    
+                    if duplicate_response.status_code == 400:
+                        self.log_result("Location Tracking Start - Duplicate Prevention", True, 
+                                      "Correctly prevented duplicate active session")
+                    else:
+                        self.log_result("Location Tracking Start - Duplicate Prevention", False, 
+                                      f"Duplicate session not prevented: {duplicate_response.status_code}")
+                else:
+                    self.log_result("Location Tracking Start - Response Structure", False, 
+                                  f"Missing required fields: {missing_fields}")
+            else:
+                self.log_result("Location Tracking Start - Create Session", False, 
+                              f"Failed to create tracking session: {response.status_code}",
+                              {"response": response.text})
+                
+        except Exception as e:
+            self.log_result("Location Tracking Start Session", False, f"Test error: {str(e)}")
+    
+    def test_location_tracking_update_location(self):
+        """Test POST /api/location/tracking/update endpoint"""
+        print("\n=== TESTING LOCATION TRACKING UPDATE LOCATION ===")
+        
+        try:
+            # Get session_id from previous test
+            session_id = getattr(self, 'test_session_id', None)
+            
+            if not session_id:
+                self.log_result("Location Tracking Update - No Session", False, 
+                              "No active session available for update test")
+                return
+            
+            # Test 1: Add location point to session
+            location_data = {
+                "session_id": session_id,
+                "latitude": 6.9271,  # Colombo coordinates
+                "longitude": 79.8612,
+                "accuracy": 10.5
+            }
+            
+            response = self.session.post(f"{API_BASE}/location/tracking/update", json=location_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if "timestamp" in data and "message" in data:
+                    timestamp = data.get("timestamp")
+                    self.log_result("Location Tracking Update - Add Location", True, 
+                                  "Successfully added location point to session",
+                                  {"session_id": session_id, "timestamp": timestamp})
+                    
+                    # Test 2: Add multiple location updates
+                    location_data_2 = {
+                        "session_id": session_id,
+                        "latitude": 6.9280,  # Slightly different coordinates
+                        "longitude": 79.8620,
+                        "accuracy": 8.2
+                    }
+                    
+                    response_2 = self.session.post(f"{API_BASE}/location/tracking/update", json=location_data_2)
+                    
+                    if response_2.status_code == 200:
+                        self.log_result("Location Tracking Update - Multiple Updates", True, 
+                                      "Successfully added multiple location points")
+                    else:
+                        self.log_result("Location Tracking Update - Multiple Updates", False, 
+                                      f"Failed to add second location: {response_2.status_code}")
+                else:
+                    self.log_result("Location Tracking Update - Response Structure", False, 
+                                  "Missing timestamp or message in response")
+            else:
+                self.log_result("Location Tracking Update - Add Location", False, 
+                              f"Failed to update location: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 3: Invalid session_id
+            invalid_data = {
+                "session_id": "invalid-session-id",
+                "latitude": 6.9271,
+                "longitude": 79.8612,
+                "accuracy": 10.5
+            }
+            
+            invalid_response = self.session.post(f"{API_BASE}/location/tracking/update", json=invalid_data)
+            
+            if invalid_response.status_code == 404:
+                self.log_result("Location Tracking Update - Invalid Session", True, 
+                              "Correctly rejected invalid session_id")
+            else:
+                self.log_result("Location Tracking Update - Invalid Session", False, 
+                              f"Invalid session_id not properly handled: {invalid_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Location Tracking Update Location", False, f"Test error: {str(e)}")
+    
+    def test_location_tracking_stop_session(self):
+        """Test POST /api/location/tracking/stop endpoint"""
+        print("\n=== TESTING LOCATION TRACKING STOP SESSION ===")
+        
+        try:
+            # Get session_id from previous test
+            session_id = getattr(self, 'test_session_id', None)
+            
+            if not session_id:
+                self.log_result("Location Tracking Stop - No Session", False, 
+                              "No active session available for stop test")
+                return
+            
+            # Test 1: Stop active session
+            stop_data = {"session_id": session_id}
+            
+            response = self.session.post(f"{API_BASE}/location/tracking/stop", json=stop_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                required_fields = ["session_id", "end_time", "total_locations"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    end_time = data.get("end_time")
+                    total_locations = data.get("total_locations")
+                    
+                    self.log_result("Location Tracking Stop - Stop Session", True, 
+                                  "Successfully stopped tracking session",
+                                  {"session_id": session_id, "end_time": end_time, 
+                                   "total_locations": total_locations})
+                    
+                    # Verify total_locations count (should be 2 from our updates)
+                    if total_locations >= 2:
+                        self.log_result("Location Tracking Stop - Location Count", True, 
+                                      f"Correct location count: {total_locations}")
+                    else:
+                        self.log_result("Location Tracking Stop - Location Count", False, 
+                                      f"Unexpected location count: {total_locations}")
+                else:
+                    self.log_result("Location Tracking Stop - Response Structure", False, 
+                                  f"Missing required fields: {missing_fields}")
+            else:
+                self.log_result("Location Tracking Stop - Stop Session", False, 
+                              f"Failed to stop session: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 2: Try to stop already stopped session (should fail)
+            duplicate_stop_response = self.session.post(f"{API_BASE}/location/tracking/stop", json=stop_data)
+            
+            if duplicate_stop_response.status_code == 400:
+                self.log_result("Location Tracking Stop - Already Stopped", True, 
+                              "Correctly prevented stopping already stopped session")
+            else:
+                self.log_result("Location Tracking Stop - Already Stopped", False, 
+                              f"Already stopped session not handled: {duplicate_stop_response.status_code}")
+            
+            # Test 3: Invalid session_id
+            invalid_stop_data = {"session_id": "invalid-session-id"}
+            
+            invalid_response = self.session.post(f"{API_BASE}/location/tracking/stop", json=invalid_stop_data)
+            
+            if invalid_response.status_code == 404:
+                self.log_result("Location Tracking Stop - Invalid Session", True, 
+                              "Correctly rejected invalid session_id for stop")
+            else:
+                self.log_result("Location Tracking Stop - Invalid Session", False, 
+                              f"Invalid session_id not properly handled: {invalid_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Location Tracking Stop Session", False, f"Test error: {str(e)}")
+    
+    def test_attendance_with_location(self):
+        """Test POST /api/attendance/mark-with-location endpoint"""
+        print("\n=== TESTING ATTENDANCE WITH LOCATION ===")
+        
+        try:
+            # Get employee for testing
+            employees_response = self.session.get(f"{API_BASE}/employees")
+            if employees_response.status_code != 200:
+                self.log_result("Attendance Location - Get Employees", False, 
+                              "Cannot get employees for attendance location test")
+                return
+            
+            employees = employees_response.json()
+            if not employees:
+                self.log_result("Attendance Location - No Employees", False, 
+                              "No employees found for attendance location test")
+                return
+            
+            test_employee = employees[0]
+            employee_id = test_employee.get('id')
+            
+            # Test 1: Mark attendance with location
+            today = datetime.now().date().isoformat()
+            
+            # Create mock base64 map snapshot (1x1 pixel PNG)
+            mock_map_snapshot = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg=="
+            
+            attendance_data = {
+                "employee_id": employee_id,
+                "date": today,
+                "check_in": "09:00",
+                "check_out": "17:00",
+                "status": "present",
+                "latitude": 6.9271,
+                "longitude": 79.8612,
+                "accuracy": 15.0,
+                "address": "Colombo, Sri Lanka",
+                "map_snapshot": mock_map_snapshot
+            }
+            
+            response = self.session.post(f"{API_BASE}/attendance/mark-with-location", json=attendance_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if "message" in data and "attendance_id" in data:
+                    attendance_id = data.get("attendance_id")
+                    self.log_result("Attendance Location - Mark Attendance", True, 
+                                  "Successfully marked attendance with location",
+                                  {"employee_id": employee_id, "attendance_id": attendance_id})
+                    
+                    # Verify location object structure in response
+                    if "location" in data:
+                        location = data["location"]
+                        location_fields = ["latitude", "longitude", "address", "map_snapshot", "captured_at"]
+                        missing_location_fields = [field for field in location_fields if field not in location]
+                        
+                        if not missing_location_fields:
+                            self.log_result("Attendance Location - Location Object", True, 
+                                          "Location object has correct structure")
+                        else:
+                            self.log_result("Attendance Location - Location Object", False, 
+                                          f"Missing location fields: {missing_location_fields}")
+                    else:
+                        self.log_result("Attendance Location - Location Object", False, 
+                                      "Location object missing from response")
+                else:
+                    self.log_result("Attendance Location - Response Structure", False, 
+                                  "Missing message or attendance_id in response")
+            else:
+                self.log_result("Attendance Location - Mark Attendance", False, 
+                              f"Failed to mark attendance with location: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 2: Auto-generate check-in if not provided
+            tomorrow = (datetime.now().date() + timedelta(days=1)).isoformat()
+            
+            auto_checkin_data = {
+                "employee_id": employee_id,
+                "date": tomorrow,
+                "status": "present",
+                "latitude": 6.9271,
+                "longitude": 79.8612,
+                "address": "Colombo, Sri Lanka"
+            }
+            
+            auto_response = self.session.post(f"{API_BASE}/attendance/mark-with-location", json=auto_checkin_data)
+            
+            if auto_response.status_code == 200:
+                self.log_result("Attendance Location - Auto Check-in", True, 
+                              "Successfully auto-generated check-in time")
+            else:
+                self.log_result("Attendance Location - Auto Check-in", False, 
+                              f"Auto check-in failed: {auto_response.status_code}")
+            
+            # Test 3: Duplicate attendance prevention
+            duplicate_response = self.session.post(f"{API_BASE}/attendance/mark-with-location", json=attendance_data)
+            
+            if duplicate_response.status_code == 400:
+                self.log_result("Attendance Location - Duplicate Prevention", True, 
+                              "Correctly prevented duplicate attendance")
+            else:
+                self.log_result("Attendance Location - Duplicate Prevention", False, 
+                              f"Duplicate attendance not prevented: {duplicate_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Attendance With Location", False, f"Test error: {str(e)}")
+    
+    def test_location_tracking_history(self):
+        """Test GET /api/location/tracking/history endpoint"""
+        print("\n=== TESTING LOCATION TRACKING HISTORY ===")
+        
+        try:
+            # Test 1: Get employee's tracking history
+            response = self.session.get(f"{API_BASE}/location/tracking/history")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if "sessions" in data and "total" in data:
+                    sessions = data.get("sessions", [])
+                    total = data.get("total", 0)
+                    
+                    self.log_result("Location Tracking History - Basic Retrieval", True, 
+                                  f"Successfully retrieved {total} tracking sessions",
+                                  {"total_sessions": total})
+                    
+                    # Verify session structure if sessions exist
+                    if sessions:
+                        first_session = sessions[0]
+                        session_fields = ["id", "start_time", "end_time", "status", "locations"]
+                        missing_session_fields = [field for field in session_fields if field not in first_session]
+                        
+                        if not missing_session_fields:
+                            self.log_result("Location Tracking History - Session Structure", True, 
+                                          "Session structure is correct")
+                            
+                            # Verify sessions are sorted by start_time descending
+                            if len(sessions) > 1:
+                                sorted_correctly = all(
+                                    sessions[i]["start_time"] >= sessions[i+1]["start_time"] 
+                                    for i in range(len(sessions)-1)
+                                )
+                                if sorted_correctly:
+                                    self.log_result("Location Tracking History - Sorting", True, 
+                                                  "Sessions correctly sorted by start_time descending")
+                                else:
+                                    self.log_result("Location Tracking History - Sorting", False, 
+                                                  "Sessions not properly sorted")
+                        else:
+                            self.log_result("Location Tracking History - Session Structure", False, 
+                                          f"Missing session fields: {missing_session_fields}")
+                    else:
+                        self.log_result("Location Tracking History - No Sessions", True, 
+                                      "No tracking sessions found (acceptable for new system)")
+                else:
+                    self.log_result("Location Tracking History - Response Structure", False, 
+                                  "Missing sessions or total in response")
+            else:
+                self.log_result("Location Tracking History - Basic Retrieval", False, 
+                              f"Failed to get tracking history: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 2: Date filtering
+            from datetime import timedelta
+            today = datetime.now().date()
+            yesterday = (today - timedelta(days=1)).isoformat()
+            today_str = today.isoformat()
+            
+            date_response = self.session.get(f"{API_BASE}/location/tracking/history", 
+                                           params={"from_date": yesterday, "to_date": today_str})
+            
+            if date_response.status_code == 200:
+                date_data = date_response.json()
+                self.log_result("Location Tracking History - Date Filtering", True, 
+                              f"Date filtering working, got {date_data.get('total', 0)} sessions")
+            else:
+                self.log_result("Location Tracking History - Date Filtering", False, 
+                              f"Date filtering failed: {date_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Location Tracking History", False, f"Test error: {str(e)}")
+    
+    def test_admin_employee_location_report(self):
+        """Test GET /api/location/reports/employee/{employee_id} endpoint (Admin only)"""
+        print("\n=== TESTING ADMIN EMPLOYEE LOCATION REPORT ===")
+        
+        try:
+            # Get employees for testing
+            employees_response = self.session.get(f"{API_BASE}/employees")
+            if employees_response.status_code != 200:
+                self.log_result("Admin Employee Report - Get Employees", False, 
+                              "Cannot get employees for admin report test")
+                return
+            
+            employees = employees_response.json()
+            if not employees:
+                self.log_result("Admin Employee Report - No Employees", False, 
+                              "No employees found for admin report test")
+                return
+            
+            test_employee = employees[0]
+            employee_id = test_employee.get('id')
+            
+            # Test 1: Admin access to specific employee report
+            response = self.session.get(f"{API_BASE}/location/reports/employee/{employee_id}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                required_fields = ["employee_info", "tracking_sessions", "attendance_with_location", "summary"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    employee_info = data.get("employee_info", {})
+                    tracking_sessions = data.get("tracking_sessions", [])
+                    attendance_with_location = data.get("attendance_with_location", [])
+                    summary = data.get("summary", {})
+                    
+                    self.log_result("Admin Employee Report - Structure", True, 
+                                  "Employee location report has correct structure",
+                                  {"employee_name": employee_info.get("name"),
+                                   "tracking_sessions": len(tracking_sessions),
+                                   "attendance_records": len(attendance_with_location)})
+                    
+                    # Verify summary statistics
+                    summary_fields = ["total_sessions", "total_attendance_records", "total_location_points"]
+                    missing_summary_fields = [field for field in summary_fields if field not in summary]
+                    
+                    if not missing_summary_fields:
+                        self.log_result("Admin Employee Report - Summary Statistics", True, 
+                                      "Summary statistics correctly calculated",
+                                      {"total_sessions": summary.get("total_sessions"),
+                                       "total_attendance": summary.get("total_attendance_records"),
+                                       "total_points": summary.get("total_location_points")})
+                    else:
+                        self.log_result("Admin Employee Report - Summary Statistics", False, 
+                                      f"Missing summary fields: {missing_summary_fields}")
+                else:
+                    self.log_result("Admin Employee Report - Structure", False, 
+                                  f"Missing required fields: {missing_fields}")
+            else:
+                self.log_result("Admin Employee Report - Admin Access", False, 
+                              f"Admin cannot access employee report: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 2: Date filtering
+            from datetime import timedelta
+            today = datetime.now().date()
+            last_week = (today - timedelta(days=7)).isoformat()
+            today_str = today.isoformat()
+            
+            date_response = self.session.get(f"{API_BASE}/location/reports/employee/{employee_id}", 
+                                           params={"from_date": last_week, "to_date": today_str})
+            
+            if date_response.status_code == 200:
+                self.log_result("Admin Employee Report - Date Filtering", True, 
+                              "Date filtering working for employee report")
+            else:
+                self.log_result("Admin Employee Report - Date Filtering", False, 
+                              f"Date filtering failed: {date_response.status_code}")
+            
+            # Test 3: Employee role access (should be denied for other employees)
+            self.test_employee_access_to_admin_reports(employee_id)
+                
+        except Exception as e:
+            self.log_result("Admin Employee Location Report", False, f"Test error: {str(e)}")
+    
+    def test_admin_all_employees_location_report(self):
+        """Test GET /api/location/reports/all endpoint (Admin only)"""
+        print("\n=== TESTING ADMIN ALL EMPLOYEES LOCATION REPORT ===")
+        
+        try:
+            # Test 1: Admin access to all employees' location data
+            response = self.session.get(f"{API_BASE}/location/reports/all")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                required_fields = ["employees", "summary"]
+                missing_fields = [field for field in required_fields if field not in data]
+                
+                if not missing_fields:
+                    employees = data.get("employees", [])
+                    summary = data.get("summary", {})
+                    
+                    self.log_result("Admin All Reports - Structure", True, 
+                                  "All employees location report has correct structure",
+                                  {"total_employees": len(employees)})
+                    
+                    # Verify employee report structure
+                    if employees:
+                        first_employee = employees[0]
+                        employee_fields = ["employee_id", "employee_name", "tracking_sessions_count", 
+                                         "attendance_records_count", "latest_tracking_session", "latest_attendance"]
+                        missing_employee_fields = [field for field in employee_fields if field not in first_employee]
+                        
+                        if not missing_employee_fields:
+                            self.log_result("Admin All Reports - Employee Structure", True, 
+                                          "Employee report structure is correct")
+                        else:
+                            self.log_result("Admin All Reports - Employee Structure", False, 
+                                          f"Missing employee fields: {missing_employee_fields}")
+                    else:
+                        self.log_result("Admin All Reports - No Employees", True, 
+                                      "No employees with location data (acceptable)")
+                    
+                    # Verify company-wide summary
+                    summary_fields = ["total_employees", "total_tracking_sessions", "total_attendance_records", "total_location_points"]
+                    missing_summary_fields = [field for field in summary_fields if field not in summary]
+                    
+                    if not missing_summary_fields:
+                        self.log_result("Admin All Reports - Company Summary", True, 
+                                      "Company-wide summary statistics correct",
+                                      {"total_employees": summary.get("total_employees"),
+                                       "total_sessions": summary.get("total_tracking_sessions"),
+                                       "total_attendance": summary.get("total_attendance_records")})
+                    else:
+                        self.log_result("Admin All Reports - Company Summary", False, 
+                                      f"Missing summary fields: {missing_summary_fields}")
+                else:
+                    self.log_result("Admin All Reports - Structure", False, 
+                                  f"Missing required fields: {missing_fields}")
+            else:
+                self.log_result("Admin All Reports - Admin Access", False, 
+                              f"Admin cannot access all employees report: {response.status_code}",
+                              {"response": response.text})
+            
+            # Test 2: Date filtering
+            from datetime import timedelta
+            today = datetime.now().date()
+            last_month = (today - timedelta(days=30)).isoformat()
+            today_str = today.isoformat()
+            
+            date_response = self.session.get(f"{API_BASE}/location/reports/all", 
+                                           params={"from_date": last_month, "to_date": today_str})
+            
+            if date_response.status_code == 200:
+                self.log_result("Admin All Reports - Date Filtering", True, 
+                              "Date filtering working for all employees report")
+            else:
+                self.log_result("Admin All Reports - Date Filtering", False, 
+                              f"Date filtering failed: {date_response.status_code}")
+            
+            # Test 3: Employee role access (should be denied)
+            self.test_employee_access_to_all_reports()
+                
+        except Exception as e:
+            self.log_result("Admin All Employees Location Report", False, f"Test error: {str(e)}")
+    
+    def test_employee_access_to_admin_reports(self, employee_id):
+        """Test employee role access to admin location reports (should be denied)"""
+        try:
+            # Create employee token
+            import jwt
+            employee_payload = {
+                "user_id": "95f4fd94-47ff-44ac-bcb8-b13561fbb446",  # Employee from DB
+                "role": "employee", 
+                "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",
+                "mobile": "0770539581"
+            }
+            
+            jwt_secret = "attendance-system-secret-key-change-in-production"
+            employee_token = jwt.encode(employee_payload, jwt_secret, algorithm="HS256")
+            
+            # Create new session for employee
+            employee_session = requests.Session()
+            employee_session.headers.update({'Authorization': f'Bearer {employee_token}'})
+            
+            # Test employee trying to access other employee's report (should fail)
+            response = employee_session.get(f"{API_BASE}/location/reports/employee/{employee_id}")
+            
+            if response.status_code == 403:
+                self.log_result("Location Reports - Employee Access Denied", True, 
+                              "Employee correctly denied access to other employees' location reports")
+            else:
+                self.log_result("Location Reports - Employee Access Denied", False, 
+                              f"Employee has unexpected access to admin reports: {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Employee Access to Admin Reports", False, f"Test error: {str(e)}")
+    
+    def test_employee_access_to_all_reports(self):
+        """Test employee role access to all employees report (should be denied)"""
+        try:
+            # Create employee token
+            import jwt
+            employee_payload = {
+                "user_id": "95f4fd94-47ff-44ac-bcb8-b13561fbb446",  # Employee from DB
+                "role": "employee", 
+                "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",
+                "mobile": "0770539581"
+            }
+            
+            jwt_secret = "attendance-system-secret-key-change-in-production"
+            employee_token = jwt.encode(employee_payload, jwt_secret, algorithm="HS256")
+            
+            # Create new session for employee
+            employee_session = requests.Session()
+            employee_session.headers.update({'Authorization': f'Bearer {employee_token}'})
+            
+            # Test employee trying to access all employees report (should fail)
+            response = employee_session.get(f"{API_BASE}/location/reports/all")
+            
+            if response.status_code == 403:
+                self.log_result("All Reports - Employee Access Denied", True, 
+                              "Employee correctly denied access to all employees location report (403)")
+            else:
+                self.log_result("All Reports - Employee Access Denied", False, 
+                              f"Employee has unexpected access to all reports: {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Employee Access to All Reports", False, f"Test error: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting IT Signature ERP Backend API Tests - BULK EMPLOYEE IMPORT TESTING")
