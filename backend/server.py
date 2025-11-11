@@ -4133,14 +4133,14 @@ async def get_employee_location_report(
         "employee_id": employee_id
     }
     
-    # Add date filtering if provided
+    # Add date filtering if provided (start_time is ISO datetime)
     if from_date or to_date:
-        date_filter = {}
+        tracking_date_filter = {}
         if from_date:
-            date_filter["$gte"] = from_date
+            tracking_date_filter["$gte"] = f"{from_date}T00:00:00"
         if to_date:
-            date_filter["$lte"] = to_date
-        query["start_time"] = date_filter
+            tracking_date_filter["$lte"] = f"{to_date}T23:59:59"
+        query["start_time"] = tracking_date_filter
     
     # Get tracking sessions
     tracking_sessions = await db.tracking_sessions.find(
@@ -4155,13 +4155,14 @@ async def get_employee_location_report(
         "location": {"$exists": True}
     }
     
+    # Add date filtering for attendance (date is YYYY-MM-DD)
     if from_date or to_date:
-        date_filter = {}
+        attendance_date_filter = {}
         if from_date:
-            date_filter["$gte"] = from_date
+            attendance_date_filter["$gte"] = from_date
         if to_date:
-            date_filter["$lte"] = to_date
-        attendance_query["date"] = date_filter
+            attendance_date_filter["$lte"] = to_date
+        attendance_query["date"] = attendance_date_filter
     
     attendance_records = await db.attendance.find(
         attendance_query,
