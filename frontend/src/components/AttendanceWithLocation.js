@@ -106,15 +106,9 @@ const AttendanceWithLocation = () => {
       const token = localStorage.getItem('token');
       const today = new Date().toISOString().split('T')[0];
 
-      // Get current user info
-      const userStr = localStorage.getItem('user');
-      const currentUser = userStr ? JSON.parse(userStr) : null;
-      const employeeId = currentUser?.employee_id || currentUser?.id;
-
       await axios.post(
         `${backendUrl}/api/attendance/mark-with-location`,
         {
-          employee_id: employeeId,
           date: today,
           status: 'present',
           latitude: location.latitude,
