@@ -365,6 +365,12 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Location Tracking for All Users */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <LocationTracker />
+          <AttendanceWithLocation />
+        </div>
+
         {/* Recent Activities for Admin/Manager */}
         {isAdmin && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
