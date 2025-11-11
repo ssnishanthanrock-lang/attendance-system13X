@@ -338,7 +338,7 @@ class LocationUpdate(BaseModel):
     accuracy: Optional[float] = None
 
 class AttendanceWithLocation(BaseModel):
-    employee_id: str
+    employee_id: Optional[str] = None
     date: str
     check_in: Optional[str] = None
     check_out: Optional[str] = None
