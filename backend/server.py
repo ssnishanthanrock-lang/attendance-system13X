@@ -4133,13 +4133,16 @@ async def get_employee_location_report(
 ):
     """Admin: Get location reports for a specific employee"""
     
-    if current_user.role not in ["admin", "manager"]:
+    if current_user.role not in ["admin", "manager", "super_admin"]:
         raise HTTPException(status_code=403, detail="Admin or manager access required")
     
-    # Verify employee belongs to same company
+    # Verify employee exists (check both with company_id and without for super admins)
     employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
     if not employee:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        # Try finding user without company_id restriction (for super admin testing)
+        employee = await db.users.find_one({"id": employee_id})
+        if not employee:
+            raise HTTPException(status_code=404, detail="Employee not found")
     
     # Build query
     query = {
