@@ -129,6 +129,91 @@ user_problem_statement: |
   - Invoicing system (customers, products, estimates, invoices)
 
 backend:
+  - task: "Location Tracking - Start Session Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/location/tracking/start endpoint implemented. Creates new tracking session for employee with unique session_id, prevents duplicate active sessions, stores company_id, employee_id, employee_name, start_time, status='active'. Returns session_id and start_time. Logs activity."
+
+  - task: "Location Tracking - Update Location Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/location/tracking/update endpoint implemented. Accepts session_id, latitude, longitude, accuracy. Validates active session exists. Pushes location point with timestamp to locations array. Returns confirmation with timestamp."
+
+  - task: "Location Tracking - Stop Session Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/location/tracking/stop endpoint implemented. Accepts session_id, validates active session, updates status to 'stopped', sets end_time. Returns session_id, end_time, and total_locations count. Logs activity with session duration."
+
+  - task: "Attendance with Location Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/attendance/mark-with-location endpoint implemented. Accepts employee_id, date, check_in/out times, status, leave_type, latitude, longitude, accuracy, address, map_snapshot (base64). Creates attendance record with embedded location object including coordinates, accuracy, address, map snapshot image, and captured_at timestamp. Validates employee, checks for duplicate attendance. Logs activity with location coordinates."
+
+  - task: "Location Tracking History Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/location/tracking/history endpoint implemented. Returns employee's own tracking sessions with optional from_date/to_date filtering. Sorted by start_time descending. Returns sessions array and total count. Multi-tenant safe (filters by company_id and employee_id)."
+
+  - task: "Admin - Employee Location Report Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/location/reports/employee/{employee_id} endpoint implemented. Admin/manager can view specific employee's location data. Returns employee info, tracking_sessions array, attendance_with_location array, and summary statistics (total sessions, attendance records, location points). Supports date filtering. Validates employee belongs to same company."
+
+  - task: "Admin - All Employees Location Report Endpoint"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "GET /api/location/reports/all endpoint implemented. Admin/manager can view all employees' location data. Returns array of employee reports with tracking/attendance counts, latest tracking session, latest attendance. Includes company-wide summary statistics. Supports date filtering. Only includes employees with location data. Multi-tenant safe."
+
+
   - task: "Super Admin Invoicing Toggle"
     implemented: true
     working: "NA"
