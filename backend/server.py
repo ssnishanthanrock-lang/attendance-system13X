@@ -4259,9 +4259,22 @@ async def get_all_location_reports(
     
     # Group by employee
     employee_reports = []
+    
+    # Debug logging
+    print(f"DEBUG: Total employees in company: {len(employees)}")
+    print(f"DEBUG: Total tracking sessions: {len(all_tracking_sessions)}")
+    print(f"DEBUG: Total attendance records: {len(all_attendance)}")
+    
+    if all_tracking_sessions:
+        print(f"DEBUG: Sample tracking session employee_id: {all_tracking_sessions[0].get('employee_id')}")
+    if employees:
+        print(f"DEBUG: Sample employee id: {employees[0].get('id')}")
+    
     for emp in employees:
         emp_tracking = [s for s in all_tracking_sessions if s["employee_id"] == emp["id"]]
         emp_attendance = [a for a in all_attendance if a["employee_id"] == emp["id"]]
+        
+        print(f"DEBUG: Employee {emp['name']} (id={emp['id']}): {len(emp_tracking)} tracking, {len(emp_attendance)} attendance")
         
         if emp_tracking or emp_attendance:  # Only include employees with location data
             employee_reports.append({
