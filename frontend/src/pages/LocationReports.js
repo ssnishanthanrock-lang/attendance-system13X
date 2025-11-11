@@ -243,33 +243,43 @@ const LocationReports = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {allReports.employees.map((empReport) => (
-                      <tr key={empReport.employee.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4">
-                          <div>
-                            <div className="font-medium text-gray-900">{empReport.employee.name}</div>
-                            <div className="text-sm text-gray-500">{empReport.employee.position}</div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{empReport.tracking_sessions_count}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{empReport.attendance_with_location_count}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{empReport.total_location_points}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                          {empReport.latest_tracking ? formatDate(empReport.latest_tracking.start_time) : 'N/A'}
-                        </td>
-                        <td className="px-6 py-4">
-                          <button
-                            onClick={() => {
-                              setSelectedEmployee(empReport.employee.id);
-                              fetchEmployeeReport(empReport.employee.id);
-                            }}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
-                          >
-                            View Details
-                          </button>
+                    {allReports.employees && allReports.employees.length > 0 ? (
+                      allReports.employees.map((empReport) => (
+                        <tr key={empReport.employee.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4">
+                            <div>
+                              <div className="font-medium text-gray-900">{empReport.employee.name}</div>
+                              <div className="text-sm text-gray-500">{empReport.employee.position}</div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{empReport.tracking_sessions_count}</td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{empReport.attendance_with_location_count}</td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{empReport.total_location_points}</td>
+                          <td className="px-6 py-4 text-sm text-gray-500">
+                            {empReport.latest_tracking ? formatDate(empReport.latest_tracking.start_time) : 'N/A'}
+                          </td>
+                          <td className="px-6 py-4">
+                            <button
+                              onClick={() => {
+                                setSelectedEmployee(empReport.employee.id);
+                                fetchEmployeeReport(empReport.employee.id);
+                              }}
+                              className="text-blue-600 hover:text-blue-800 font-medium"
+                            >
+                              View Details
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                          <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                          <p>No location data found for the selected date range</p>
+                          <p className="text-sm mt-1">Try adjusting the date filters or ensure employees have started tracking</p>
                         </td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>
