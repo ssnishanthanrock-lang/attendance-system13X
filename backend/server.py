@@ -4093,13 +4093,13 @@ async def get_tracking_history(
         "employee_id": employee_id
     }
     
-    # Add date filtering if provided
+    # Add date filtering if provided (start_time is ISO datetime)
     if from_date or to_date:
         date_filter = {}
         if from_date:
-            date_filter["$gte"] = from_date
+            date_filter["$gte"] = f"{from_date}T00:00:00"
         if to_date:
-            date_filter["$lte"] = to_date
+            date_filter["$lte"] = f"{to_date}T23:59:59"
         query["start_time"] = date_filter
     
     # Get tracking sessions
