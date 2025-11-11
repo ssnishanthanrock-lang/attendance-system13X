@@ -194,8 +194,9 @@ const AttendanceWithLocation = () => {
             <p className="text-xs text-gray-500 mt-1">
               Address: {address || 'Loading...'}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className={`text-xs mt-1 ${location.accuracy > 100 ? 'text-orange-600 font-medium' : 'text-gray-500'}`}>
               Accuracy: ±{location.accuracy.toFixed(0)}m
+              {location.accuracy > 100 && ' (Low accuracy - Please enable GPS/WiFi for better results)'}
             </p>
           </div>
 
