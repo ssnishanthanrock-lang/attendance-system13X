@@ -4014,9 +4014,23 @@ async def mark_attendance_with_location(attendance_data: AttendanceWithLocation,
     
     # Validate employee
     employee_id = attendance_data.employee_id or current_user.employee_id or current_user.id
+    
+    # Debug logging
+    print(f"DEBUG: Trying to find employee - employee_id: {employee_id}, company_id: {current_user.company_id}")
+    print(f"DEBUG: current_user.id: {current_user.id}, current_user.employee_id: {current_user.employee_id}")
+    
     employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
+    
     if not employee:
-        raise HTTPException(status_code=404, detail="Employee not found")
+        # Try alternative lookup - maybe the user doesn't have employee_id field
+        employee = await db.users.find_one({"id": current_user.id})
+        print(f"DEBUG: Alternative lookup result: {employee}")
+        
+        if not employee:
+            raise HTTPException(
+                status_code=404, 
+                detail=f"Employee not found. Searched for id={employee_id}, company_id={current_user.company_id}"
+            )
     
     # Check if attendance already exists for this date
     existing = await db.attendance.find_one({
