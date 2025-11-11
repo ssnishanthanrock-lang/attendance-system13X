@@ -3533,7 +3533,7 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
 
     def run_all_tests(self):
         """Run all backend tests"""
-        print("🚀 Starting IT Signature ERP Backend API Tests - BULK EMPLOYEE IMPORT TESTING")
+        print("🚀 Starting IT Signature ERP Backend API Tests - LOCATION TRACKING SYSTEM TESTING")
         print(f"Testing against: {API_BASE}")
         print("=" * 80)
         
@@ -3541,9 +3541,16 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
         auth_success = self.test_authentication()
         
         if auth_success:
-            # Run Bulk Employee Import Tests (REVIEW REQUEST FOCUS)
+            # Run Location Tracking System Tests (REVIEW REQUEST FOCUS)
             print("\n" + "="*80)
-            print("🤖 TESTING AI-POWERED BULK EMPLOYEE IMPORT (REVIEW REQUEST FOCUS)")
+            print("📍 TESTING LOCATION TRACKING SYSTEM - 7 NEW ENDPOINTS (REVIEW REQUEST FOCUS)")
+            print("="*80)
+            
+            self.test_location_tracking_system()
+            
+            # Run Bulk Employee Import Tests (Previous)
+            print("\n" + "="*80)
+            print("🤖 TESTING AI-POWERED BULK EMPLOYEE IMPORT (Previous)")
             print("="*80)
             
             self.test_bulk_employee_import()
