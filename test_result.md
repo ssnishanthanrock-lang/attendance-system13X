@@ -104,20 +104,29 @@
 
 user_problem_statement: |
   IT Signature ERP - Multi-tenant employee attendance software
-  CURRENT PHASE: Invoicing System Implementation
-  Complete invoicing system with:
-  1. Super Admin invoicing toggle per company
-  2. Product categories and products with stock management
-  3. Customer management
-  4. Estimates with auto-numbering (EST-25-MMDD-XX)
-  5. Invoices with auto-numbering (INV-25-MMDD-XX), payments, and stock reduction
-  6. Company invoice settings (address, mobile, hotline, bank details)
+  CURRENT PHASE: Employee Location Tracking System
+  Real-time location tracking for employees with two main features:
+  1. Live Location Tracking: Employee can start/stop tracking session with location updates every 5 minutes
+  2. Attendance with Location: Employee can mark attendance with location snapshot (map image + coordinates)
+  
+  Admin Reports:
+  - View live tracking routes on map with timestamps
+  - List all tracked locations with date/time filtering
+  - View attendance location history with map snapshots
+  - Access all employees' location data
+  
+  Technical Implementation:
+  - Map Provider: Leaflet with OpenStreetMap (free, no API key)
+  - Location Update Interval: Every 5 minutes during active tracking
+  - Map Snapshots: Generated as base64 images with location markers
+  - Reverse Geocoding: Nominatim API for addresses (free)
   
   Previous Phases Completed:
   - Employee attendance system with payroll
   - Dashboard with salary summary and attendance charts
   - Super Admin Management UI
   - Profile picture and branding uploads
+  - Invoicing system (customers, products, estimates, invoices)
 
 backend:
   - task: "Super Admin Invoicing Toggle"
