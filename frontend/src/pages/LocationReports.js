@@ -57,6 +57,8 @@ const LocationReports = () => {
         headers: { Authorization: `Bearer ${token}` },
         params
       });
+      console.log('All Reports Response:', response.data);
+      console.log('Employees array:', response.data.employees);
       setAllReports(response.data);
     } catch (error) {
       console.error('Error fetching all reports:', error);
