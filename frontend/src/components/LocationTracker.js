@@ -175,10 +175,10 @@ const LocationTracker = () => {
   };
 
   const startLocationUpdates = (currentSessionId) => {
-    // Update location every 5 minutes (300000 ms)
+    // Update location every 10 seconds for TESTING (change to 300000 ms for 5 minutes in production)
     locationIntervalRef.current = setInterval(() => {
       captureAndSendLocation(currentSessionId);
-    }, 300000); // 5 minutes
+    }, 10000); // 10 seconds for testing
   };
 
   const startTimer = () => {
