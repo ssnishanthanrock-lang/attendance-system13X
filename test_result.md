@@ -197,6 +197,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Attendance with location endpoint working correctly. Successfully marks attendance with location data including coordinates (6.9271, 79.8612), address, and base64 map snapshot. Location object properly embedded with all required fields (latitude, longitude, address, map_snapshot, captured_at). Auto-generates check-in time when not provided. Duplicate attendance prevention working. Minor: Response structure uses 'attendance' field instead of 'attendance_id' (acceptable - returns full attendance object)."
+      - working: false
+        agent: "testing"
+        comment: "❌ COMPREHENSIVE TEST ISSUE: Attendance with location endpoint has duplicate prevention issue. Failed to mark attendance with location (400 error: 'Attendance already exists for Test Admin on 2025-11-11'). This indicates attendance was already marked for today during previous tests. Duplicate prevention is working correctly, but endpoint cannot be fully tested due to existing attendance record. Auto check-in test also failed (400). Core functionality appears implemented but blocked by existing data."
 
   - task: "Location Tracking History Endpoint"
     implemented: true
