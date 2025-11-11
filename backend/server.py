@@ -4269,7 +4269,28 @@ async def get_all_location_reports(
         {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1, "role": 1}
     ).to_list(length=None)
     
-    print(f"DEBUG: Found {len(users_with_data)} users with location data")
+    print(f"DEBUG: Found {len(users_with_data)} users from database")
+    
+    # For any employee_ids not found in users, create placeholder from session data
+    found_ids = {user["id"] for user in users_with_data}
+    missing_ids = employee_ids - found_ids
+    
+    if missing_ids:
+        print(f"DEBUG: Missing user IDs: {missing_ids}")
+        # Add placeholder users from tracking session data
+        for emp_id in missing_ids:
+            # Find a session with this employee_id to get the name
+            session_with_name = next((s for s in all_tracking_sessions if s.get("employee_id") == emp_id), None)
+            if session_with_name:
+                users_with_data.append({
+                    "id": emp_id,
+                    "name": session_with_name.get("employee_name", "Unknown User"),
+                    "mobile": "N/A",
+                    "position": "Super Admin" if emp_id == "SUPER-ADMIN" else "Unknown",
+                    "role": "super_admin" if emp_id == "SUPER-ADMIN" else "unknown"
+                })
+    
+    print(f"DEBUG: Total users with location data (including placeholders): {len(users_with_data)}")
     print(f"DEBUG: Total tracking sessions: {len(all_tracking_sessions)}")
     print(f"DEBUG: Total attendance records: {len(all_attendance)}")
     
