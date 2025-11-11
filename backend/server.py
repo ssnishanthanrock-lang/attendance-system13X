@@ -4201,18 +4201,20 @@ async def get_all_location_reports(
         {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1}
     ).to_list(length=None)
     
-    # Build date filter
-    date_filter = {}
+    # Build date filter for tracking (start_time is ISO datetime string)
+    tracking_date_filter = {}
     if from_date or to_date:
         if from_date:
-            date_filter["$gte"] = from_date
+            # Convert date to start of day datetime for comparison
+            tracking_date_filter["$gte"] = f"{from_date}T00:00:00"
         if to_date:
-            date_filter["$lte"] = to_date
+            # Convert date to end of day datetime for comparison
+            tracking_date_filter["$lte"] = f"{to_date}T23:59:59"
     
     # Get all tracking sessions
     tracking_query = {"company_id": current_user.company_id}
-    if date_filter:
-        tracking_query["start_time"] = date_filter
+    if tracking_date_filter:
+        tracking_query["start_time"] = tracking_date_filter
     
     all_tracking_sessions = await db.tracking_sessions.find(
         tracking_query,
