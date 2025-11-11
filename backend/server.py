@@ -4221,13 +4221,21 @@ async def get_all_location_reports(
         {"_id": 0}
     ).sort("start_time", -1).to_list(length=None)
     
+    # Build date filter for attendance (date is YYYY-MM-DD string)
+    attendance_date_filter = {}
+    if from_date or to_date:
+        if from_date:
+            attendance_date_filter["$gte"] = from_date
+        if to_date:
+            attendance_date_filter["$lte"] = to_date
+    
     # Get all attendance with location
     attendance_query = {
         "company_id": current_user.company_id,
         "location": {"$exists": True}
     }
-    if date_filter:
-        attendance_query["date"] = date_filter
+    if attendance_date_filter:
+        attendance_query["date"] = attendance_date_filter
     
     all_attendance = await db.attendance.find(
         attendance_query,
