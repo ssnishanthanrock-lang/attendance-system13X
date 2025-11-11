@@ -176,15 +176,18 @@ backend:
 
   - task: "Attendance with Location Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/attendance/mark-with-location endpoint implemented. Accepts employee_id, date, check_in/out times, status, leave_type, latitude, longitude, accuracy, address, map_snapshot (base64). Creates attendance record with embedded location object including coordinates, accuracy, address, map snapshot image, and captured_at timestamp. Validates employee, checks for duplicate attendance. Logs activity with location coordinates."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Attendance with location endpoint working correctly. Successfully marks attendance with location data including coordinates (6.9271, 79.8612), address, and base64 map snapshot. Location object properly embedded with all required fields (latitude, longitude, address, map_snapshot, captured_at). Auto-generates check-in time when not provided. Duplicate attendance prevention working. Minor: Response structure uses 'attendance' field instead of 'attendance_id' (acceptable - returns full attendance object)."
 
   - task: "Location Tracking History Endpoint"
     implemented: true
