@@ -4279,10 +4279,11 @@ async def get_all_location_reports(
         print(f"DEBUG: Sample employee id: {employees[0].get('id')}")
     
     for emp in employees:
-        emp_tracking = [s for s in all_tracking_sessions if s["employee_id"] == emp["id"]]
-        emp_attendance = [a for a in all_attendance if a["employee_id"] == emp["id"]]
+        # Match by employee_id or by user id
+        emp_tracking = [s for s in all_tracking_sessions if s.get("employee_id") == emp["id"]]
+        emp_attendance = [a for a in all_attendance if a.get("employee_id") == emp["id"]]
         
-        print(f"DEBUG: Employee {emp['name']} (id={emp['id']}): {len(emp_tracking)} tracking, {len(emp_attendance)} attendance")
+        print(f"DEBUG: Employee {emp.get('name')} (id={emp['id']}, role={emp.get('role')}): {len(emp_tracking)} tracking, {len(emp_attendance)} attendance")
         
         if emp_tracking or emp_attendance:  # Only include employees with location data
             employee_reports.append({
