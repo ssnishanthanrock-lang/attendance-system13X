@@ -260,7 +260,7 @@ const LocationTracker = () => {
           </div>
 
           <p className="text-sm text-gray-600 mb-4 text-center">
-            Location is updated every 5 minutes
+            Location is updated every 10 seconds (testing mode)
           </p>
 
           <button
