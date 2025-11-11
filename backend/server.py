@@ -4207,34 +4207,18 @@ async def get_all_location_reports(
 ):
     """Admin: Get location reports for all employees"""
     
-    if current_user.role not in ["admin", "manager"]:
+    if current_user.role not in ["admin", "manager", "super_admin"]:
         raise HTTPException(status_code=403, detail="Admin or manager access required")
-    
-    # Get all users in the company (including super admin for testing)
-    employees = await db.users.find(
-        {"company_id": current_user.company_id},
-        {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1, "role": 1}
-    ).to_list(length=None)
-    
-    # If testing with super admin, also include super admin users who have company_id
-    if current_user.role == "super_admin":
-        super_admins = await db.users.find(
-            {"role": "super_admin", "company_id": current_user.company_id},
-            {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1, "role": 1}
-        ).to_list(length=None)
-        employees.extend(super_admins)
     
     # Build date filter for tracking (start_time is ISO datetime string)
     tracking_date_filter = {}
     if from_date or to_date:
         if from_date:
-            # Convert date to start of day datetime for comparison
             tracking_date_filter["$gte"] = f"{from_date}T00:00:00"
         if to_date:
-            # Convert date to end of day datetime for comparison
             tracking_date_filter["$lte"] = f"{to_date}T23:59:59"
     
-    # Get all tracking sessions
+    # Get all tracking sessions for the company
     tracking_query = {"company_id": current_user.company_id}
     if tracking_date_filter:
         tracking_query["start_time"] = tracking_date_filter
@@ -4252,7 +4236,7 @@ async def get_all_location_reports(
         if to_date:
             attendance_date_filter["$lte"] = to_date
     
-    # Get all attendance with location
+    # Get all attendance with location for the company
     attendance_query = {
         "company_id": current_user.company_id,
         "location": {"$exists": True}
@@ -4265,33 +4249,44 @@ async def get_all_location_reports(
         {"_id": 0}
     ).sort("date", -1).to_list(length=None)
     
-    # Group by employee
-    employee_reports = []
+    # Extract unique employee_ids from tracking sessions and attendance
+    employee_ids = set()
+    for session in all_tracking_sessions:
+        if session.get("employee_id"):
+            employee_ids.add(session["employee_id"])
+    for att in all_attendance:
+        if att.get("employee_id"):
+            employee_ids.add(att["employee_id"])
     
-    # Debug logging
-    print(f"DEBUG: Total employees in company: {len(employees)}")
+    print(f"DEBUG: Unique employee_ids with location data: {employee_ids}")
+    
+    # Fetch user information for all these employee_ids
+    users_with_data = await db.users.find(
+        {"id": {"$in": list(employee_ids)}},
+        {"_id": 0, "id": 1, "name": 1, "mobile": 1, "position": 1, "role": 1}
+    ).to_list(length=None)
+    
+    print(f"DEBUG: Found {len(users_with_data)} users with location data")
     print(f"DEBUG: Total tracking sessions: {len(all_tracking_sessions)}")
     print(f"DEBUG: Total attendance records: {len(all_attendance)}")
     
-    if all_tracking_sessions:
-        print(f"DEBUG: Sample tracking session employee_id: {all_tracking_sessions[0].get('employee_id')}")
-    if employees:
-        print(f"DEBUG: Sample employee id: {employees[0].get('id')}")
+    # Group by employee
+    employee_reports = []
     
-    for emp in employees:
-        # Match by employee_id or by user id
-        emp_tracking = [s for s in all_tracking_sessions if s.get("employee_id") == emp["id"]]
-        emp_attendance = [a for a in all_attendance if a.get("employee_id") == emp["id"]]
+    for user in users_with_data:
+        # Match by employee_id
+        emp_tracking = [s for s in all_tracking_sessions if s.get("employee_id") == user["id"]]
+        emp_attendance = [a for a in all_attendance if a.get("employee_id") == user["id"]]
         
-        print(f"DEBUG: Employee {emp.get('name')} (id={emp['id']}, role={emp.get('role')}): {len(emp_tracking)} tracking, {len(emp_attendance)} attendance")
+        print(f"DEBUG: User {user.get('name')} (id={user['id']}, role={user.get('role')}): {len(emp_tracking)} tracking, {len(emp_attendance)} attendance")
         
-        if emp_tracking or emp_attendance:  # Only include employees with location data
+        if emp_tracking or emp_attendance:
             employee_reports.append({
                 "employee": {
-                    "id": emp["id"],
-                    "name": capitalize_name(emp["name"]),
-                    "mobile": emp["mobile"],
-                    "position": emp.get("position")
+                    "id": user["id"],
+                    "name": capitalize_name(user["name"]),
+                    "mobile": user.get("mobile", "N/A"),
+                    "position": user.get("position", user.get("role", "").title())
                 },
                 "tracking_sessions_count": len(emp_tracking),
                 "attendance_with_location_count": len(emp_attendance),
