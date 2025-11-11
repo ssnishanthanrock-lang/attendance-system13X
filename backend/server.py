@@ -311,6 +311,45 @@ class Estimate(BaseModel):
     deleted_at: Optional[str] = None
     deleted_by: Optional[str] = None
 
+
+# ============= LOCATION TRACKING MODELS =============
+class LocationPoint(BaseModel):
+    latitude: float
+    longitude: float
+    timestamp: str
+    accuracy: Optional[float] = None
+
+class TrackingSession(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    company_id: str
+    employee_id: str
+    employee_name: str
+    start_time: str
+    end_time: Optional[str] = None
+    status: str = "active"  # active, stopped
+    locations: List[LocationPoint] = []
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class LocationUpdate(BaseModel):
+    session_id: str
+    latitude: float
+    longitude: float
+    accuracy: Optional[float] = None
+
+class AttendanceWithLocation(BaseModel):
+    employee_id: str
+    date: str
+    check_in: Optional[str] = None
+    check_out: Optional[str] = None
+    status: str = "present"
+    leave_type: Optional[str] = None
+    latitude: float
+    longitude: float
+    accuracy: Optional[float] = None
+    address: Optional[str] = None
+    map_snapshot: Optional[str] = None  # base64 encoded image
+
 # ============= HELPER FUNCTIONS =============
 def create_access_token(data: dict):
     to_encode = data.copy()
