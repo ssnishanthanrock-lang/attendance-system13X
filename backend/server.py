@@ -4032,15 +4032,18 @@ async def mark_attendance_with_location(attendance_data: AttendanceWithLocation,
                 detail=f"Employee not found. Searched for id={employee_id}, company_id={current_user.company_id}"
             )
     
-    # Check if attendance already exists for this date
-    existing = await db.attendance.find_one({
+    # Check how many attendance records exist for this date (allow up to 10 per day)
+    existing_count = await db.attendance.count_documents({
         "company_id": current_user.company_id,
         "employee_id": employee_id,
         "date": attendance_data.date
     })
     
-    if existing:
-        raise HTTPException(status_code=400, detail=f"Attendance already exists for {employee['name']} on {attendance_data.date}")
+    if existing_count >= 10:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Daily limit exceeded. Maximum 10 attendance records per day allowed. Current count: {existing_count}"
+        )
     
     # Create attendance record with location
     check_in_datetime = None
