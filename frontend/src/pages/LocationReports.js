@@ -459,7 +459,8 @@ const LocationReports = () => {
           </div>
         </div>
       )}
-    </div>
+      </div>
+    </Layout>
   );
 };
 
