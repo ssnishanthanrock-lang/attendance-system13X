@@ -749,13 +749,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Location Tracking - Start Session Endpoint"
-    - "Location Tracking - Update Location Endpoint"
-    - "Location Tracking - Stop Session Endpoint"
-    - "Attendance with Location Endpoint"
-    - "Location Tracking History Endpoint"
-    - "Admin - Employee Location Report Endpoint"
-    - "Admin - All Employees Location Report Endpoint"
+    - "Location Tracking Component - Employee Interface"
+    - "Attendance with Location Component"
+    - "Location Reports Page - Admin Interface"
+    - "Dashboard Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
