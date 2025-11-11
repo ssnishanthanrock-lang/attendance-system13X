@@ -15,6 +15,7 @@ import {
   Settings,
   ChevronDown,
   ChevronRight,
+  MapPin,
 } from 'lucide-react';
 import ImpersonationBanner from './ImpersonationBanner';
 import { getImpersonationState, clearImpersonationState } from '../utils/impersonation';
