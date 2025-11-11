@@ -4147,8 +4147,24 @@ async def get_employee_location_report(
     if not employee:
         # Try finding user without company_id restriction (for super admin testing)
         employee = await db.users.find_one({"id": employee_id})
-        if not employee:
+    
+    # If still not found, check if this employee_id has tracking data and create placeholder
+    if not employee:
+        # Check if there's tracking data for this employee_id
+        has_tracking = await db.tracking_sessions.find_one({"employee_id": employee_id, "company_id": current_user.company_id})
+        has_attendance = await db.attendance.find_one({"employee_id": employee_id, "company_id": current_user.company_id})
+        
+        if not (has_tracking or has_attendance):
             raise HTTPException(status_code=404, detail="Employee not found")
+        
+        # Create placeholder employee from tracking session data
+        session_with_name = has_tracking or has_attendance
+        employee = {
+            "id": employee_id,
+            "name": session_with_name.get("employee_name", "Unknown User"),
+            "mobile": "N/A",
+            "position": "Super Admin" if employee_id == "SUPER-ADMIN" else "Unknown"
+        }
     
     # Build query
     query = {
