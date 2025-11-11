@@ -148,6 +148,15 @@ function App() {
             }
           />
           <Route
+            path="/location-reports"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <LocationReports />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
             path="/leaves"
             element={
               <ProtectedRoute allowedRoles={['admin', 'manager', 'employee', 'staff_member']}>
