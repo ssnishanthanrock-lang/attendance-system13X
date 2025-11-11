@@ -251,6 +251,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Admin all employees location report endpoint working correctly. Admin can access all employees' location data. Returns employees array with tracking/attendance counts. Company-wide summary statistics calculated. Date filtering working. Role-based access control verified - employees denied access (403). Multi-tenancy verified. Minor: Response field names slightly different from expected (uses 'employee' instead of 'employee_info', different summary field names) but contains all required data and functionality."
+      - working: false
+        agent: "testing"
+        comment: "❌ COMPREHENSIVE TEST ISSUES: Admin all employees location report endpoint has response structure issues. Missing employee fields: ['employee_id', 'employee_name', 'attendance_records_count', 'latest_tracking_session'] and missing summary fields: ['total_employees', 'total_attendance_records']. Core functionality working - admin can access all employees' location data, returns employees array, date filtering working, role-based access control verified (employees denied 403), multi-tenancy verified. Issues are response field naming and structure inconsistencies."
 
 
   - task: "Super Admin Invoicing Toggle"
