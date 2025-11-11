@@ -2775,15 +2775,18 @@ async def add_manual_attendance(attendance_data: dict, current_user: User = Depe
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
     
-    # Check if attendance already exists for this date
-    existing = await db.attendance.find_one({
+    # Check how many attendance records exist for this date (allow up to 10 per day)
+    existing_count = await db.attendance.count_documents({
         "company_id": current_user.company_id,
         "employee_id": attendance_data["employee_id"],
         "date": attendance_data["date"]
     })
     
-    if existing:
-        raise HTTPException(status_code=400, detail=f"Attendance already exists for {employee['name']} on {attendance_data['date']}")
+    if existing_count >= 10:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Daily limit exceeded. Maximum 10 attendance records per day allowed. Current count: {existing_count}"
+        )
     
     # Create attendance record
     # Combine date with times to create ISO datetime strings
