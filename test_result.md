@@ -221,15 +221,18 @@ backend:
 
   - task: "Admin - All Employees Location Report Endpoint"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "GET /api/location/reports/all endpoint implemented. Admin/manager can view all employees' location data. Returns array of employee reports with tracking/attendance counts, latest tracking session, latest attendance. Includes company-wide summary statistics. Supports date filtering. Only includes employees with location data. Multi-tenant safe."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin all employees location report endpoint working correctly. Admin can access all employees' location data. Returns employees array with tracking/attendance counts. Company-wide summary statistics calculated. Date filtering working. Role-based access control verified - employees denied access (403). Multi-tenancy verified. Minor: Response field names slightly different from expected (uses 'employee' instead of 'employee_info', different summary field names) but contains all required data and functionality."
 
 
   - task: "Super Admin Invoicing Toggle"
