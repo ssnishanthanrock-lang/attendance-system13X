@@ -233,6 +233,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Admin employee location report endpoint working correctly. Admin can access specific employee's location data. Returns employee info, tracking_sessions, attendance_with_location arrays. Summary statistics correctly calculated (total_tracking_sessions, total_attendance_with_location, total_location_points). Date filtering working. Role-based access control verified - employees denied access to other employees' reports (403). Minor: Response uses 'employee' field instead of 'employee_info' (acceptable - contains same data)."
+      - working: false
+        agent: "testing"
+        comment: "❌ COMPREHENSIVE TEST ISSUE: Admin employee location report endpoint has response structure issue. Missing required field 'employee_info' in response (found 'employee' instead). Core functionality working - admin can access specific employee's location data, returns tracking_sessions and attendance_with_location arrays, summary statistics calculated correctly. Date filtering working. Role-based access control verified (employees denied 403). Issue is response field naming inconsistency."
 
   - task: "Admin - All Employees Location Report Endpoint"
     implemented: true
