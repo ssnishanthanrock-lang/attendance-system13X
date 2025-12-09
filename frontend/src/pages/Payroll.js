@@ -460,6 +460,11 @@ export default function Payroll() {
                   ))}
                 </div>
                 )}
+              </>
+            )}
+
+            {/* Card View - Always Show */}
+            <>
 
             {/* Table View */}
             {viewMode === 'table' && (
