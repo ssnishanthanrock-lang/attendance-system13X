@@ -4063,17 +4063,20 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
                                     elif row_type == 'OUT':
                                         out_times[full_date] = time_str
                                         
-                                        # When we have OUT time, create a record (IN time might be missing)
-                                        in_time = in_times.get(full_date, "00:00")
+                                        # Create records for both IN and OUT times
+                                        in_time = in_times.get(full_date)
                                         
-                                        records.append({
-                                            "vendor_id": current_enroll_no,
-                                            "datetime": f"{full_date} {in_time}",
-                                            "date": full_date,
-                                            "time": in_time,
-                                            "record_type": "punch_in"
-                                        })
+                                        # Only create IN record if we have a valid IN time
+                                        if in_time and in_time != "00:00":
+                                            records.append({
+                                                "vendor_id": current_enroll_no,
+                                                "datetime": f"{full_date} {in_time}",
+                                                "date": full_date,
+                                                "time": in_time,
+                                                "record_type": "punch_in"
+                                            })
                                         
+                                        # Always create OUT record when we have OUT time
                                         records.append({
                                             "vendor_id": current_enroll_no,
                                             "datetime": f"{full_date} {time_str}",
