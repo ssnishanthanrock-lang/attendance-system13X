@@ -1421,33 +1421,7 @@ class ERPTester:
                 
         except Exception as e:
             print(f"❌ Investigation Error: {str(e)}")
-            self.log_result("Payroll Discrepancy Investigation", False, f"Investigation error: {str(e)}")_attendance = set(record.get('employee_id') for record in attendance_records)
-                    employee_names = set(record.get('employee_name', 'Unknown') for record in attendance_records)
-                    
-                    self.log_result("December 2025 Attendance Check", True, 
-                                  f"Found {december_attendance_count} attendance records for {len(employees_with_attendance)} employees",
-                                  {"attendance_count": december_attendance_count,
-                                   "unique_employees": len(employees_with_attendance),
-                                   "employee_names": list(employee_names)[:5]})  # Show first 5 names
-                else:
-                    self.log_result("December 2025 Attendance Check", True, 
-                                  "No attendance records found for December 2025 (expected for new system)")
-            else:
-                self.log_result("December 2025 Attendance Check", False, 
-                              f"Failed to check attendance: {attendance_response.status_code}")
-            
-            # Step 2: Call Dashboard Live Payroll endpoint
-            print("📊 Step 2: Getting Dashboard Live Payroll data...")
-            live_response = self.session.get(f"{API_BASE}/payroll/live-current-month")
-            
-            if live_response.status_code != 200:
-                self.log_result("Dashboard Live Payroll - Request Failed", False, 
-                              f"Live payroll endpoint failed: {live_response.status_code}",
-                              {"response": live_response.text})
-                return
-            
-            live_data = live_response.json()
-            live_total_gross = live_data.get("total_gross", 0)
+            self.log_result("Payroll Discrepancy Investigation", False, f"Investigation error: {str(e)}")
             live_timestamp = live_data.get("timestamp", "")
             live_employees = live_data.get("employees", [])
             live_employee_count = len(live_employees)
