@@ -416,7 +416,26 @@ export default function Employees() {
           <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }} data-testid="employees-title">
             Employee Management
           </h1>
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
+            {/* View Toggle Buttons */}
+            <div className="flex gap-2 mr-2">
+              <Button
+                onClick={() => setViewMode('card')}
+                variant={viewMode === 'card' ? 'default' : 'outline'}
+                size="sm"
+                title="Card View"
+              >
+                Card View
+              </Button>
+              <Button
+                onClick={() => setViewMode('table')}
+                variant={viewMode === 'table' ? 'default' : 'outline'}
+                size="sm"
+                title="Table View"
+              >
+                Table View
+              </Button>
+            </div>
             {hasDeletedEmployees && (
               <Button
                 variant="outline"
