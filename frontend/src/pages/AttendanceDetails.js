@@ -269,7 +269,7 @@ export default function AttendanceDetails() {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-md"
+              className="px-2 py-1 border border-gray-300 rounded-md"
             />
             <Button
               variant="outline"
@@ -326,29 +326,29 @@ export default function AttendanceDetails() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Employee
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Check In
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Check Out
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Hours
                     </th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Earnings
                     </th>
                     {canEdit && (
-                      <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         Actions
                       </th>
                     )}
@@ -364,25 +364,25 @@ export default function AttendanceDetails() {
                   ) : (
                     attendance.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((record) => (
                       <tr key={record.id || record.employee_id} className="hover:bg-gray-50">
-                        <td className="px-3 py-2 whitespace-nowrap">
+                        <td className="px-2 py-1 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900">{record.employee_name}</div>
                         </td>
-                        <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-900">
                           {new Date(record.date).toLocaleDateString()}
                         </td>
-                        <td className="px-3 py-2 whitespace-nowrap">
+                        <td className="px-2 py-1 whitespace-nowrap">
                           {getStatusBadge(record.status)}
                         </td>
-                        <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-900">
                           {formatTime(record.check_in)}
                         </td>
-                        <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-900">
                           {formatTime(record.check_out)}
                         </td>
-                        <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-900">
                           {calculateHours(record.check_in, record.check_out) === 'N/A' ? 'N/A' : `${calculateHours(record.check_in, record.check_out)}h`}
                         </td>
-                        <td className="px-3 py-2 whitespace-nowrap text-sm font-semibold text-green-600">
+                        <td className="px-2 py-1 whitespace-nowrap text-sm font-semibold text-green-600">
                           <div className="flex items-center gap-2">
                             <span>Rs {record.earnings ? record.earnings.toFixed(2) : '0.00'}</span>
                             {record.check_in && !record.check_out && selectedDate === new Date().toISOString().split('T')[0] && (
@@ -394,7 +394,7 @@ export default function AttendanceDetails() {
                           </div>
                         </td>
                         {canEdit && (
-                          <td className="px-3 py-2 whitespace-nowrap text-sm">
+                          <td className="px-2 py-1 whitespace-nowrap text-sm">
                             <div className="flex gap-2">
                               <Button
                                 variant="outline"
@@ -455,7 +455,7 @@ export default function AttendanceDetails() {
                 <select
                   value={editingRecord.status}
                   onChange={(e) => setEditingRecord({ ...editingRecord, status: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md"
                 >
                   <option value="present">Present</option>
                   <option value="absent">Absent</option>
@@ -471,7 +471,7 @@ export default function AttendanceDetails() {
                   type="datetime-local"
                   value={editingRecord.check_in ? new Date(editingRecord.check_in).toISOString().slice(0, 16) : ''}
                   onChange={(e) => setEditingRecord({ ...editingRecord, check_in: e.target.value ? new Date(e.target.value).toISOString() : null })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md"
                 />
               </div>
               <div>
@@ -480,7 +480,7 @@ export default function AttendanceDetails() {
                   type="datetime-local"
                   value={editingRecord.check_out ? new Date(editingRecord.check_out).toISOString().slice(0, 16) : ''}
                   onChange={(e) => setEditingRecord({ ...editingRecord, check_out: e.target.value ? new Date(e.target.value).toISOString() : null })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                  className="w-full px-2 py-1 border border-gray-300 rounded-md"
                 />
               </div>
               <div className="flex justify-end gap-2">
