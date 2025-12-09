@@ -18,7 +18,7 @@ export default function Payroll() {
   const [livePayroll, setLivePayroll] = useState(null);
   const liveIntervalRef = useRef(null);
   const [viewingSalarySlip, setViewingSalarySlip] = useState(null);
-  const [viewMode, setViewMode] = useState('table'); // Default to table view for monthly payroll
+  const [viewMode, setViewMode] = useState('card'); // Always show card view
 
   // Determine view mode based on URL
   const isLiveView = !month; // If no month param, show live view
@@ -160,7 +160,7 @@ export default function Payroll() {
         {/* Live Current Month View */}
         {isLiveView && livePayroll && (
           <div className="space-y-4">
-            {/* Header */}
+            {/* Header with View Toggle */}
             <div className="flex items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
@@ -208,7 +208,11 @@ export default function Payroll() {
               </Card>
             </div>
 
-            {/* Monthly History Section - Below Live Tracker */}
+            {/* Employee Cards - Card View */}
+            {viewMode === 'card' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {livePayroll.employees.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((emp) => (
+                <Card key={emp.employee_id} className="hover:shadow-lg transition-shadow">
                   <CardContent className="p-5">
                     {/* Employee Header */}
                     <div className="flex items-center gap-3 mb-4 pb-4 border-b">
