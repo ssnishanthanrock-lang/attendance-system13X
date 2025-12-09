@@ -1220,6 +1220,186 @@ class ERPTester:
             live_working_days = None
             live_sample_employee = None
             if live_employees:
+                # Find first employee with salary data
+                for emp in live_employees:
+                    if emp.get("basic_salary", 0) > 0:
+                        live_sample_employee = emp
+                        live_working_days = emp.get("working_days")
+                        break
+            
+            self.log_result("Dashboard Live Payroll - Data Retrieved", True, 
+                          f"Dashboard total_gross: LKR {live_total_gross:,.2f}",
+                          {"total_gross": live_total_gross,
+                           "employee_count": live_employee_count,
+                           "working_days": live_working_days,
+                           "timestamp": live_timestamp,
+                           "sample_employee": {
+                               "name": live_sample_employee.get("employee_name") if live_sample_employee else None,
+                               "basic_salary": live_sample_employee.get("basic_salary") if live_sample_employee else None,
+                               "earnings": live_sample_employee.get("earnings") if live_sample_employee else None,
+                               "gross_salary": live_sample_employee.get("gross_salary") if live_sample_employee else None,
+                               "salary_per_minute": live_sample_employee.get("salary_per_minute") if live_sample_employee else None
+                           }})
+            
+            # Step 3: Call Monthly Payroll detailed endpoint for December 2025
+            print("📊 Step 3: Getting Monthly Payroll detailed data for December 2025...")
+            detailed_response = self.session.get(f"{API_BASE}/payroll/detailed/2025-12")
+            
+            if detailed_response.status_code != 200:
+                self.log_result("Monthly Payroll Detailed - Request Failed", False, 
+                              f"Detailed payroll endpoint failed: {detailed_response.status_code}",
+                              {"response": detailed_response.text})
+                return
+            
+            detailed_data = detailed_response.json()
+            detailed_total_gross = detailed_data.get("total_gross", 0)
+            detailed_employees = detailed_data.get("employees", [])
+            detailed_employee_count = len(detailed_employees)
+            
+            # Get working_days and sample employee data from detailed endpoint
+            detailed_working_days = None
+            detailed_sample_employee = None
+            if detailed_employees:
+                # Find the same employee as in live data for comparison
+                if live_sample_employee:
+                    live_employee_id = live_sample_employee.get("employee_id")
+                    for emp in detailed_employees:
+                        if emp.get("employee_id") == live_employee_id:
+                            detailed_sample_employee = emp
+                            detailed_working_days = emp.get("working_days")
+                            break
+                
+                # If not found, use first employee with salary
+                if not detailed_sample_employee:
+                    for emp in detailed_employees:
+                        if emp.get("basic_salary", 0) > 0:
+                            detailed_sample_employee = emp
+                            detailed_working_days = emp.get("working_days")
+                            break
+            
+            self.log_result("Monthly Payroll Detailed - Data Retrieved", True, 
+                          f"Monthly Payroll total_gross: LKR {detailed_total_gross:,.2f}",
+                          {"total_gross": detailed_total_gross,
+                           "employee_count": detailed_employee_count,
+                           "working_days": detailed_working_days,
+                           "month": "2025-12",
+                           "sample_employee": {
+                               "name": detailed_sample_employee.get("employee_name") if detailed_sample_employee else None,
+                               "basic_salary": detailed_sample_employee.get("basic_salary") if detailed_sample_employee else None,
+                               "earnings": detailed_sample_employee.get("earnings") if detailed_sample_employee else None,
+                               "gross_salary": detailed_sample_employee.get("gross_salary") if detailed_sample_employee else None,
+                               "salary_per_minute": detailed_sample_employee.get("salary_per_minute") if detailed_sample_employee else None
+                           }})
+            
+            # Step 4: Calculate exact difference and analyze
+            print("🔍 Step 4: Calculating exact difference and analyzing root cause...")
+            
+            difference_lkr = live_total_gross - detailed_total_gross
+            difference_percentage = (difference_lkr / detailed_total_gross * 100) if detailed_total_gross > 0 else 0
+            
+            if abs(difference_lkr) < 0.01:  # Less than 1 cent difference
+                self.log_result("Payroll Discrepancy - No Difference Found", True, 
+                              "Both endpoints return identical total_gross values",
+                              {"dashboard_total": live_total_gross,
+                               "monthly_total": detailed_total_gross,
+                               "difference": difference_lkr})
+            else:
+                higher_endpoint = "Dashboard Live" if difference_lkr > 0 else "Monthly Payroll"
+                
+                self.log_result("Payroll Discrepancy - DIFFERENCE CONFIRMED", False, 
+                              f"DISCREPANCY FOUND: {higher_endpoint} is LKR {abs(difference_lkr):,.2f} higher ({abs(difference_percentage):.2f}%)",
+                              {"dashboard_total_gross": live_total_gross,
+                               "monthly_total_gross": detailed_total_gross,
+                               "difference_lkr": difference_lkr,
+                               "difference_percentage": difference_percentage,
+                               "higher_endpoint": higher_endpoint})
+            
+            # Step 5: Deep dive into specific employee comparison
+            if live_sample_employee and detailed_sample_employee:
+                print("🔍 Step 5: Deep dive into specific employee comparison...")
+                
+                employee_name = live_sample_employee.get("employee_name", "Unknown")
+                
+                # Compare all fields between both endpoints
+                comparison_fields = [
+                    "basic_salary", "earnings", "allowances", "extra_payment", 
+                    "gross_salary", "salary_per_minute", "total_attendance_minutes", "working_days"
+                ]
+                
+                field_differences = {}
+                for field in comparison_fields:
+                    live_value = live_sample_employee.get(field, 0)
+                    detailed_value = detailed_sample_employee.get(field, 0)
+                    
+                    if abs(live_value - detailed_value) > 0.01:  # Significant difference
+                        field_differences[field] = {
+                            "live": live_value,
+                            "detailed": detailed_value,
+                            "difference": live_value - detailed_value
+                        }
+                
+                if field_differences:
+                    self.log_result("Employee Field Comparison - DIFFERENCES FOUND", False, 
+                                  f"Field differences found for employee {employee_name}",
+                                  {"employee_name": employee_name,
+                                   "field_differences": field_differences})
+                else:
+                    self.log_result("Employee Field Comparison - No Differences", True, 
+                                  f"All fields match for employee {employee_name}")
+            
+            # Step 6: Identify potential root causes
+            print("🔍 Step 6: Identifying potential root causes...")
+            
+            root_causes = []
+            
+            # Check if working_days are actually different
+            if live_working_days != detailed_working_days:
+                root_causes.append(f"Working days differ: Live={live_working_days}, Detailed={detailed_working_days}")
+            
+            # Check if employee counts differ
+            if live_employee_count != detailed_employee_count:
+                root_causes.append(f"Employee counts differ: Live={live_employee_count}, Detailed={detailed_employee_count}")
+            
+            # Check if there's a timing issue (live vs historical calculation)
+            if "live" in live_timestamp.lower() or "real-time" in str(live_data):
+                root_causes.append("Timing issue: Live endpoint calculates real-time, Detailed uses historical data")
+            
+            # Check for calculation method differences
+            if live_sample_employee and detailed_sample_employee:
+                live_earnings = live_sample_employee.get("earnings", 0)
+                detailed_earnings = detailed_sample_employee.get("earnings", 0)
+                
+                if abs(live_earnings - detailed_earnings) > 0.01:
+                    root_causes.append("Earnings calculation differs between endpoints")
+            
+            if root_causes:
+                self.log_result("Root Cause Analysis - CAUSES IDENTIFIED", False, 
+                              "Potential root causes identified",
+                              {"root_causes": root_causes})
+            else:
+                self.log_result("Root Cause Analysis - No Clear Cause", True, 
+                              "No obvious root cause identified - may need deeper investigation")
+            
+            # Step 7: Final recommendation
+            print("📋 Step 7: Providing recommendation...")
+            
+            if abs(difference_lkr) < 0.01:
+                recommendation = "No discrepancy found. Both endpoints return identical values."
+            elif abs(difference_lkr) < 100:  # Less than LKR 100 difference
+                recommendation = f"Minor discrepancy of LKR {abs(difference_lkr):,.2f}. Likely due to rounding or timing differences."
+            else:
+                recommendation = f"Significant discrepancy of LKR {abs(difference_lkr):,.2f}. Requires immediate investigation of calculation logic."
+            
+            self.log_result("Payroll Discrepancy Investigation - FINAL RECOMMENDATION", True, 
+                          recommendation,
+                          {"dashboard_total": live_total_gross,
+                           "monthly_total": detailed_total_gross,
+                           "difference": difference_lkr,
+                           "user_belief": "Monthly Payroll is correct",
+                           "next_steps": root_causes if root_causes else ["No immediate action needed"]})
+                
+        except Exception as e:
+            self.log_result("Payroll Discrepancy Investigation", False, f"Investigation error: {str(e)}")
                 live_sample_employee = live_employees[0]
                 live_working_days = live_sample_employee.get("working_days", 0)
             
