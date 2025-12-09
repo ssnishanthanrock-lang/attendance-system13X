@@ -3999,6 +3999,7 @@ IMPORTANT:
         print("DEBUG: Calling AI model")
         response = client.chat(
             messages=[prompt],
+            model="gemini-2.0-flash-exp",
             temperature=0.1
         )
         
