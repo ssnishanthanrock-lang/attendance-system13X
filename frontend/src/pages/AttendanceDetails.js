@@ -30,27 +30,30 @@ export default function AttendanceDetails() {
     const today = new Date().toISOString().split('T')[0];
     let intervalId;
     
-    if (selectedDate === today) {
+    if (selectedDate === today && lastFetchTime) {
       intervalId = setInterval(() => {
-        // Calculate earnings with SECOND-LEVEL precision for smooth live counter
+        // Increment earnings from backend's base value by elapsed seconds
+        const secondsSinceLastFetch = Math.floor((Date.now() - lastFetchTime) / 1000);
+        
         setAttendance(prevAttendance => {
           let newTotal = 0;
           const updatedAttendance = prevAttendance.map(record => {
             if (record.check_in && !record.check_out && record.salary_per_minute) {
-              // Calculate live earnings based on SECONDS worked
-              const checkinTime = new Date(record.check_in);
-              const now = new Date();
-              const secondsWorked = Math.floor((now - checkinTime) / 1000);
+              // Get the base earnings from backend (stored when fetched)
+              const baseEarnings = record.baseEarnings !== undefined ? record.baseEarnings : record.earnings;
               
-              // Calculate per-second rate for smooth live increment
+              // Calculate additional earnings since last fetch
               const perMinuteRate = record.salary_per_minute || 0;
               const perSecondRate = perMinuteRate / 60;
-              const newEarnings = secondsWorked * perSecondRate;
+              const additionalEarnings = secondsSinceLastFetch * perSecondRate;
+              
+              // New earnings = base + increment
+              const newEarnings = baseEarnings + additionalEarnings;
               newTotal += newEarnings;
               
-              return { ...record, earnings: newEarnings };
+              return { ...record, earnings: newEarnings, baseEarnings: baseEarnings };
             } else {
-              // For completed records or those without check-in, use existing earnings
+              // For completed records, use existing earnings
               newTotal += record.earnings || 0;
               return record;
             }
