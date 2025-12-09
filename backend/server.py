@@ -3568,7 +3568,6 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
                     duration = checkout_dt - checkin_dt
                     total_attendance_minutes += int(duration.total_seconds() / 60)
                 except Exception as e:
-                    print(f"DEBUG: Error in completed days: {e}")
                     pass
             # For today's ongoing attendance (checked in but not out yet)
             elif record_date == today_str and record.get("check_in") and not record.get("check_out"):
