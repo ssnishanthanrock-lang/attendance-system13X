@@ -25,25 +25,26 @@ export default function AttendanceDetails() {
     setUser(userData);
     fetchAttendanceForDate(selectedDate);
 
-    // For today's date, update earnings every second without page refresh
+    // For today's date, update earnings every second for SUPER LIVE VIEW
     const today = new Date().toISOString().split('T')[0];
     let intervalId;
     
     if (selectedDate === today) {
       intervalId = setInterval(() => {
-        // Update earnings for ongoing attendance (checked in but not out)
+        // Calculate earnings with SECOND-LEVEL precision for smooth live counter
         setAttendance(prevAttendance => {
           let newTotal = 0;
           const updatedAttendance = prevAttendance.map(record => {
             if (record.check_in && !record.check_out && record.salary_per_minute) {
-              // Calculate live earnings for ongoing attendance
+              // Calculate live earnings based on SECONDS worked
               const checkinTime = new Date(record.check_in);
               const now = new Date();
-              const minutesWorked = Math.floor((now - checkinTime) / (1000 * 60));
+              const secondsWorked = Math.floor((now - checkinTime) / 1000);
               
-              // Use the salary_per_minute from backend
+              // Calculate per-second rate for smooth live increment
               const perMinuteRate = record.salary_per_minute || 0;
-              const newEarnings = minutesWorked * perMinuteRate;
+              const perSecondRate = perMinuteRate / 60;
+              const newEarnings = secondsWorked * perSecondRate;
               newTotal += newEarnings;
               
               return { ...record, earnings: newEarnings };
@@ -57,7 +58,7 @@ export default function AttendanceDetails() {
           setTotalEarnings(newTotal);
           return updatedAttendance;
         });
-      }, 1000); // Update every second
+      }, 1000); // Update every second - creates visible live running effect
     }
 
     return () => {
