@@ -55,6 +55,7 @@ class Company(BaseModel):
     sms_password: Optional[str] = None
     company_info_completed: bool = False
     invoicing_enabled: bool = False
+    location_tracking_enabled: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     last_login: Optional[str] = None
 
