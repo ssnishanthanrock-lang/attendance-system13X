@@ -706,9 +706,6 @@ export default function Payroll() {
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
                               {perMinuteSalary.toFixed(2)}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
-                              {emp.allowances.toLocaleString()}
-                            </td>
                             <td 
                               className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50" 
                               title={emp.fixed_salary ? `Fixed Salary: Basic + Allowances` : `Total minutes: ${emp.total_attendance_minutes || 0} | Per minute: Rs ${perMinuteSalary.toFixed(2)}`}
@@ -732,6 +729,9 @@ export default function Payroll() {
                               {emp.late_deduction.toLocaleString(undefined, {maximumFractionDigits: 2})}
                             </td>
                             
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-blue-50">
+                              {emp.allowances.toLocaleString()}
+                            </td>
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600 bg-blue-50">
                               {(emp.extra_payment || 0).toLocaleString()}
                             </td>
