@@ -88,8 +88,10 @@ export default function AttendanceDetails() {
     };
   }, [selectedDate, lastFetchTime]);
 
-  const fetchAttendanceForDate = async (date) => {
-    setLoading(true);
+  const fetchAttendanceForDate = async (date, silent = false) => {
+    if (!silent) {
+      setLoading(true);
+    }
     try {
       const response = await api.get(`/attendance/date/${date}`);
       // Store base earnings for live increment calculation
@@ -115,10 +117,14 @@ export default function AttendanceDetails() {
         total: response.data.attendance.length
       });
     } catch (error) {
-      toast.error('Failed to fetch attendance details');
+      if (!silent) {
+        toast.error('Failed to fetch attendance details');
+      }
       console.error(error);
     } finally {
-      setLoading(false);
+      if (!silent) {
+        setLoading(false);
+      }
     }
   };
 
