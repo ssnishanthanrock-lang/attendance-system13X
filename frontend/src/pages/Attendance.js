@@ -43,6 +43,7 @@ export default function Attendance() {
   const [companySettings, setCompanySettings] = useState(null);
   const [viewMode, setViewMode] = useState('today'); // 'today' or 'last7days'
   const [todayAttendanceCount, setTodayAttendanceCount] = useState(0);
+  const [importDialogOpen, setImportDialogOpen] = useState(false);
   const [activeEmployeesCount, setActiveEmployeesCount] = useState(0);
   const [hasDeletedAttendance, setHasDeletedAttendance] = useState(false);
   
