@@ -4084,33 +4084,13 @@ Return ONLY the JSON response, no additional text.""",
                     "end": sorted_dates[-1] if sorted_dates else None
                 }
                 
-                # Parse time data for each date column
-                if row_type in ['IN', 'OUT']:
-                    for col_idx, date_str in date_columns.items():
-                        time_val = row[col_idx] if col_idx < len(row) else None
-                        
-                        if time_val and str(time_val).strip() and str(time_val).strip() != '00:00':
-                            time_str = str(time_val).strip()
-                            
-                            # Convert date format (12/01 -> 2025-12-01)
-                            try:
-                                month_day = date_str.split('/')
-                                if len(month_day) == 2:
-                                    full_date = f"{report_year}-{month_day[0]}-{month_day[1]}"
-                                    dates.add(full_date)
-                                    
-                                    # Initialize date entry if needed
-                                    if full_date not in employee_punches[current_enroll_no]:
-                                        employee_punches[current_enroll_no][full_date] = {}
-                                    
-                                    # Store IN or OUT time
-                                    if row_type == 'IN':
-                                        employee_punches[current_enroll_no][full_date]['in'] = time_str
-                                    elif row_type == 'OUT':
-                                        employee_punches[current_enroll_no][full_date]['out'] = time_str
-                            except Exception as e:
-                                print(f"DEBUG: Error parsing date/time: {e}")
-                                continue
+                parsed_data = {
+                    "format_detected": ai_result.get('format_detected', 'AI-detected format'),
+                    "records": records,
+                    "unique_vendor_ids": sorted(unique_vendor_ids),
+                    "date_range": date_range,
+                    "total_records": len(records)
+                }
             
             # Now create records from collected punch data
             for enroll_no, date_punches in employee_punches.items():
