@@ -50,8 +50,8 @@ class ERPTester:
         """Test authentication flow"""
         print("\n=== TESTING AUTHENTICATION ===")
         
-        # Use existing mobile since 0773769019 doesn't exist in database
-        test_mobile = "0712345678"  # Existing admin user from database
+        # Use the specific mobile from review request
+        test_mobile = "0773769019"  # Mobile from review request
         
         try:
             # Step 1: Send OTP
