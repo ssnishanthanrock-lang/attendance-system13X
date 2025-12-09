@@ -3347,14 +3347,14 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
     """Get detailed salary breakdown for all employees in a month"""
     # Get company and settings
     company = await db.companies.find_one({"id": current_user.company_id}, {"_id": 0})
-    settings = await db.settings.find_one({"company_id": current_user.company_id})
+    db_settings = await db.settings.find_one({"company_id": current_user.company_id})
     working_hours_per_day = 8
     start_time = "09:00"
     finish_time = "17:00"
     
-    if settings:
-        start_time = settings.get("start_time", "09:00")
-        finish_time = settings.get("finish_time", "17:00")
+    if db_settings:
+        start_time = db_settings.get("start_time", "09:00")
+        finish_time = db_settings.get("finish_time", "17:00")
         try:
             start_dt = datetime.strptime(start_time, "%H:%M")
             finish_dt = datetime.strptime(finish_time, "%H:%M")
