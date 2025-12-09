@@ -492,6 +492,18 @@ backend:
         comment: "✅ TESTED: Activity logs endpoint (GET /api/activity-logs) working perfectly. Pagination with custom limit parameter working (default 100, tested with 50). Date range filtering (from_date, to_date) functional. Search functionality working across user_name, action, and details fields. All logs properly filtered by company_id for multi-tenancy."
 
 frontend:
+  - task: "Super Admin Re-send URL to Admin Feature UI"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/pages/SuperAdminCompanyDetail.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ AUTHENTICATION BLOCKER: Cannot test 'Re-send URL to Admin' feature UI due to Super Admin authentication failure (User not found for 0773966920). COMPREHENSIVE FRONTEND CODE ANALYSIS COMPLETED: ✅ BUTTON IMPLEMENTATION: 'Re-send URL to Admin' button correctly positioned after status change buttons (Activate/Suspend) in Company Information card. Button has proper blue styling (bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100), Send icon from lucide-react, and onClick handler. ✅ DIALOG LOGIC: Smart conditional flow - if admins.length === 1 shows confirmation dialog directly, if multiple admins shows selection dialog first. Proper error handling for no admins found. ✅ ADMIN SELECTION DIALOG: Title 'Select Admin to Send URL', description 'Choose which admin should receive the company URL via SMS', admin list with cursor-pointer styling, displays admin name and mobile, Send icon for each admin, click handler to select admin and proceed to confirmation. ✅ CONFIRMATION DIALOG: Title 'Confirm SMS Send', admin details in blue box (bg-blue-50 border-blue-200), message preview showing company name and URL (https://paystack-app.preview.emergentagent.com), Cancel and Send SMS buttons with proper styling. ✅ LOADING STATES: Send SMS button shows spinner animation and 'Sending...' text during API call, button disabled during loading. ✅ API INTEGRATION: Calls POST /api/superadmin/companies/{companyId}/resend-url?admin_id={adminId}, proper error handling. ✅ TOAST NOTIFICATIONS: Success toast with admin name/mobile, error toast for failures, proper styling (green/red). ✅ STATE MANAGEMENT: All dialog states, admin selection, loading states properly managed. CRITICAL ISSUE: Super Admin user 0773966920 does not exist in system preventing functional testing. All UI components are correctly implemented per requirements."
+
   - task: "Invoice Customers Management - Full CRUD"
     implemented: true
     working: "NA"
