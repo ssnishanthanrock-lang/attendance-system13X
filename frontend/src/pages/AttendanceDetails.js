@@ -31,6 +31,7 @@ export default function AttendanceDetails() {
     try {
       const response = await api.get(`/attendance/date/${date}`);
       setAttendance(response.data.attendance || []);
+      setTotalEarnings(response.data.total_earnings || 0);
       
       // Calculate stats
       const present = response.data.attendance.filter(a => a.status === 'present').length;
