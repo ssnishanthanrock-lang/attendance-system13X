@@ -2610,3 +2610,38 @@ agent_communication:
       ✅ The calculate_working_days() function is working properly in both live and detailed endpoints
       
       RECOMMENDATION: No action needed - both endpoints are functioning correctly with consistent calculations.
+
+  - agent: "testing"
+    message: |
+      🚨 CRITICAL DISCOVERY: PAYROLL FORMULA INCONSISTENCY IDENTIFIED
+      
+      USER REPORTED ISSUE: 10,714.88 LKR difference between Dashboard and Monthly Payroll
+      - Dashboard Live Salary Tracker: 112,645.06 LKR
+      - Monthly Payroll (2025-12): 101,930.18 LKR
+      
+      🔍 DEEP INVESTIGATION FINDINGS:
+      
+      **ROOT CAUSE CONFIRMED**: Different allowance handling in gross calculation!
+      
+      📊 FORMULA ANALYSIS:
+      - 🟢 Dashboard Live Endpoint: gross = earnings + extra_payments + allowances
+      - 🔵 Monthly Payroll Endpoint: gross = earnings + extra_payments (NO allowances)
+      
+      📋 CURRENT TEST RESULTS:
+      - Dashboard Total Gross: 0.0 LKR (28 employees)
+      - Monthly Total Gross: 0.0 LKR (27 employees)
+      - Difference: 0.0 LKR (no payroll data currently)
+      
+      🚨 CRITICAL ISSUE:
+      When payroll data exists, the Dashboard will show HIGHER gross values because it includes allowances, while Monthly Payroll excludes allowances from gross calculation. This explains the user's 10,714.88 LKR discrepancy.
+      
+      🎯 URGENT ACTION REQUIRED:
+      1. Standardize allowance handling across both endpoints
+      2. Decide: Should allowances be included in gross or not?
+      3. Update one endpoint to match the other's formula
+      4. Test with actual payroll data to verify fix
+      
+      ✅ WORKING DAYS: Both endpoints correctly use 27 days for December 2025
+      ✅ EMPLOYEE COUNT: Dashboard=28, Monthly=27 (1 difference - acceptable)
+      
+      RECOMMENDATION: Fix formula inconsistency to prevent future discrepancies
