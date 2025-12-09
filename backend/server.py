@@ -3395,6 +3395,8 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         "role": {"$in": ["admin", "employee", "staff_member", "manager"]}
     }).to_list(length=None)
     
+    print(f"DEBUG DETAILED PAYROLL: Found {len(employees)} employees for company {current_user.company_id}")
+    
     detailed_records = []
     
     for employee in employees:
