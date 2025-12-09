@@ -3579,16 +3579,19 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
             # Pro-rata calculation based on time passed
             earnings_basic = (basic_salary / hours_in_month) * hours_passed
             earnings_allowances = (allowances / hours_in_month) * hours_passed
-            earnings = earnings_basic + earnings_allowances
+            earnings = earnings_basic
+            # Gross = Basic earnings + Extra payments (WITHOUT allowances)
             gross_salary = earnings + total_extra_payment
         else:
             # Non-fixed: based on actual minutes worked so far
             earnings = total_attendance_minutes * salary_per_minute
-            gross_salary = earnings + allowances + total_extra_payment
+            # Gross = Earnings + Extra payments (WITHOUT allowances)
+            gross_salary = earnings + total_extra_payment
         
         # Calculate net salary
+        # Net = Gross + Allowances - Deductions (WITH allowances)
         total_deductions = late_deduction + total_advances + other_deductions + loan_deduction
-        net_salary = gross_salary - total_deductions
+        net_salary = gross_salary + allowances - total_deductions
         
         detailed_records.append({
             "employee_id": employee["id"],
