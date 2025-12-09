@@ -3362,13 +3362,21 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         except:
             pass
     
-    # Get working days for the month from settings
+    # Calculate working days dynamically based on calendar and holidays
     year, month_num = month.split("-")
-    settings = company.get("settings", {})
-    working_days_data = settings.get("working_days", {}) if settings else {}
-    working_days = working_days_data.get(month, 26)  # default 26
+    year_int = int(year)
+    month_int = int(month_num)
     
-    print(f"DEBUG DETAILED PAYROLL: Month={month}, Settings={working_days_data}, Working Days={working_days}")
+    # Get holidays and Saturday settings
+    holidays = db_settings.get("holidays", []) if db_settings else []
+    saturday_enabled = db_settings.get("saturday_enabled", True) if db_settings else True
+    saturday_type = db_settings.get("saturday_type", "full") if db_settings else "full"
+    
+    # Calculate working days for this month
+    working_days_result = calculate_working_days(year_int, month_int, holidays, saturday_enabled, saturday_type)
+    working_days = working_days_result["working_days"]
+    
+    print(f"DEBUG DETAILED PAYROLL: Month={month}, Calculated Working Days={working_days}")
     
     # Get all employees
     employees = await db.users.find({
