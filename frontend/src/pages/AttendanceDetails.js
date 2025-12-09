@@ -68,7 +68,7 @@ export default function AttendanceDetails() {
     return () => {
       if (intervalId) clearInterval(intervalId);
     };
-  }, [selectedDate]);
+  }, [selectedDate, lastFetchTime]);
 
   const fetchAttendanceForDate = async (date) => {
     setLoading(true);
