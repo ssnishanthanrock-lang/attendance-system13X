@@ -29,13 +29,25 @@ export default function Dashboard() {
       // Initial fetch
       fetchLivePayroll();
       
-      // Set up live updates every second
-      const intervalId = setInterval(() => {
+      // Fetch from backend every 5 seconds for accuracy
+      const fetchIntervalId = setInterval(() => {
         fetchLivePayroll();
+      }, 5000);
+      
+      // Increment display every second for live feel
+      const displayIntervalId = setInterval(() => {
+        setDisplayTodaySalary(prev => {
+          // Increment by estimated per-second rate
+          // Assuming average Rs 0.5 per second across all employees
+          return prev + 0.5;
+        });
       }, 1000);
       
       // Cleanup on unmount
-      return () => clearInterval(intervalId);
+      return () => {
+        clearInterval(fetchIntervalId);
+        clearInterval(displayIntervalId);
+      };
     }
   }, []);
 
