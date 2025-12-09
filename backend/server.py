@@ -3936,7 +3936,8 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
     print(f"DEBUG: Parsing device import, file length: {len(request.file_content)}")
     
     try:
-        from emergentintegrations import OpenAIClient
+        import json
+        from emergentintegrations.llm.openai import LlmChat
         
         # Get Emergent LLM key
         emergent_key = os.environ.get("EMERGENT_LLM_KEY")
@@ -3944,8 +3945,8 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
             print("ERROR: EMERGENT_LLM_KEY not found")
             raise HTTPException(status_code=500, detail="AI service not configured")
         
-        print("DEBUG: Creating OpenAI client")
-        client = OpenAIClient(api_key=emergent_key)
+        print("DEBUG: Creating LlmChat client")
+        client = LlmChat(api_key=emergent_key, model="gemini-2.0-flash-exp")
         
         # Check if it's an Excel file
         file_content_to_parse = request.file_content
