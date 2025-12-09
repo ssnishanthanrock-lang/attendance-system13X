@@ -1352,51 +1352,11 @@ class ERPTester:
                 "monthly_admin_count": len(monthly_admins),
                 "fix_successful": fix_successful
             }
-            print(f"\n🔍 Step 7: Formula Analysis...")
-            
-            # Check if allowances are being added to gross in one endpoint but not the other
-            dashboard_uses_allowances_in_gross = False
-            monthly_uses_allowances_in_gross = False
-            
-            if dashboard_employees:
-                first_dashboard = dashboard_employees[0]
-                dashboard_basic = first_dashboard.get("basic_salary", 0)
-                dashboard_allowances = first_dashboard.get("allowances", 0)
-                dashboard_earnings = first_dashboard.get("earnings", 0)
-                dashboard_gross = first_dashboard.get("gross_salary", 0)
                 
-                # Check if gross = earnings + extra_payments (without allowances)
-                # OR gross = earnings + extra_payments + allowances (with allowances)
-                expected_gross_without_allowances = dashboard_earnings + first_dashboard.get("extra_payment", 0)
-                expected_gross_with_allowances = expected_gross_without_allowances + dashboard_allowances
-                
-                if abs(dashboard_gross - expected_gross_with_allowances) < 0.01:
-                    dashboard_uses_allowances_in_gross = True
-                    print(f"🟢 Dashboard Formula: gross = earnings + extra_payments + allowances")
-                elif abs(dashboard_gross - expected_gross_without_allowances) < 0.01:
-                    dashboard_uses_allowances_in_gross = False
-                    print(f"🟢 Dashboard Formula: gross = earnings + extra_payments (no allowances)")
-                else:
-                    print(f"🟢 Dashboard Formula: Unknown/Complex")
-            
-            if monthly_employees:
-                first_monthly = monthly_employees[0]
-                monthly_basic = first_monthly.get("basic_salary", 0)
-                monthly_allowances = first_monthly.get("allowances", 0)
-                monthly_earnings = first_monthly.get("earnings", 0)
-                monthly_gross = first_monthly.get("gross_salary", 0)
-                
-                expected_gross_without_allowances = monthly_earnings + first_monthly.get("extra_payment", 0)
-                expected_gross_with_allowances = expected_gross_without_allowances + monthly_allowances
-                
-                if abs(monthly_gross - expected_gross_with_allowances) < 0.01:
-                    monthly_uses_allowances_in_gross = True
-                    print(f"🔵 Monthly Formula: gross = earnings + extra_payments + allowances")
-                elif abs(monthly_gross - expected_gross_without_allowances) < 0.01:
-                    monthly_uses_allowances_in_gross = False
-                    print(f"🔵 Monthly Formula: gross = earnings + extra_payments (no allowances)")
-                else:
-                    print(f"🔵 Monthly Formula: Unknown/Complex")
+        except Exception as e:
+            print(f"❌ ERROR during admin inclusion fix verification: {str(e)}")
+            self.log_result("Admin Inclusion Fix - Error", False, f"Test error: {str(e)}")
+            return None
             
             # Step 8: Final Summary and Recommendations
             print(f"\n📋 === INVESTIGATION SUMMARY ===")
