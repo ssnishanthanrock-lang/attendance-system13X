@@ -4254,12 +4254,12 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
             
             self.test_earnings_comparison_review_request()
             
-            # PRIORITY: Run payroll discrepancy investigation (REVIEW REQUEST FOCUS)
+            # PRIORITY: Run admin inclusion fix verification (CURRENT REVIEW REQUEST)
             print("\n" + "="*80)
-            print("🚨 TESTING PAYROLL DISCREPANCY INVESTIGATION (REVIEW REQUEST FOCUS)")
+            print("🚨 TESTING ADMIN INCLUSION FIX VERIFICATION (CURRENT REVIEW REQUEST)")
             print("="*80)
             
-            self.test_payroll_discrepancy_investigation()
+            self.test_payroll_admin_inclusion_fix()
             
             # Run Location Tracking System Tests (Previous)
             print("\n" + "="*80)
