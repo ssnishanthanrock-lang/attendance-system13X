@@ -311,16 +311,6 @@ export default function Payroll() {
             </div>
             )}
 
-            {/* Table View for Live Payroll - Coming Soon Note */}
-            {viewMode === 'table' && (
-              <Card>
-                <CardContent className="p-6 text-center text-gray-600">
-                  <p className="text-lg">Table view for live payroll uses the same table structure as detailed month view.</p>
-                  <p className="mt-2">Click on any month card below to see the full table view with all details.</p>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Monthly History Section - Below Live Tracker */}
             {months.length > 0 && (
               <div className="mt-8 pt-8 border-t border-gray-200">
