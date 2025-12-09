@@ -1204,12 +1204,12 @@ class ERPTester:
                            "employee_count": len(live_employees),
                            "timestamp": live_timestamp})
             
-            # Step 2: Call /api/payroll/detailed/2025-12
-            print("Step 2: Testing /api/payroll/detailed/2025-12 endpoint...")
+            # Step 2: Call /api/payroll/detailed/2025-12 and capture REAL values
+            print("📋 Step 2: Getting Monthly Payroll detailed data for December 2025...")
             detailed_response = self.session.get(f"{API_BASE}/payroll/detailed/2025-12")
             
             if detailed_response.status_code != 200:
-                self.log_result("Payroll Discrepancy - Detailed Endpoint", False, 
+                self.log_result("Payroll Investigation - Detailed Endpoint Failed", False, 
                               f"Detailed payroll endpoint failed: {detailed_response.status_code}",
                               {"response": detailed_response.text})
                 return
@@ -1218,16 +1218,23 @@ class ERPTester:
             detailed_total_gross = detailed_data.get("total_gross", 0)
             detailed_employees = detailed_data.get("employees", [])
             
-            # Get working_days from first employee in detailed endpoint
+            # Get working_days and sample employee data from detailed endpoint
             detailed_working_days = None
+            detailed_sample_employee = None
             if detailed_employees:
-                detailed_working_days = detailed_employees[0].get("working_days", 0)
+                detailed_sample_employee = detailed_employees[0]
+                detailed_working_days = detailed_sample_employee.get("working_days", 0)
             
-            self.log_result("Payroll Discrepancy - Detailed Endpoint Success", True, 
-                          f"Detailed payroll endpoint working",
+            print(f"   ✅ Detailed Endpoint Results:")
+            print(f"      - Total Gross: {detailed_total_gross} LKR")
+            print(f"      - Working Days: {detailed_working_days}")
+            print(f"      - Employee Count: {len(detailed_employees)}")
+            
+            self.log_result("Payroll Investigation - Detailed Endpoint Success", True, 
+                          f"Monthly Payroll detailed data captured",
                           {"total_gross": detailed_total_gross,
-                           "employee_count": len(detailed_employees),
-                           "first_employee_working_days": detailed_working_days})
+                           "working_days": detailed_working_days,
+                           "employee_count": len(detailed_employees)})
             
             # Step 3: Verify working_days = 27 for December 2025
             print("Step 3: Verifying working_days = 27 for December 2025...")
