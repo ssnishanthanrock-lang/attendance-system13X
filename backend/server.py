@@ -3947,14 +3947,19 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
         print("DEBUG: Creating OpenAI client")
         client = OpenAIClient(api_key=emergent_key)
         
+        # Limit file content if too large (take first 5000 chars for analysis)
+        file_sample = request.file_content[:5000] if len(request.file_content) > 5000 else request.file_content
+        
+        print("DEBUG: Preparing AI prompt")
+        
         # AI Prompt to parse the file
         prompt = f"""You are an expert at parsing attendance device export files. Analyze this file content and extract attendance records.
 
 File Content:
-{request.file_content}
+{file_sample}
 
 Instructions:
-1. Identify the format (columns, delimiters, datetime format)
+1. Identify the format (columns, delimiters, datetime format) - supports .dat, .txt, .csv, .xlsx
 2. Extract each record with: vendor_id (employee ID from device), datetime, date, time
 3. Group records by vendor_id and date to identify check-in and check-out pairs
 4. Return JSON array with structure:
