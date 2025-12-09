@@ -1156,25 +1156,56 @@ class ERPTester:
         """
         DETAILED PAYROLL DISCREPANCY INVESTIGATION
         
-        Investigate the total_gross discrepancy between Dashboard and Monthly Payroll view with ACTUAL data.
+        Compare ACTUAL total_gross values between Dashboard and Monthly Payroll with REAL working data.
         
-        **Context:**
-        - User reports total_gross differs between:
-          1. Dashboard Live Salary Tracker (uses `/api/payroll/live-current-month`)
-          2. Monthly Payroll `/payroll/month/2025-12` (uses `/api/payroll/detailed/2025-12`)
-        - Both were fixed to use 27 working days
-        - User believes monthly payroll is correct
-        - We have actual attendance data for December (13 records)
+        **Critical Investigation:**
+        User reports Dashboard shows DIFFERENT total_gross than Monthly Payroll view, and believes Monthly Payroll is correct.
+        
+        **Detailed Test Required:**
+        1. Login with actual user (mobile: 0773769019 or any valid admin)
+        2. Check for employees with actual attendance: Does anyone have check-in records for December 2025?
+        3. Call both endpoints and get REAL values:
+           A. Dashboard endpoint: GET /api/payroll/live-current-month
+           B. Monthly Payroll endpoint: GET /api/payroll/detailed/2025-12
+        4. Calculate exact difference and identify root cause
         """
         print("\n🔍 === DETAILED PAYROLL DISCREPANCY INVESTIGATION ===")
         
         try:
-            # Step 1: Call /api/payroll/live-current-month and capture REAL values
-            print("📊 Step 1: Getting Dashboard Live Salary Tracker data...")
+            # Step 1: Check for employees with actual attendance in December 2025
+            print("📋 Step 1: Checking for employees with actual attendance in December 2025...")
+            
+            # Check attendance records for December 2025
+            attendance_response = self.session.get(f"{API_BASE}/attendance", 
+                                                 params={"from_date": "2025-12-01", "to_date": "2025-12-31"})
+            
+            if attendance_response.status_code == 200:
+                attendance_records = attendance_response.json()
+                december_attendance_count = len(attendance_records)
+                
+                if december_attendance_count > 0:
+                    # Get unique employees with attendance
+                    employees_with_attendance = set(record.get('employee_id') for record in attendance_records)
+                    employee_names = set(record.get('employee_name', 'Unknown') for record in attendance_records)
+                    
+                    self.log_result("December 2025 Attendance Check", True, 
+                                  f"Found {december_attendance_count} attendance records for {len(employees_with_attendance)} employees",
+                                  {"attendance_count": december_attendance_count,
+                                   "unique_employees": len(employees_with_attendance),
+                                   "employee_names": list(employee_names)[:5]})  # Show first 5 names
+                else:
+                    self.log_result("December 2025 Attendance Check", True, 
+                                  "No attendance records found for December 2025 (expected for new system)")
+            else:
+                self.log_result("December 2025 Attendance Check", False, 
+                              f"Failed to check attendance: {attendance_response.status_code}")
+            
+            # Step 2: Call Dashboard Live Payroll endpoint
+            print("📊 Step 2: Getting Dashboard Live Payroll data...")
             live_response = self.session.get(f"{API_BASE}/payroll/live-current-month")
             
             if live_response.status_code != 200:
-                self.log_result("Payroll Investigation - Live Endpoint Failed", False, 
+                self.log_result("Dashboard Live Payroll - Request Failed", False, 
                               f"Live payroll endpoint failed: {live_response.status_code}",
                               {"response": live_response.text})
                 return
@@ -1183,6 +1214,7 @@ class ERPTester:
             live_total_gross = live_data.get("total_gross", 0)
             live_timestamp = live_data.get("timestamp", "")
             live_employees = live_data.get("employees", [])
+            live_employee_count = len(live_employees)
             
             # Get working_days and sample employee data from live endpoint
             live_working_days = None
