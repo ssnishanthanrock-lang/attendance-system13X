@@ -545,17 +545,6 @@ export default function Payroll() {
                               <span>Late: {emp.late_minutes} min</span>
                             </div>
                           </div>
-                          
-                          {/* View Salary Slip Button */}
-                          <Button
-                            onClick={() => setViewingSalarySlip(emp)}
-                            variant="outline"
-                            size="sm"
-                            className="w-full flex items-center justify-center gap-2"
-                          >
-                            <FileText className="w-4 h-4" />
-                            View Salary Slip
-                          </Button>
                         </div>
                       </CardContent>
                     </Card>
