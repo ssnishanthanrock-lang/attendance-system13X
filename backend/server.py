@@ -3707,13 +3707,18 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
                 try:
                     from datetime import timedelta
                     checkin_dt = datetime.fromisoformat(record["check_in"])
-                    # Server is in UTC, but check-ins are in Sri Lanka time (UTC+5:30)
-                    # Add 5.5 hours to server time to get Sri Lanka time for ongoing attendance
+                    
+                    # For total_attendance_minutes: Use NO timezone adjustment (match detailed payroll)
+                    duration_no_tz = now - checkin_dt
+                    minutes_no_tz = int(duration_no_tz.total_seconds() / 60)
+                    total_attendance_minutes += minutes_no_tz
+                    
+                    # For today_minutes (used in Today Salary): Use timezone adjustment
+                    # Server is in UTC, check-ins are in Sri Lanka time (UTC+5:30)
                     now_srilanka = now + timedelta(hours=5, minutes=30)
-                    duration = now_srilanka - checkin_dt
-                    minutes_worked = int(duration.total_seconds() / 60)
-                    total_attendance_minutes += minutes_worked
-                    today_minutes += minutes_worked  # Track today's minutes
+                    duration_with_tz = now_srilanka - checkin_dt
+                    minutes_with_tz = int(duration_with_tz.total_seconds() / 60)
+                    today_minutes += minutes_with_tz  # Use adjusted time for today's earnings
                 except Exception as e:
                     pass
         
