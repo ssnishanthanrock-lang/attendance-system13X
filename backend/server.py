@@ -4071,23 +4071,12 @@ Return ONLY the JSON response, no additional text.""",
                 # Validate and process AI response
                 records = ai_result.get('records', [])
                 unique_vendor_ids = ai_result.get('unique_vendor_ids', [])
-            
-            for row_idx in range(header_row_idx + 1, sheet.max_row + 1):  # Skip header row
-                row = list(sheet.iter_rows(min_row=row_idx, max_row=row_idx, values_only=True))[0]
                 
-                # Check if this row has an Enroll No (new employee)
-                enroll_val = str(row[enroll_col]).strip() if row[enroll_col] else ''
-                if enroll_val and enroll_val not in ['IN', 'OUT', 'WH', 'Enroll No', '']:
-                    # Make sure it's numeric or alphanumeric ID
-                    if enroll_val.replace('-', '').replace('_', '').isalnum():
-                        current_enroll_no = enroll_val
-                        unique_vendor_ids.add(current_enroll_no)
-                        if current_enroll_no not in employee_punches:
-                            employee_punches[current_enroll_no] = {}
-                        continue
-                
-                if current_enroll_no is None:
-                    continue
+                # Extract dates for date range
+                dates = set()
+                for record in records:
+                    if 'date' in record:
+                        dates.add(record['date'])
                 
                 # Check if this is IN/OUT/WH row
                 row_type = None
