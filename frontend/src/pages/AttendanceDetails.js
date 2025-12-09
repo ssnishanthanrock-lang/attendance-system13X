@@ -73,6 +73,7 @@ export default function AttendanceDetails() {
       const response = await api.get(`/attendance/date/${date}`);
       setAttendance(response.data.attendance || []);
       setTotalEarnings(response.data.total_earnings || 0);
+      setLastFetchTime(Date.now()); // Track when we fetched from backend
       
       // Calculate stats
       const present = response.data.attendance.filter(a => a.status === 'present').length;
