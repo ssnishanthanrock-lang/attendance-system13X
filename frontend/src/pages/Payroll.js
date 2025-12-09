@@ -208,11 +208,7 @@ export default function Payroll() {
               </Card>
             </div>
 
-            {/* Employee Cards - Card View */}
-            {viewMode === 'card' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {livePayroll.employees.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((emp) => (
-                <Card key={emp.employee_id} className="hover:shadow-lg transition-shadow">
+            {/* Monthly History Section - Below Live Tracker */}
                   <CardContent className="p-5">
                     {/* Employee Header */}
                     <div className="flex items-center gap-3 mb-4 pb-4 border-b">
