@@ -3954,7 +3954,14 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
         auth_success = self.test_authentication()
         
         if auth_success:
-            # PRIORITY: Run payroll discrepancy investigation first (REVIEW REQUEST FOCUS)
+            # PRIORITY: Run earnings comparison test first (SPECIFIC REVIEW REQUEST)
+            print("\n" + "="*80)
+            print("💰 TESTING EARNINGS COMPARISON - DASHBOARD vs ATTENDANCE DETAILS (REVIEW REQUEST)")
+            print("="*80)
+            
+            self.test_earnings_comparison_review_request()
+            
+            # PRIORITY: Run payroll discrepancy investigation (REVIEW REQUEST FOCUS)
             print("\n" + "="*80)
             print("🚨 TESTING PAYROLL DISCREPANCY INVESTIGATION (REVIEW REQUEST FOCUS)")
             print("="*80)
