@@ -3321,9 +3321,14 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         
         # Calculate total attendance minutes
         total_attendance_minutes = 0
+        now = datetime.now(timezone.utc)
+        today_str = now.strftime("%Y-%m-%d")
         
         # For present days with check-in/out
         for record in attendance_records:
+            record_date = record.get("date", "")
+            
+            # For completed days (check-in and check-out both present)
             if record.get("check_in") and record.get("check_out"):
                 try:
                     checkin_dt = datetime.fromisoformat(record["check_in"])
@@ -3334,6 +3339,18 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
                     if checkout_dt.tzinfo is None:
                         checkout_dt = checkout_dt.replace(tzinfo=timezone.utc)
                     duration = checkout_dt - checkin_dt
+                    total_attendance_minutes += int(duration.total_seconds() / 60)
+                except:
+                    pass
+            # For today's ongoing attendance (checked in but not out yet) - only if viewing current month
+            elif record_date == today_str and record.get("check_in") and not record.get("check_out") and month == now.strftime("%Y-%m"):
+                try:
+                    checkin_dt = datetime.fromisoformat(record["check_in"])
+                    # Make timezone-aware if needed
+                    if checkin_dt.tzinfo is None:
+                        checkin_dt = checkin_dt.replace(tzinfo=timezone.utc)
+                    # Calculate up to current time
+                    duration = now - checkin_dt
                     total_attendance_minutes += int(duration.total_seconds() / 60)
                 except:
                     pass
