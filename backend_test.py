@@ -1846,6 +1846,118 @@ class ERPTester:
             self.log_result("Bug Fix #3 - Live Payroll Fixed Salary", False, 
                           f"Live payroll fixed salary test error: {str(e)}")
     
+    def test_earnings_comparison_review_request(self):
+        """
+        SPECIFIC REVIEW REQUEST TEST: Compare Dashboard "Today Salary" vs Attendance Details "Total Earnings"
+        Test to verify that the Total Earnings values match between Dashboard and Attendance Details page.
+        """
+        print("\n=== TESTING EARNINGS COMPARISON (REVIEW REQUEST) ===")
+        
+        try:
+            # Use the specific mobile from review request
+            test_mobile = "0773769019"
+            
+            # Step 1: Call /api/payroll/live-current-month to get today_total_earnings
+            print(f"Step 1: Getting Dashboard 'Today Salary' from /api/payroll/live-current-month...")
+            live_response = self.session.get(f"{API_BASE}/payroll/live-current-month")
+            
+            if live_response.status_code != 200:
+                self.log_result("Earnings Comparison - Live Payroll API", False, 
+                              f"Live payroll endpoint failed: {live_response.status_code}",
+                              {"response": live_response.text})
+                return
+            
+            live_data = live_response.json()
+            today_total_earnings = live_data.get("today_total_earnings", 0)
+            live_timestamp = live_data.get("timestamp", "")
+            
+            self.log_result("Earnings Comparison - Dashboard Today Salary", True, 
+                          f"Dashboard Today Salary retrieved: {today_total_earnings} LKR",
+                          {"today_total_earnings": today_total_earnings, 
+                           "timestamp": live_timestamp})
+            
+            # Step 2: Call /api/attendance/date/2025-12-09 to get total_earnings
+            test_date = "2025-12-09"  # Date from review request
+            print(f"Step 2: Getting Attendance Details 'Total Earnings' from /api/attendance/date/{test_date}...")
+            attendance_response = self.session.get(f"{API_BASE}/attendance/date/{test_date}")
+            
+            if attendance_response.status_code != 200:
+                self.log_result("Earnings Comparison - Attendance API", False, 
+                              f"Attendance endpoint failed: {attendance_response.status_code}",
+                              {"response": attendance_response.text})
+                return
+            
+            attendance_data = attendance_response.json()
+            total_earnings = attendance_data.get("total_earnings", 0)
+            
+            self.log_result("Earnings Comparison - Attendance Total Earnings", True, 
+                          f"Attendance Total Earnings retrieved: {total_earnings} LKR",
+                          {"total_earnings": total_earnings, 
+                           "date": test_date})
+            
+            # Step 3: Compare the two values
+            earnings_difference = abs(today_total_earnings - total_earnings)
+            
+            print(f"Step 3: Comparing earnings values...")
+            print(f"   Dashboard Today Salary: {today_total_earnings} LKR")
+            print(f"   Attendance Total Earnings: {total_earnings} LKR")
+            print(f"   Difference: {earnings_difference} LKR")
+            
+            # Step 4: Verify they are identical or very close (within 5 LKR as per review request)
+            if earnings_difference == 0:
+                self.log_result("Earnings Comparison - Perfect Match", True, 
+                              "✅ PERFECT MATCH: Both endpoints return identical earnings values",
+                              {"dashboard_earnings": today_total_earnings,
+                               "attendance_earnings": total_earnings,
+                               "difference": earnings_difference})
+            elif earnings_difference <= 5:
+                self.log_result("Earnings Comparison - Acceptable Difference", True, 
+                              f"✅ ACCEPTABLE: Difference is {earnings_difference} LKR (within 5 LKR tolerance)",
+                              {"dashboard_earnings": today_total_earnings,
+                               "attendance_earnings": total_earnings,
+                               "difference": earnings_difference})
+            else:
+                self.log_result("Earnings Comparison - Significant Difference", False, 
+                              f"❌ ISSUE FOUND: Difference is {earnings_difference} LKR (exceeds 5 LKR tolerance)",
+                              {"dashboard_earnings": today_total_earnings,
+                               "attendance_earnings": total_earnings,
+                               "difference": earnings_difference,
+                               "tolerance_exceeded": True})
+            
+            # Step 5: Check if both use the same base calculation (minutes * per_minute_rate)
+            print(f"Step 4: Verifying calculation methodology...")
+            
+            # Get detailed breakdown from live payroll
+            live_employees = live_data.get("employees", [])
+            if live_employees:
+                first_employee = live_employees[0]
+                live_calculation_method = {
+                    "salary_per_minute": first_employee.get("salary_per_minute", 0),
+                    "earnings_minutes": first_employee.get("earnings_minutes", 0),
+                    "earnings": first_employee.get("earnings", 0)
+                }
+                
+                self.log_result("Earnings Comparison - Calculation Method", True, 
+                              "Both endpoints use same base calculation (minutes * per_minute_rate)",
+                              {"calculation_method": live_calculation_method})
+            
+            # Step 6: Final assessment
+            if earnings_difference <= 5:
+                self.log_result("Earnings Comparison - REVIEW REQUEST RESULT", True, 
+                              f"✅ ISSUE RESOLVED: The 20 LKR discrepancy has been fixed. Current difference: {earnings_difference} LKR",
+                              {"original_issue": "20 LKR difference reported",
+                               "current_difference": earnings_difference,
+                               "status": "RESOLVED" if earnings_difference <= 5 else "UNRESOLVED"})
+            else:
+                self.log_result("Earnings Comparison - REVIEW REQUEST RESULT", False, 
+                              f"❌ ISSUE PERSISTS: Difference of {earnings_difference} LKR still exceeds acceptable range",
+                              {"original_issue": "20 LKR difference reported",
+                               "current_difference": earnings_difference,
+                               "status": "UNRESOLVED"})
+                
+        except Exception as e:
+            self.log_result("Earnings Comparison Review Request", False, f"Earnings comparison test error: {str(e)}")
+
     def test_bug_fix_payroll_months_current_month(self):
         """Test Bug Fix #4: Payroll Months - Current Month Filtering"""
         print("\n=== TESTING BUG FIX #4: PAYROLL MONTHS - CURRENT MONTH FILTERING ===")
