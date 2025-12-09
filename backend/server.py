@@ -3095,7 +3095,11 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
             
             # Calculate earnings for this day
             earnings = 0
+            now = datetime.now(timezone.utc)
+            today_str = now.strftime("%Y-%m-%d")
+            
             if record.get("check_in") and record.get("check_out"):
+                # Completed attendance - calculate based on actual hours
                 try:
                     checkin_dt = datetime.fromisoformat(record["check_in"])
                     checkout_dt = datetime.fromisoformat(record["check_out"])
@@ -3104,6 +3108,17 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
                     if checkout_dt.tzinfo is None:
                         checkout_dt = checkout_dt.replace(tzinfo=timezone.utc)
                     duration = checkout_dt - checkin_dt
+                    minutes_worked = int(duration.total_seconds() / 60)
+                    earnings = minutes_worked * salary_per_minute
+                except:
+                    pass
+            elif record.get("check_in") and not record.get("check_out") and date == today_str:
+                # Ongoing attendance for today - calculate up to now
+                try:
+                    checkin_dt = datetime.fromisoformat(record["check_in"])
+                    if checkin_dt.tzinfo is None:
+                        checkin_dt = checkin_dt.replace(tzinfo=timezone.utc)
+                    duration = now - checkin_dt
                     minutes_worked = int(duration.total_seconds() / 60)
                     earnings = minutes_worked * salary_per_minute
                 except:
