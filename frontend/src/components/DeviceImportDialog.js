@@ -22,11 +22,26 @@ const DeviceImportDialog = ({ open, onClose, employees, onImportComplete }) => {
     if (!file) return;
 
     setFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      setFileContent(event.target.result);
-    };
-    reader.readAsText(file);
+    
+    // Check if it's an Excel file
+    const isExcel = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+    
+    if (isExcel) {
+      // For Excel files, read as binary and convert to base64
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        // Send indication that it's Excel format
+        setFileContent(`[EXCEL_FILE]\n${file.name}\n${event.target.result}`);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // For text files, read as text
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFileContent(event.target.result);
+      };
+      reader.readAsText(file);
+    }
   };
 
   const handleParse = async () => {
