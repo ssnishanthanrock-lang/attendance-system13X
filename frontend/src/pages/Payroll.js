@@ -41,81 +41,16 @@ export default function Payroll() {
       const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM format
       
       if (month === currentMonth) {
-        // Silent backend refresh every 5 seconds to keep base values accurate
+        // Fetch from backend every 1 second (same as Dashboard) for perfect sync
         const refreshIntervalId = setInterval(() => {
           fetchDetailedPayroll(month, true); // true = silent update, no page refresh
-        }, 5000);
+        }, 1000); // Changed from 5000 to 1000 to match Dashboard
         
         // Clean up interval when month changes or component unmounts
         return () => clearInterval(refreshIntervalId);
       }
     }
   }, [month]);
-
-  // Live counter effect - runs every second for smooth increments
-  useEffect(() => {
-    if (!month || !lastFetchTime) return;
-    
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    if (month !== currentMonth) return; // Only for current month
-    
-    const liveCounterInterval = setInterval(() => {
-      const secondsSinceLastFetch = Math.floor((Date.now() - lastFetchTime) / 1000);
-      
-      setDetailedPayroll(prevPayroll => {
-        if (!prevPayroll || !prevPayroll.employees) return prevPayroll;
-        
-        let newTotalGross = 0;
-        let newTotalNet = 0;
-        
-        const updatedEmployees = prevPayroll.employees.map(emp => {
-          // Only update for non-fixed salary employees
-          if (emp.fixed_salary) {
-            newTotalGross += emp.gross_salary;
-            newTotalNet += emp.net_salary;
-            return emp;
-          }
-          
-          // Get base values (from last backend fetch)
-          const baseGross = emp.base_gross_salary !== undefined ? emp.base_gross_salary : emp.gross_salary;
-          const baseNet = emp.base_net_salary !== undefined ? emp.base_net_salary : emp.net_salary;
-          const baseEarnings = emp.base_earnings !== undefined ? emp.base_earnings : emp.earnings;
-          
-          // Calculate increment
-          const perMinuteRate = emp.salary_per_minute || 0;
-          const perSecondRate = perMinuteRate / 60;
-          const additionalEarnings = secondsSinceLastFetch * perSecondRate;
-          
-          // New values = base + increment
-          const newEarnings = baseEarnings + additionalEarnings;
-          const newGross = baseGross + additionalEarnings;
-          const newNet = baseNet + additionalEarnings;
-          
-          newTotalGross += newGross;
-          newTotalNet += newNet;
-          
-          return {
-            ...emp,
-            earnings: newEarnings,
-            gross_salary: newGross,
-            net_salary: newNet,
-            base_gross_salary: baseGross,
-            base_net_salary: baseNet,
-            base_earnings: baseEarnings
-          };
-        });
-        
-        return {
-          ...prevPayroll,
-          employees: updatedEmployees,
-          total_gross: newTotalGross,
-          total_net: newTotalNet
-        };
-      });
-    }, 1000); // Update every second for smooth live counter
-    
-    return () => clearInterval(liveCounterInterval);
-  }, [month, lastFetchTime]); // Removed detailedPayroll from dependencies to prevent multiple intervals
 
   // Live payroll update effect
   useEffect(() => {
