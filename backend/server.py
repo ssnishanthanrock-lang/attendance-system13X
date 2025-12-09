@@ -3034,6 +3034,48 @@ async def delete_attendance(attendance_id: str, current_user: User = Depends(get
     
     return {"message": "Attendance deleted successfully"}
 
+@api_router.get("/attendance/date/{date}")
+async def get_attendance_by_date(date: str, current_user: User = Depends(get_current_user)):
+    """Get all attendance records for a specific date"""
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Get all employees in company
+    employees = await db.users.find(
+        {"company_id": current_user.company_id, "role": {"$in": ["admin", "employee", "manager", "staff_member"]}},
+        {"_id": 0, "id": 1, "name": 1, "employee_id": 1}
+    ).to_list(length=None)
+    
+    # Get attendance for the date
+    attendance_records = await db.attendance.find(
+        {"company_id": current_user.company_id, "date": date},
+        {"_id": 0}
+    ).to_list(length=None)
+    
+    # Create a map of employee_id to attendance
+    attendance_map = {record["employee_id"]: record for record in attendance_records}
+    
+    # Build complete attendance list (including absent employees)
+    all_attendance = []
+    for employee in employees:
+        if employee["id"] in attendance_map:
+            all_attendance.append(attendance_map[employee["id"]])
+        else:
+            # Employee has no record for this date - mark as absent
+            all_attendance.append({
+                "id": None,
+                "employee_id": employee["id"],
+                "employee_name": employee["name"],
+                "employee_id_display": employee.get("employee_id"),
+                "company_id": current_user.company_id,
+                "date": date,
+                "status": "absent",
+                "check_in": None,
+                "check_out": None
+            })
+    
+    return {"attendance": all_attendance, "date": date, "total": len(all_attendance)}
+
 @api_router.get("/attendance/deleted")
 async def get_deleted_attendance(current_user: User = Depends(get_current_user)):
     if current_user.role not in ["admin", "manager"]:
