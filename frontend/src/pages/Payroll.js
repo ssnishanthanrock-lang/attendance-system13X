@@ -160,7 +160,7 @@ export default function Payroll() {
         {/* Live Current Month View */}
         {isLiveView && livePayroll && (
           <div className="space-y-4">
-            {/* Header with View Toggle */}
+            {/* Header */}
             <div className="flex items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
