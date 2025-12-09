@@ -809,6 +809,60 @@ async def update_company_sms(company_id: str, sms_settings: SMSSettings, current
     
     return {"message": "SMS settings updated"}
 
+@api_router.get("/superadmin/companies/{company_id}/admins")
+async def get_company_admins(company_id: str, current_user: User = Depends(get_current_user)):
+    """Get all admin users for a specific company"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Find all users with admin role for this company
+    admins = await db.users.find(
+        {"company_id": company_id, "role": "admin"},
+        {"_id": 0, "id": 1, "name": 1, "mobile": 1, "employee_id": 1}
+    ).to_list(100)
+    
+    return admins
+
+@api_router.post("/superadmin/companies/{company_id}/resend-url")
+async def resend_company_url(company_id: str, admin_id: str, current_user: User = Depends(get_current_user)):
+    """Re-send company URL to a specific admin via SMS"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    # Get company details
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0})
+    if not company:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    # Get admin details
+    admin = await db.users.find_one(
+        {"id": admin_id, "company_id": company_id, "role": "admin"},
+        {"_id": 0}
+    )
+    if not admin:
+        raise HTTPException(status_code=404, detail="Admin not found")
+    
+    # Send SMS using default system gateway (same as OTP)
+    message = f"Your company portal: {company['name']}. Login with mobile {admin['mobile']} at: https://paystack-app.preview.emergentagent.com"
+    sms_sent = send_sms(admin['mobile'], message, None)  # None = use default system gateway
+    
+    if not sms_sent:
+        raise HTTPException(status_code=500, detail="Failed to send SMS")
+    
+    await log_activity(
+        "SUPER_ADMIN", 
+        current_user.id, 
+        current_user.name, 
+        "RESEND_URL", 
+        f"Re-sent company URL for {company['name']} to admin {admin['name']} ({admin['mobile']})"
+    )
+    
+    return {
+        "message": "URL sent successfully",
+        "admin_name": admin['name'],
+        "admin_mobile": admin['mobile']
+    }
+
 @api_router.get("/superadmin/admins")
 async def get_super_admins(current_user: User = Depends(get_current_user)):
     if current_user.role != "super_admin":
