@@ -129,12 +129,11 @@ class ERPTester:
             # This is a workaround for testing - in production, proper OTP verification is required
             import jwt
             
-            # Use the specific mobile from review request: 0773769019
-            # This should match the real user data from the database
+            # Use real user data from the database (company with payroll data)
             test_payload = {
                 "user_id": "cfb58f53-79c7-4f12-85b0-268dde3f3fe0",  # Real user ID from DB
                 "role": "admin", 
-                "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",  # Real company ID from DB
+                "company_id": "56b91066-f921-4a27-abd2-cae13ff92086",  # Real company ID with payroll data
                 "mobile": mobile
             }
             
