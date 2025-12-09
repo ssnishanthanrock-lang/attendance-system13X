@@ -18,7 +18,7 @@ export default function Payroll() {
   const [livePayroll, setLivePayroll] = useState(null);
   const liveIntervalRef = useRef(null);
   const [viewingSalarySlip, setViewingSalarySlip] = useState(null);
-  const [viewMode, setViewMode] = useState('table'); // Default to table view for monthly detail
+  const [viewMode, setViewMode] = useState('card'); // Always show card view
 
   // Determine view mode based on URL
   const isLiveView = !month; // If no month param, show live view
@@ -208,6 +208,119 @@ export default function Payroll() {
               </Card>
             </div>
 
+            {/* Employee Cards - Card View */}
+            {viewMode === 'card' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {livePayroll.employees.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((emp) => (
+                <Card key={emp.employee_id} className="hover:shadow-lg transition-shadow">
+                  <CardContent className="p-5">
+                    {/* Employee Header */}
+                    <div className="flex items-center gap-3 mb-4 pb-4 border-b">
+                      <div className="w-12 h-12 rounded-full flex-shrink-0">
+                        {emp.profile_picture && emp.profile_picture.trim() !== '' ? (
+                          <img 
+                            src={emp.profile_picture} 
+                            alt={emp.employee_name} 
+                            className="w-12 h-12 rounded-full object-cover"
+                            onError={(e) => {
+                              e.target.outerHTML = '<div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
+                            }}
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                            <User className="w-6 h-6 text-white" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-bold text-gray-900">{emp.employee_name}</h3>
+                        <p className="text-sm text-gray-500">{emp.position}</p>
+                        {emp.fixed_salary && (
+                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Fixed Salary</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Earnings Section */}
+                    <div className="space-y-2 mb-3">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Basic Salary:</span>
+                        <span className="font-semibold">Rs {emp.basic_salary.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Allowances:</span>
+                        <span className="font-semibold">Rs {emp.allowances.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Earned So Far:</span>
+                        <span className="font-semibold text-green-600">Rs {emp.earnings.toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Extra Payment:</span>
+                        <span className="font-semibold text-green-600">Rs {(emp.extra_payment || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm pt-2 border-t">
+                        <span className="text-gray-700 font-semibold">Gross Salary:</span>
+                        <span className="font-bold text-blue-600">Rs {emp.gross_salary.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Deductions Section */}
+                    <div className="space-y-2 mb-3 pt-3 border-t">
+                      <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Deductions</p>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Late Deduction:</span>
+                        <span className="text-red-600">Rs {emp.late_deduction.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Advances:</span>
+                        <span className="text-red-600">Rs {emp.advances.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Loan:</span>
+                        <span className="text-red-600">Rs {(emp.loan_deduction || 0).toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Other:</span>
+                        <span className="text-red-600">Rs {emp.other_deductions.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Net Salary */}
+                    <div className="pt-3 border-t bg-green-50 -mx-5 -mb-5 px-5 py-3 rounded-b-lg">
+                      <div className="flex justify-between items-center">
+                        <span className="font-bold text-gray-900">Net Salary (So Far):</span>
+                        <span className="text-xl font-bold text-green-700">Rs {emp.net_salary.toLocaleString()}</span>
+                      </div>
+                    </div>
+
+                    {/* Attendance Info */}
+                    <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-1">
+                      <div className="flex justify-between">
+                        <span>Present: {emp.present_days}</span>
+                        <span>Leave: {emp.leave_days}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Minutes Worked: {emp.total_attendance_minutes}</span>
+                        <span>Late: {emp.late_minutes} min</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+            )}
+
+            {/* Table View for Live Payroll - Coming Soon Note */}
+            {viewMode === 'table' && (
+              <Card>
+                <CardContent className="p-6 text-center text-gray-600">
+                  <p className="text-lg">Table view for live payroll uses the same table structure as detailed month view.</p>
+                  <p className="mt-2">Click on any month card below to see the full table view with all details.</p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Monthly History Section - Below Live Tracker */}
             {months.length > 0 && (
               <div className="mt-8 pt-8 border-t border-gray-200">
@@ -336,8 +449,7 @@ export default function Payroll() {
                   </Card>
                 </div>
                 
-                {/* Card View */}
-                {viewMode === 'card' && (
+                {/* Employee Cards Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {detailedPayroll.employees.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((emp) => (
                     <Card key={emp.employee_id} className="hover:shadow-lg transition-shadow">
@@ -459,12 +571,8 @@ export default function Payroll() {
                     </Card>
                   ))}
                 </div>
-                )}
               </>
             )}
-
-            {/* Card View - Always Show */}
-            <>
 
             {/* Table View */}
             {viewMode === 'table' && (
