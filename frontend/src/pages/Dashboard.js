@@ -483,20 +483,33 @@ export default function Dashboard() {
                       <p className="text-xl font-bold text-blue-700">Rs {livePayroll.total_gross?.toLocaleString()}</p>
                     </CardContent>
                   </Card>
-                  {livePayroll.total_allowances > 0 && (
-                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-                      <CardContent className="p-3 text-center">
-                        <p className="text-xs text-gray-600 mb-1">Total Allowances</p>
-                        <p className="text-xl font-bold text-purple-700">Rs {livePayroll.total_allowances?.toLocaleString()}</p>
-                      </CardContent>
-                    </Card>
-                  )}
-                  <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+                  
+                  {/* Today Salary Card */}
+                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
                     <CardContent className="p-3 text-center">
-                      <p className="text-xs text-gray-600 mb-1">Total Deductions</p>
-                      <p className="text-xl font-bold text-red-700">Rs {livePayroll.total_deductions?.toLocaleString()}</p>
+                      <p className="text-xs text-gray-600 mb-1">Today Salary</p>
+                      <p className="text-xl font-bold text-orange-700">Rs {livePayroll.today_total_earnings?.toLocaleString() || '0'}</p>
                     </CardContent>
                   </Card>
+
+                  {/* Allowances and Deductions in 2-column grid (50% width each) */}
+                  <div className="grid grid-cols-2 gap-3">
+                    {livePayroll.total_allowances > 0 && (
+                      <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                        <CardContent className="p-3 text-center">
+                          <p className="text-xs text-gray-600 mb-1">Total Allowances</p>
+                          <p className="text-xl font-bold text-purple-700">Rs {livePayroll.total_allowances?.toLocaleString()}</p>
+                        </CardContent>
+                      </Card>
+                    )}
+                    <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
+                      <CardContent className="p-3 text-center">
+                        <p className="text-xs text-gray-600 mb-1">Total Deductions</p>
+                        <p className="text-xl font-bold text-red-700">Rs {livePayroll.total_deductions?.toLocaleString()}</p>
+                      </CardContent>
+                    </Card>
+                  </div>
+
                   <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                     <CardContent className="p-3 text-center">
                       <p className="text-xs text-gray-600 mb-1">Total Net (So Far)</p>
