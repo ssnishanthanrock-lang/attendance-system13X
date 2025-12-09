@@ -1277,32 +1277,111 @@ class ERPTester:
                 self.log_result("Payroll Investigation - Detailed Working Days", False, 
                               f"Detailed endpoint shows working_days = {detailed_working_days}, expected 27")
             
-            # Step 5: Additional verification - check if both use same calculation method
-            print("Step 5: Verifying calculation consistency...")
+            # Step 5: Deep dive into calculation logic for sample employee
+            print("🔬 Step 5: Deep dive into calculation logic for sample employee...")
             
-            if live_working_days == detailed_working_days == 27:
-                self.log_result("Payroll Discrepancy - Working Days Consistency", True, 
-                              "Both endpoints use same working_days calculation (27 days)")
-            else:
-                self.log_result("Payroll Discrepancy - Working Days Inconsistency", False, 
-                              f"Working days mismatch: live={live_working_days}, detailed={detailed_working_days}")
-            
-            # Step 6: Summary of fix verification
-            working_days_fixed = (live_working_days == 27 and detailed_working_days == 27)
-            total_gross_matches = (percentage_diff <= 5)
-            
-            if working_days_fixed and total_gross_matches:
-                self.log_result("Payroll Discrepancy - Fix Verification", True, 
-                              "✅ PAYROLL DISCREPANCY FIX SUCCESSFUL: Both endpoints use 27 working days and return matching total_gross values")
-            else:
-                issues = []
-                if not working_days_fixed:
-                    issues.append("working_days not consistently 27")
-                if not total_gross_matches:
-                    issues.append("total_gross values differ by >5%")
+            if live_sample_employee and detailed_sample_employee:
+                print(f"   📋 Sample Employee Analysis:")
                 
-                self.log_result("Payroll Discrepancy - Fix Verification", False, 
-                              f"❌ PAYROLL DISCREPANCY FIX INCOMPLETE: {', '.join(issues)}")
+                # Live endpoint sample employee
+                live_emp_name = live_sample_employee.get("employee_name", "Unknown")
+                live_emp_basic = live_sample_employee.get("basic_salary", 0)
+                live_emp_allowances = live_sample_employee.get("allowances", 0)
+                live_emp_earnings = live_sample_employee.get("earnings", 0)
+                live_emp_gross = live_sample_employee.get("gross_salary", 0)
+                live_emp_extra = live_sample_employee.get("extra_payment", 0)
+                
+                # Detailed endpoint sample employee
+                detailed_emp_name = detailed_sample_employee.get("employee_name", "Unknown")
+                detailed_emp_basic = detailed_sample_employee.get("basic_salary", 0)
+                detailed_emp_allowances = detailed_sample_employee.get("allowances", 0)
+                detailed_emp_earnings = detailed_sample_employee.get("earnings", 0)
+                detailed_emp_gross = detailed_sample_employee.get("gross_salary", 0)
+                
+                print(f"      Live Endpoint - {live_emp_name}:")
+                print(f"        - Basic Salary: {live_emp_basic:,.2f}")
+                print(f"        - Allowances: {live_emp_allowances:,.2f}")
+                print(f"        - Earnings: {live_emp_earnings:,.2f}")
+                print(f"        - Extra Payments: {live_emp_extra:,.2f}")
+                print(f"        - Gross Salary: {live_emp_gross:,.2f}")
+                
+                print(f"      Detailed Endpoint - {detailed_emp_name}:")
+                print(f"        - Basic Salary: {detailed_emp_basic:,.2f}")
+                print(f"        - Allowances: {detailed_emp_allowances:,.2f}")
+                print(f"        - Earnings: {detailed_emp_earnings:,.2f}")
+                print(f"        - Gross Salary: {detailed_emp_gross:,.2f}")
+                
+                # Check if formulas differ
+                live_formula = f"gross_salary = earnings + extra_payments = {live_emp_earnings} + {live_emp_extra} = {live_emp_earnings + live_emp_extra}"
+                detailed_formula = f"gross_salary = basic + allowances = {detailed_emp_basic} + {detailed_emp_allowances} = {detailed_emp_basic + detailed_emp_allowances}"
+                
+                print(f"      Formula Comparison:")
+                print(f"        - Live: {live_formula}")
+                print(f"        - Detailed: {detailed_formula}")
+                
+                self.log_result("Payroll Investigation - Sample Employee Analysis", True, 
+                              f"Sample employee calculation breakdown completed",
+                              {"live_employee": live_emp_name, "detailed_employee": detailed_emp_name,
+                               "live_gross": live_emp_gross, "detailed_gross": detailed_emp_gross})
+            
+            # Step 6: Identify root cause
+            print("🎯 Step 6: Root Cause Analysis...")
+            
+            root_causes = []
+            
+            if not working_days_consistent:
+                root_causes.append("Working days calculation inconsistency")
+            
+            if difference_lkr > 0:
+                if live_sample_employee and detailed_sample_employee:
+                    # Check if it's a formula difference
+                    live_includes_extra = live_sample_employee.get("extra_payment", 0) > 0
+                    if live_includes_extra:
+                        root_causes.append("Live endpoint includes extra_payments, detailed endpoint may not")
+                    
+                    # Check if it's allowances handling
+                    live_allowances = live_sample_employee.get("allowances", 0)
+                    detailed_allowances = detailed_sample_employee.get("allowances", 0)
+                    if live_allowances != detailed_allowances:
+                        root_causes.append("Allowances calculation differs between endpoints")
+                
+                # Check if it's timing issue
+                if "timestamp" in live_data:
+                    root_causes.append("Timing issue - live endpoint fetched at different time")
+            
+            if not root_causes:
+                root_causes.append("No significant discrepancy found")
+            
+            print(f"   🔍 Identified Root Causes:")
+            for i, cause in enumerate(root_causes, 1):
+                print(f"      {i}. {cause}")
+            
+            # Step 7: Final assessment and recommendation
+            print("📋 Step 7: Final Assessment and Recommendation...")
+            
+            if difference_lkr == 0:
+                assessment = "✅ PERFECT MATCH - No discrepancy found"
+                recommendation = "No action needed - both endpoints return identical values"
+                success = True
+            elif difference_lkr <= 100:  # Within 100 LKR tolerance
+                assessment = f"✅ ACCEPTABLE DIFFERENCE - {difference_lkr:,.2f} LKR difference is within tolerance"
+                recommendation = "Monitor for consistency, but no immediate action required"
+                success = True
+            else:
+                assessment = f"❌ SIGNIFICANT DISCREPANCY - {difference_lkr:,.2f} LKR difference exceeds tolerance"
+                recommendation = f"Investigation required: {', '.join(root_causes)}"
+                success = False
+            
+            print(f"   {assessment}")
+            print(f"   💡 Recommendation: {recommendation}")
+            
+            self.log_result("Payroll Investigation - Final Assessment", success, 
+                          assessment,
+                          {"difference_lkr": difference_lkr,
+                           "percentage_diff": percentage_diff,
+                           "root_causes": root_causes,
+                           "recommendation": recommendation,
+                           "working_days_consistent": working_days_consistent})
                 
         except Exception as e:
             self.log_result("Payroll Discrepancy Investigation", False, 
