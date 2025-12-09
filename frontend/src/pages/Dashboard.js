@@ -477,11 +477,18 @@ export default function Dashboard() {
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Today Salary Card - White background at top */}
-                  <Card className="bg-white border-2 border-orange-300 shadow-lg">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-sm font-semibold text-gray-700 mb-2">Today Salary</p>
-                      <p className="text-3xl font-bold text-orange-600">Rs {livePayroll.today_total_earnings?.toLocaleString() || '0'}</p>
+                  {/* Today Salary Card - Enhanced design */}
+                  <Card className="bg-gradient-to-br from-orange-500 to-orange-600 border-none shadow-xl">
+                    <CardContent className="p-6 text-center">
+                      <div className="flex items-center justify-center gap-2 mb-3">
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        <p className="text-sm font-bold text-white uppercase tracking-wider">Today's Earnings</p>
+                        <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                      </div>
+                      <p className="text-4xl md:text-5xl font-bold text-white mb-1">
+                        Rs {livePayroll.today_total_earnings?.toLocaleString() || '0'}
+                      </p>
+                      <p className="text-xs text-orange-100">Live • Updates every second</p>
                     </CardContent>
                   </Card>
 
