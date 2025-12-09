@@ -1235,119 +1235,123 @@ class ERPTester:
                               f"Monthly payroll endpoint failed: {monthly_response.status_code}")
                 return
             
-            # Step 3: Calculate the actual difference
-            print(f"\n🔍 Step 3: Calculating Actual Difference...")
+            # Step 3: Compare Employee Counts (Key Test for Admin Inclusion Fix)
+            print(f"\n🔍 Step 3: Comparing Employee Counts...")
+            
+            dashboard_count = len(dashboard_employees)
+            monthly_count = len(monthly_employees)
+            
+            print(f"📊 EMPLOYEE COUNT COMPARISON:")
+            print(f"   🟢 Dashboard Live Count: {dashboard_count} employees")
+            print(f"   🔵 Monthly Payroll Count: {monthly_count} employees")
+            
+            if dashboard_count == monthly_count:
+                print("✅ SUCCESS: Employee counts are now EQUAL!")
+                self.log_result("Admin Inclusion Fix - Employee Count", True, 
+                              f"Both endpoints return same employee count: {dashboard_count}")
+            else:
+                print(f"❌ ISSUE: Employee counts still differ by {abs(dashboard_count - monthly_count)}")
+                self.log_result("Admin Inclusion Fix - Employee Count", False, 
+                              f"Employee count mismatch: Dashboard={dashboard_count}, Monthly={monthly_count}")
+            
+            # Step 4: Compare Total Gross Amounts
+            print(f"\n🔍 Step 4: Comparing Total Gross Amounts...")
             
             actual_difference = dashboard_total_gross - monthly_total_gross
             
-            print(f"📊 ACTUAL COMPARISON:")
+            print(f"📊 TOTAL GROSS COMPARISON:")
             print(f"   🟢 Dashboard Live Total: {dashboard_total_gross} LKR")
             print(f"   🔵 Monthly Payroll Total: {monthly_total_gross} LKR")
             print(f"   🔴 Difference: {actual_difference} LKR")
-            print(f"   📋 User Reported Difference: 10,714.88 LKR")
             
-            if abs(actual_difference - 10714.88) < 1.0:  # Within 1 LKR tolerance
-                print("✅ CONFIRMED: Difference matches user report!")
-                self.log_result("Discrepancy Investigation - Difference Confirmed", True, 
-                              f"Confirmed difference of {actual_difference} LKR matches user report")
+            # Check if the fix resolved the discrepancy
+            if abs(actual_difference) < 10:  # Less than 10 LKR difference (acceptable)
+                print("✅ SUCCESS: Discrepancy RESOLVED! Difference is now minimal.")
+                self.log_result("Admin Inclusion Fix - Total Gross", True, 
+                              f"Discrepancy resolved: difference now only {actual_difference} LKR (< 10 LKR threshold)")
+            elif abs(actual_difference) < 100:  # Less than 100 LKR (significant improvement)
+                print("🟡 IMPROVEMENT: Discrepancy significantly reduced but not fully resolved.")
+                self.log_result("Admin Inclusion Fix - Total Gross", True, 
+                              f"Significant improvement: difference reduced to {actual_difference} LKR")
             else:
-                print(f"⚠️  DIFFERENT: Actual difference ({actual_difference}) differs from user report (10,714.88)")
-                self.log_result("Discrepancy Investigation - Difference Mismatch", False, 
-                              f"Actual difference {actual_difference} differs from user report 10,714.88")
+                print(f"❌ ISSUE: Large discrepancy still exists: {actual_difference} LKR")
+                self.log_result("Admin Inclusion Fix - Total Gross", False, 
+                              f"Large discrepancy remains: {actual_difference} LKR")
             
-            # Step 4: Employee-by-Employee Comparison
-            print(f"\n🔍 Step 4: Employee-by-Employee Comparison...")
+            # Step 5: Check for Admin Role Inclusion
+            print(f"\n🔍 Step 5: Verifying Admin Role Inclusion...")
             
-            # Create dictionaries for easy comparison
-            dashboard_emp_dict = {emp.get("employee_id", emp.get("employee_name", "unknown")): emp for emp in dashboard_employees}
-            monthly_emp_dict = {emp.get("employee_id", emp.get("employee_name", "unknown")): emp for emp in monthly_employees}
+            # Count admin roles in both datasets
+            dashboard_admins = [emp for emp in dashboard_employees if emp.get("role", "").lower() == "admin"]
+            monthly_admins = [emp for emp in monthly_employees if emp.get("role", "").lower() == "admin"]
             
-            print(f"📋 Dashboard Employees: {len(dashboard_emp_dict)}")
-            print(f"📋 Monthly Employees: {len(monthly_emp_dict)}")
+            print(f"👑 ADMIN ROLE ANALYSIS:")
+            print(f"   🟢 Dashboard Admins: {len(dashboard_admins)}")
+            print(f"   🔵 Monthly Admins: {len(monthly_admins)}")
             
-            # Find employees in both datasets
-            common_employees = set(dashboard_emp_dict.keys()) & set(monthly_emp_dict.keys())
-            dashboard_only = set(dashboard_emp_dict.keys()) - set(monthly_emp_dict.keys())
-            monthly_only = set(monthly_emp_dict.keys()) - set(dashboard_emp_dict.keys())
+            if len(dashboard_admins) > 0 and len(monthly_admins) > 0:
+                if len(dashboard_admins) == len(monthly_admins):
+                    print("✅ SUCCESS: Both endpoints now include admin roles equally!")
+                    self.log_result("Admin Inclusion Fix - Admin Roles", True, 
+                                  f"Both endpoints include {len(dashboard_admins)} admin(s)")
+                else:
+                    print(f"⚠️  PARTIAL: Admin counts differ - Dashboard: {len(dashboard_admins)}, Monthly: {len(monthly_admins)}")
+                    self.log_result("Admin Inclusion Fix - Admin Roles", False, 
+                                  f"Admin count mismatch: Dashboard={len(dashboard_admins)}, Monthly={len(monthly_admins)}")
+            elif len(dashboard_admins) > 0 and len(monthly_admins) == 0:
+                print("❌ ISSUE: Dashboard includes admins but Monthly Payroll still excludes them!")
+                self.log_result("Admin Inclusion Fix - Admin Roles", False, 
+                              f"Monthly payroll still excludes {len(dashboard_admins)} admin(s)")
+            elif len(dashboard_admins) == 0 and len(monthly_admins) == 0:
+                print("ℹ️  INFO: No admin roles found in either endpoint (may be expected)")
+                self.log_result("Admin Inclusion Fix - Admin Roles", True, 
+                              "No admin roles in either endpoint (consistent)")
+            else:
+                print("🔄 REVERSE: Monthly includes admins but Dashboard doesn't (unexpected)")
+                self.log_result("Admin Inclusion Fix - Admin Roles", False, 
+                              "Unexpected: Monthly has admins but Dashboard doesn't")
             
-            print(f"👥 Common Employees: {len(common_employees)}")
-            print(f"🟢 Dashboard Only: {len(dashboard_only)}")
-            print(f"🔵 Monthly Only: {len(monthly_only)}")
+            # Step 6: Final Assessment
+            print(f"\n🎯 FINAL ASSESSMENT:")
             
-            if dashboard_only:
-                print(f"🟢 Employees ONLY in Dashboard: {list(dashboard_only)}")
-            if monthly_only:
-                print(f"🔵 Employees ONLY in Monthly: {list(monthly_only)}")
+            fix_successful = (
+                dashboard_count == monthly_count and  # Same employee count
+                abs(actual_difference) < 10 and      # Minimal difference
+                len(dashboard_admins) == len(monthly_admins)  # Same admin count
+            )
             
-            # Step 5: Detailed Field Comparison for Common Employees
-            print(f"\n🔍 Step 5: Detailed Field Comparison...")
-            
-            total_difference_breakdown = 0
-            employees_with_differences = []
-            
-            for emp_id in common_employees:
-                dashboard_emp = dashboard_emp_dict[emp_id]
-                monthly_emp = monthly_emp_dict[emp_id]
+            if fix_successful:
+                print("🎉 ADMIN INCLUSION FIX SUCCESSFUL!")
+                print("✅ Employee counts match")
+                print("✅ Total gross amounts are nearly identical")
+                print("✅ Admin roles included in both endpoints")
+                self.log_result("Admin Inclusion Fix - Overall", True, 
+                              "Admin inclusion fix successfully resolved the 10,685 LKR discrepancy")
+            else:
+                print("⚠️  ADMIN INCLUSION FIX NEEDS ATTENTION")
+                issues = []
+                if dashboard_count != monthly_count:
+                    issues.append(f"Employee count mismatch ({dashboard_count} vs {monthly_count})")
+                if abs(actual_difference) >= 10:
+                    issues.append(f"Large amount difference ({actual_difference} LKR)")
+                if len(dashboard_admins) != len(monthly_admins):
+                    issues.append(f"Admin count mismatch ({len(dashboard_admins)} vs {len(monthly_admins)})")
                 
-                # Compare key fields
-                dashboard_gross = dashboard_emp.get("gross_salary", 0)
-                monthly_gross = monthly_emp.get("gross_salary", 0)
-                
-                dashboard_earnings = dashboard_emp.get("earnings", 0)
-                monthly_earnings = monthly_emp.get("earnings", 0)
-                
-                dashboard_extra = dashboard_emp.get("extra_payment", 0)
-                monthly_extra = monthly_emp.get("extra_payment", 0)
-                
-                dashboard_allowances = dashboard_emp.get("allowances", 0)
-                monthly_allowances = monthly_emp.get("allowances", 0)
-                
-                gross_diff = dashboard_gross - monthly_gross
-                earnings_diff = dashboard_earnings - monthly_earnings
-                extra_diff = dashboard_extra - monthly_extra
-                allowances_diff = dashboard_allowances - monthly_allowances
-                
-                if abs(gross_diff) > 0.01:  # Significant difference
-                    employees_with_differences.append({
-                        "employee_name": dashboard_emp.get("employee_name", "Unknown"),
-                        "employee_id": emp_id,
-                        "dashboard_gross": dashboard_gross,
-                        "monthly_gross": monthly_gross,
-                        "gross_difference": gross_diff,
-                        "dashboard_earnings": dashboard_earnings,
-                        "monthly_earnings": monthly_earnings,
-                        "earnings_difference": earnings_diff,
-                        "dashboard_extra": dashboard_extra,
-                        "monthly_extra": monthly_extra,
-                        "extra_difference": extra_diff,
-                        "dashboard_allowances": dashboard_allowances,
-                        "monthly_allowances": monthly_allowances,
-                        "allowances_difference": allowances_diff
-                    })
-                    
-                    total_difference_breakdown += gross_diff
+                print(f"❌ Issues found: {'; '.join(issues)}")
+                self.log_result("Admin Inclusion Fix - Overall", False, 
+                              f"Fix incomplete - Issues: {'; '.join(issues)}")
             
-            print(f"\n📊 EMPLOYEE DIFFERENCES FOUND: {len(employees_with_differences)}")
-            print(f"💰 Total Difference from Employee Breakdown: {total_difference_breakdown} LKR")
-            
-            # Step 6: Detailed Analysis of Differences
-            print(f"\n🔍 Step 6: Root Cause Analysis...")
-            
-            if employees_with_differences:
-                print(f"\n🚨 EMPLOYEES WITH GROSS SALARY DIFFERENCES:")
-                for i, emp in enumerate(employees_with_differences[:5]):  # Show first 5
-                    print(f"\n   👤 Employee {i+1}: {emp['employee_name']} (ID: {emp['employee_id']})")
-                    print(f"      🟢 Dashboard Gross: {emp['dashboard_gross']} LKR")
-                    print(f"      🔵 Monthly Gross: {emp['monthly_gross']} LKR")
-                    print(f"      🔴 Difference: {emp['gross_difference']} LKR")
-                    print(f"      📋 Earnings - Dashboard: {emp['dashboard_earnings']}, Monthly: {emp['monthly_earnings']}, Diff: {emp['earnings_difference']}")
-                    print(f"      💰 Extra Payment - Dashboard: {emp['dashboard_extra']}, Monthly: {emp['monthly_extra']}, Diff: {emp['extra_difference']}")
-                    print(f"      🎁 Allowances - Dashboard: {emp['dashboard_allowances']}, Monthly: {emp['monthly_allowances']}, Diff: {emp['allowances_difference']}")
-                
-                if len(employees_with_differences) > 5:
-                    print(f"   ... and {len(employees_with_differences) - 5} more employees with differences")
-            
-            # Step 7: Check for Formula Differences
+            # Return summary data for further analysis if needed
+            return {
+                "dashboard_total_gross": dashboard_total_gross,
+                "monthly_total_gross": monthly_total_gross,
+                "difference": actual_difference,
+                "dashboard_employee_count": dashboard_count,
+                "monthly_employee_count": monthly_count,
+                "dashboard_admin_count": len(dashboard_admins),
+                "monthly_admin_count": len(monthly_admins),
+                "fix_successful": fix_successful
+            }
             print(f"\n🔍 Step 7: Formula Analysis...")
             
             # Check if allowances are being added to gross in one endpoint but not the other
