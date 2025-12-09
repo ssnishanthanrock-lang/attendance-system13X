@@ -3156,7 +3156,8 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
                 "status": "absent",
                 "check_in": None,
                 "check_out": None,
-                "earnings": 0
+                "earnings": 0,
+                "salary_per_minute": round(salary_per_minute, 2)
             })
     
     return {
