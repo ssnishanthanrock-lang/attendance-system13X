@@ -1152,6 +1152,144 @@ class ERPTester:
         except Exception as e:
             self.log_result("Payroll Data Integration", False, f"Payroll integration test error: {str(e)}")
     
+    def test_payroll_discrepancy_investigation(self):
+        """
+        REVIEW REQUEST FOCUS: Test both payroll endpoints to verify identical total_gross values
+        and confirm working_days fix for December 2025
+        """
+        print("\n=== TESTING PAYROLL DISCREPANCY INVESTIGATION (REVIEW REQUEST) ===")
+        
+        try:
+            # Step 1: Call /api/payroll/live-current-month
+            print("Step 1: Testing /api/payroll/live-current-month endpoint...")
+            live_response = self.session.get(f"{API_BASE}/payroll/live-current-month")
+            
+            if live_response.status_code != 200:
+                self.log_result("Payroll Discrepancy - Live Endpoint", False, 
+                              f"Live payroll endpoint failed: {live_response.status_code}",
+                              {"response": live_response.text})
+                return
+            
+            live_data = live_response.json()
+            live_total_gross = live_data.get("total_gross", 0)
+            live_timestamp = live_data.get("timestamp", "")
+            live_employees = live_data.get("employees", [])
+            
+            # Get working_days from first employee in live endpoint
+            live_working_days = None
+            if live_employees:
+                live_working_days = live_employees[0].get("working_days", 0)
+            
+            self.log_result("Payroll Discrepancy - Live Endpoint Success", True, 
+                          f"Live payroll endpoint working",
+                          {"total_gross": live_total_gross, 
+                           "timestamp": live_timestamp,
+                           "employee_count": len(live_employees),
+                           "first_employee_working_days": live_working_days})
+            
+            # Step 2: Call /api/payroll/detailed/2025-12
+            print("Step 2: Testing /api/payroll/detailed/2025-12 endpoint...")
+            detailed_response = self.session.get(f"{API_BASE}/payroll/detailed/2025-12")
+            
+            if detailed_response.status_code != 200:
+                self.log_result("Payroll Discrepancy - Detailed Endpoint", False, 
+                              f"Detailed payroll endpoint failed: {detailed_response.status_code}",
+                              {"response": detailed_response.text})
+                return
+            
+            detailed_data = detailed_response.json()
+            detailed_total_gross = detailed_data.get("total_gross", 0)
+            detailed_employees = detailed_data.get("employees", [])
+            
+            # Get working_days from first employee in detailed endpoint
+            detailed_working_days = None
+            if detailed_employees:
+                detailed_working_days = detailed_employees[0].get("working_days", 0)
+            
+            self.log_result("Payroll Discrepancy - Detailed Endpoint Success", True, 
+                          f"Detailed payroll endpoint working",
+                          {"total_gross": detailed_total_gross,
+                           "employee_count": len(detailed_employees),
+                           "first_employee_working_days": detailed_working_days})
+            
+            # Step 3: Verify working_days = 27 for December 2025
+            print("Step 3: Verifying working_days = 27 for December 2025...")
+            
+            if live_working_days == 27:
+                self.log_result("Payroll Discrepancy - Live Working Days", True, 
+                              f"Live endpoint correctly shows working_days = 27")
+            else:
+                self.log_result("Payroll Discrepancy - Live Working Days", False, 
+                              f"Live endpoint shows working_days = {live_working_days}, expected 27")
+            
+            if detailed_working_days == 27:
+                self.log_result("Payroll Discrepancy - Detailed Working Days", True, 
+                              f"Detailed endpoint correctly shows working_days = 27")
+            else:
+                self.log_result("Payroll Discrepancy - Detailed Working Days", False, 
+                              f"Detailed endpoint shows working_days = {detailed_working_days}, expected 27")
+            
+            # Step 4: Compare total_gross values
+            print("Step 4: Comparing total_gross values between endpoints...")
+            
+            if live_total_gross == 0 and detailed_total_gross == 0:
+                self.log_result("Payroll Discrepancy - Total Gross Comparison", True, 
+                              "Both endpoints return 0 total_gross (no payroll data exists)")
+                return
+            
+            # Calculate percentage difference
+            if detailed_total_gross != 0:
+                percentage_diff = abs(live_total_gross - detailed_total_gross) / detailed_total_gross * 100
+            else:
+                percentage_diff = 100 if live_total_gross != 0 else 0
+            
+            # Success criteria: difference should be within 5% (as per review request)
+            if percentage_diff <= 5:
+                self.log_result("Payroll Discrepancy - Total Gross Match", True, 
+                              f"Total gross values match within acceptable range",
+                              {"live_total_gross": live_total_gross,
+                               "detailed_total_gross": detailed_total_gross,
+                               "difference": abs(live_total_gross - detailed_total_gross),
+                               "percentage_diff": f"{percentage_diff:.2f}%"})
+            else:
+                self.log_result("Payroll Discrepancy - Total Gross Mismatch", False, 
+                              f"Total gross values differ by more than 5%",
+                              {"live_total_gross": live_total_gross,
+                               "detailed_total_gross": detailed_total_gross,
+                               "difference": abs(live_total_gross - detailed_total_gross),
+                               "percentage_diff": f"{percentage_diff:.2f}%"})
+            
+            # Step 5: Additional verification - check if both use same calculation method
+            print("Step 5: Verifying calculation consistency...")
+            
+            if live_working_days == detailed_working_days == 27:
+                self.log_result("Payroll Discrepancy - Working Days Consistency", True, 
+                              "Both endpoints use same working_days calculation (27 days)")
+            else:
+                self.log_result("Payroll Discrepancy - Working Days Inconsistency", False, 
+                              f"Working days mismatch: live={live_working_days}, detailed={detailed_working_days}")
+            
+            # Step 6: Summary of fix verification
+            working_days_fixed = (live_working_days == 27 and detailed_working_days == 27)
+            total_gross_matches = (percentage_diff <= 5)
+            
+            if working_days_fixed and total_gross_matches:
+                self.log_result("Payroll Discrepancy - Fix Verification", True, 
+                              "✅ PAYROLL DISCREPANCY FIX SUCCESSFUL: Both endpoints use 27 working days and return matching total_gross values")
+            else:
+                issues = []
+                if not working_days_fixed:
+                    issues.append("working_days not consistently 27")
+                if not total_gross_matches:
+                    issues.append("total_gross values differ by >5%")
+                
+                self.log_result("Payroll Discrepancy - Fix Verification", False, 
+                              f"❌ PAYROLL DISCREPANCY FIX INCOMPLETE: {', '.join(issues)}")
+                
+        except Exception as e:
+            self.log_result("Payroll Discrepancy Investigation", False, 
+                          f"Payroll discrepancy test error: {str(e)}")
+    
     def test_live_payroll_current_month(self):
         """Test GET /api/payroll/live-current-month endpoint (REVIEW REQUEST FOCUS)"""
         print("\n=== TESTING LIVE PAYROLL CURRENT MONTH ENDPOINT ===")
