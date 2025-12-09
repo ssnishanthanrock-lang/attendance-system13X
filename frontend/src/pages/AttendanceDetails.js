@@ -318,7 +318,7 @@ export default function AttendanceDetails() {
                           {formatTime(record.check_out)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {calculateHours(record.check_in, record.check_out)}h
+                          {calculateHours(record.check_in, record.check_out) === 'N/A' ? 'N/A' : `${calculateHours(record.check_in, record.check_out)}h`}
                         </td>
                         {canEdit && (
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
