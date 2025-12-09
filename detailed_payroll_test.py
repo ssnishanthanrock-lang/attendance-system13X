@@ -180,7 +180,7 @@ def test_detailed_payroll_investigation():
         detailed_response_after = session.get(f"{API_BASE}/payroll/detailed/2025-12")
         
         if detailed_response_after.status_code == 200:
-            detailed_data_after = detailed_data_after.json()
+            detailed_data_after = detailed_response_after.json()
             print(f"      📊 Total Gross After Generation: {detailed_data_after.get('total_gross')}")
             print(f"      📊 Total Net After Generation: {detailed_data_after.get('total_net')}")
     else:
