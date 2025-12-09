@@ -3118,7 +3118,18 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
                     duration = now - checkin_dt
                     minutes_worked = int(duration.total_seconds() / 60)
                     earnings = minutes_worked * salary_per_minute
-                except:
+                    
+                    # Debug logging
+                    print(f"DEBUG EARNINGS: Employee {record.get('employee_name')}")
+                    print(f"  Check-in: {record['check_in']}")
+                    print(f"  Check-in parsed: {checkin_dt}")
+                    print(f"  Now: {now}")
+                    print(f"  Duration: {duration}")
+                    print(f"  Minutes: {minutes_worked}")
+                    print(f"  Per-minute rate: {salary_per_minute}")
+                    print(f"  Earnings: {earnings}")
+                except Exception as e:
+                    print(f"ERROR calculating earnings: {e}")
                     pass
             
             record["earnings"] = round(earnings, 2)
