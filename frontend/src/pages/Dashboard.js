@@ -16,6 +16,7 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [checkingIn, setCheckingIn] = useState(false);
   const [livePayroll, setLivePayroll] = useState(null);
+  const [displayTodaySalary, setDisplayTodaySalary] = useState(0);
   const [companyInfo, setCompanyInfo] = useState(null);
 
   useEffect(() => {
