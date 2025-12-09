@@ -614,13 +614,13 @@ export default function Payroll() {
                         <th colSpan="2" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-blue-100">
                           Employee Details
                         </th>
-                        <th colSpan="5" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-yellow-100">
+                        <th colSpan="4" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-yellow-100">
                           Salary
                         </th>
                         <th colSpan="5" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-green-100">
                           Attendance
                         </th>
-                        <th colSpan="1" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-blue-100">
+                        <th colSpan="2" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-blue-100">
                           Extra
                         </th>
                         <th colSpan="3" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-red-100">
@@ -637,7 +637,6 @@ export default function Payroll() {
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Basic Salary</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Day Salary</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Minute Salary</th>
-                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Allowances</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Gross</th>
                         
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Present</th>
@@ -646,6 +645,7 @@ export default function Payroll() {
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Allowed Half</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Late Salary</th>
                         
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Allowances</th>
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Extra Payment</th>
                         
                         <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Advance</th>
