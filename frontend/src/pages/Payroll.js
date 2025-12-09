@@ -96,20 +96,7 @@ export default function Payroll() {
         setLoading(true);
       }
       const response = await api.get(`/payroll/detailed/${monthStr}`);
-      
-      // Store base values for live increment calculation
-      const dataWithBase = {
-        ...response.data,
-        employees: response.data.employees.map(emp => ({
-          ...emp,
-          base_gross_salary: emp.gross_salary, // Store initial gross from backend
-          base_net_salary: emp.net_salary,
-          base_earnings: emp.earnings
-        }))
-      };
-      
-      setDetailedPayroll(dataWithBase);
-      setLastFetchTime(Date.now()); // Track when we fetched from backend
+      setDetailedPayroll(response.data); // Use data directly from backend (no frontend increment)
     } catch (error) {
       if (!silentUpdate) {
         toast.error('Failed to fetch detailed payroll');
