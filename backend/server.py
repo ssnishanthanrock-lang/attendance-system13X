@@ -3591,11 +3591,14 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
             "salary_per_minute": round(salary_per_minute, 2)
         })
     
+    total_gross_calc = sum([r["gross_salary"] for r in detailed_records])
+    print(f"DEBUG DETAILED PAYROLL: Calculated total_gross={total_gross_calc} from {len(detailed_records)} records")
+    
     return {
         "month": month,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "employees": detailed_records,
-        "total_gross": sum([r["gross_salary"] for r in detailed_records]),
+        "total_gross": total_gross_calc,
         "total_net": sum([r["net_salary"] for r in detailed_records]),
         "total_deductions": sum([r["total_deductions"] for r in detailed_records]),
         "total_allowances": sum([r["allowances"] for r in detailed_records])
