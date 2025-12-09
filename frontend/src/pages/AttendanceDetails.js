@@ -325,6 +325,9 @@ export default function AttendanceDetails() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {calculateHours(record.check_in, record.check_out) === 'N/A' ? 'N/A' : `${calculateHours(record.check_in, record.check_out)}h`}
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                          {record.earnings ? `Rs ${record.earnings.toLocaleString()}` : 'Rs 0'}
+                        </td>
                         {canEdit && (
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <div className="flex gap-2">
