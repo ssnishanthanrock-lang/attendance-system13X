@@ -3551,6 +3551,7 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
         }).to_list(length=None)
     
     detailed_records = []
+    today_total_earnings = 0  # Track today's earnings across all employees
     
     for employee in employees:
         # Get effective salary
@@ -3572,6 +3573,7 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
         
         # Calculate total attendance minutes UP TO NOW
         total_attendance_minutes = 0
+        today_minutes = 0  # Track today's minutes for this employee
         today_str = now.strftime("%Y-%m-%d")
         
         for record in attendance_records:
