@@ -3581,9 +3581,7 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
                     duration = now - checkin_dt
                     minutes_worked = int(duration.total_seconds() / 60)
                     total_attendance_minutes += minutes_worked
-                    print(f"DEBUG: Employee {employee['name']} - Today's ongoing attendance: {minutes_worked} minutes")
                 except Exception as e:
-                    print(f"DEBUG: Error calculating ongoing attendance: {e}")
                     pass
         
         # Add allowed leaves (count as worked time)
