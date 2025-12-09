@@ -368,7 +368,7 @@ export default function Payroll() {
                           <div className="pt-3 border-t border-gray-200">
                             <p className="text-sm text-gray-500 mb-1">Total Salary</p>
                             <p className="text-2xl font-bold text-green-600">
-                              Rs {monthData.total_salary.toLocaleString()}
+                              Rs {(monthData.month === livePayroll.month && livePayroll.total_net ? livePayroll.total_net : monthData.total_salary).toLocaleString()}
                             </p>
                           </div>
                           
