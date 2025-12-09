@@ -286,10 +286,25 @@ export default function AttendanceDetails() {
                     </tr>
                   ) : (
                     attendance.map((record) => (
-                      <tr key={record.id} className="hover:bg-gray-50">
+                      <tr key={record.id || record.employee_id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{record.employee_name}</div>
-                          <div className="text-sm text-gray-500">{record.employee_id || '-'}</div>
+                          <div className="flex items-center">
+                            {record.profile_pic ? (
+                              <img 
+                                src={record.profile_pic} 
+                                alt={record.employee_name} 
+                                className="w-10 h-10 rounded-full object-cover mr-3"
+                              />
+                            ) : (
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold mr-3">
+                                {record.employee_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                              </div>
+                            )}
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{record.employee_name}</div>
+                              <div className="text-sm text-gray-500">{record.employee_id_display || '-'}</div>
+                            </div>
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {new Date(record.date).toLocaleDateString()}
