@@ -1670,6 +1670,20 @@ export default function Attendance() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Device Import Dialog */}
+      <DeviceImportDialog 
+        open={importDialogOpen}
+        onClose={() => setImportDialogOpen(false)}
+        employees={employees}
+        onImportComplete={(result) => {
+          toast.success(`Import complete! ${result.imported} records imported`, {
+            style: { background: '#10b981', color: 'white' }
+          });
+          fetchAttendance(); // Refresh attendance list
+          setImportDialogOpen(false);
+        }}
+      />
     </Layout>
   );
 }
