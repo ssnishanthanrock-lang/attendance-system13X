@@ -444,7 +444,7 @@ export default function Payroll() {
             {viewMode === 'card' && (
               <>
                 {/* Summary Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className={`grid grid-cols-1 ${detailedPayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                     <CardContent className="p-6">
                       <div className="text-center space-y-2">
@@ -453,6 +453,17 @@ export default function Payroll() {
                       </div>
                     </CardContent>
                   </Card>
+                  
+                  {detailedPayroll.total_allowances > 0 && (
+                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                      <CardContent className="p-6">
+                        <div className="text-center space-y-2">
+                          <p className="text-sm text-gray-600">Total Allowances</p>
+                          <p className="text-3xl font-bold text-purple-700">Rs {detailedPayroll.total_allowances?.toLocaleString()}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                   
                   <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
                     <CardContent className="p-6">
