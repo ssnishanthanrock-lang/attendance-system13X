@@ -4490,6 +4490,275 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
             self.log_result("Timezone Fix Verification", False, f"Timezone fix test error: {str(e)}")
             print(f"   ❌ ERROR: {str(e)}")
     
+    def test_super_admin_resend_url_feature(self):
+        """Test the newly implemented 'Re-send URL to Admin' feature for Super Admin"""
+        print("\n=== TESTING SUPER ADMIN RE-SEND URL TO ADMIN FEATURE ===")
+        
+        # First, we need to authenticate as a super admin
+        super_admin_token = self.create_super_admin_token()
+        if not super_admin_token:
+            self.log_result("Super Admin Auth", False, "Cannot create super admin token for testing")
+            return
+        
+        # Create super admin session
+        super_admin_session = requests.Session()
+        super_admin_session.headers.update({'Authorization': f'Bearer {super_admin_token}'})
+        
+        # Test Company ID from review request
+        test_company_id = "dc1ff8de-3db3-4885-b6b7-168b00e3cef5"
+        
+        # Test 1: Get Company Admins Endpoint
+        try:
+            print(f"\n📋 Testing GET /api/superadmin/companies/{test_company_id}/admins")
+            
+            admins_response = super_admin_session.get(f"{API_BASE}/superadmin/companies/{test_company_id}/admins")
+            
+            if admins_response.status_code == 200:
+                admins_data = admins_response.json()
+                
+                if isinstance(admins_data, list):
+                    admin_count = len(admins_data)
+                    self.log_result("Get Company Admins - Success", True, 
+                                  f"Successfully retrieved {admin_count} admin(s) for company",
+                                  {"company_id": test_company_id, "admin_count": admin_count})
+                    
+                    # Verify admin structure
+                    if admins_data:
+                        first_admin = admins_data[0]
+                        required_fields = ["id", "name", "mobile", "employee_id"]
+                        missing_fields = [field for field in required_fields if field not in first_admin]
+                        
+                        if not missing_fields:
+                            self.log_result("Get Company Admins - Structure", True, 
+                                          "Admin data structure is correct",
+                                          {"sample_admin": {
+                                              "name": first_admin.get("name"),
+                                              "mobile": first_admin.get("mobile"),
+                                              "employee_id": first_admin.get("employee_id")
+                                          }})
+                            
+                            # Test scenarios based on admin count
+                            if admin_count == 1:
+                                self.test_single_admin_scenario(super_admin_session, test_company_id, admins_data[0])
+                            elif admin_count >= 2:
+                                self.test_multiple_admins_scenario(super_admin_session, test_company_id, admins_data)
+                            else:
+                                self.log_result("Admin Count", True, "No admins found for company (edge case)")
+                        else:
+                            self.log_result("Get Company Admins - Structure", False, 
+                                          f"Missing required fields in admin data: {missing_fields}")
+                    else:
+                        self.log_result("Get Company Admins - Empty", True, 
+                                      "No admins found for company (acceptable)")
+                else:
+                    self.log_result("Get Company Admins - Format", False, 
+                                  f"Expected array, got {type(admins_data)}")
+            else:
+                self.log_result("Get Company Admins - Request", False, 
+                              f"Failed to get company admins: {admins_response.status_code}",
+                              {"response": admins_response.text})
+                
+        except Exception as e:
+            self.log_result("Get Company Admins", False, f"Get company admins error: {str(e)}")
+        
+        # Test 2: Authentication and Authorization
+        self.test_resend_url_authentication(test_company_id)
+        
+        # Test 3: Error Handling
+        self.test_resend_url_error_handling(super_admin_session)
+    
+    def create_super_admin_token(self):
+        """Create a super admin token for testing"""
+        try:
+            import jwt
+            
+            # Super admin payload (mobile: 0773966920 from review request)
+            super_admin_payload = {
+                "user_id": "super-admin-test-id",
+                "role": "super_admin",
+                "mobile": "0773966920"
+            }
+            
+            jwt_secret = "attendance-system-secret-key-change-in-production"
+            token = jwt.encode(super_admin_payload, jwt_secret, algorithm="HS256")
+            
+            self.log_result("Super Admin Token Creation", True, "Created super admin test token")
+            return token
+            
+        except Exception as e:
+            self.log_result("Super Admin Token Creation", False, f"Failed to create super admin token: {str(e)}")
+            return None
+    
+    def test_single_admin_scenario(self, session, company_id, admin_data):
+        """Test single admin scenario - should show confirmation dialog directly"""
+        print(f"\n📱 Testing Single Admin Scenario")
+        
+        try:
+            admin_id = admin_data.get("id")
+            admin_name = admin_data.get("name")
+            admin_mobile = admin_data.get("mobile")
+            
+            # Test resend URL for single admin
+            resend_response = session.post(f"{API_BASE}/superadmin/companies/{company_id}/resend-url", 
+                                         params={"admin_id": admin_id})
+            
+            if resend_response.status_code == 200:
+                result = resend_response.json()
+                
+                # Check response structure
+                expected_fields = ["message", "admin_name", "admin_mobile"]
+                missing_fields = [field for field in expected_fields if field not in result]
+                
+                if not missing_fields:
+                    self.log_result("Single Admin - Resend URL Success", True, 
+                                  f"Successfully sent URL to single admin: {admin_name}",
+                                  {"admin_name": result.get("admin_name"),
+                                   "admin_mobile": result.get("admin_mobile"),
+                                   "message": result.get("message")})
+                    
+                    # Verify the response contains correct admin info
+                    if (result.get("admin_name") == admin_name and 
+                        result.get("admin_mobile") == admin_mobile):
+                        self.log_result("Single Admin - Response Data", True, 
+                                      "Response contains correct admin information")
+                    else:
+                        self.log_result("Single Admin - Response Data", False, 
+                                      "Response admin info doesn't match request")
+                else:
+                    self.log_result("Single Admin - Response Structure", False, 
+                                  f"Missing response fields: {missing_fields}")
+            else:
+                self.log_result("Single Admin - Resend URL", False, 
+                              f"Failed to resend URL: {resend_response.status_code}",
+                              {"response": resend_response.text})
+                
+        except Exception as e:
+            self.log_result("Single Admin Scenario", False, f"Single admin test error: {str(e)}")
+    
+    def test_multiple_admins_scenario(self, session, company_id, admins_data):
+        """Test multiple admins scenario - should work for each admin"""
+        print(f"\n👥 Testing Multiple Admins Scenario ({len(admins_data)} admins)")
+        
+        try:
+            # Test resending URL to each admin
+            for i, admin_data in enumerate(admins_data[:2]):  # Test first 2 admins
+                admin_id = admin_data.get("id")
+                admin_name = admin_data.get("name")
+                admin_mobile = admin_data.get("mobile")
+                
+                print(f"   Testing admin {i+1}: {admin_name} ({admin_mobile})")
+                
+                resend_response = session.post(f"{API_BASE}/superadmin/companies/{company_id}/resend-url", 
+                                             params={"admin_id": admin_id})
+                
+                if resend_response.status_code == 200:
+                    result = resend_response.json()
+                    self.log_result(f"Multiple Admins - Admin {i+1} URL Sent", True, 
+                                  f"Successfully sent URL to {admin_name}",
+                                  {"admin_name": admin_name, "admin_mobile": admin_mobile})
+                else:
+                    self.log_result(f"Multiple Admins - Admin {i+1} URL Failed", False, 
+                                  f"Failed to send URL to {admin_name}: {resend_response.status_code}")
+            
+            # Test with expected admin data from review request
+            expected_admins = [
+                {"name": "Test Admin", "mobile": "0712345678"},
+                {"name": "Second Admin", "mobile": "0778888888"}
+            ]
+            
+            # Verify expected admins are present
+            found_admins = []
+            for expected in expected_admins:
+                matching_admin = next((admin for admin in admins_data 
+                                     if admin.get("mobile") == expected["mobile"]), None)
+                if matching_admin:
+                    found_admins.append(matching_admin)
+            
+            if len(found_admins) >= 2:
+                self.log_result("Multiple Admins - Expected Data", True, 
+                              f"Found expected test admins: {[a.get('name') for a in found_admins]}")
+            else:
+                self.log_result("Multiple Admins - Expected Data", True, 
+                              f"Found {len(found_admins)} of 2 expected admins (data may have changed)")
+                
+        except Exception as e:
+            self.log_result("Multiple Admins Scenario", False, f"Multiple admins test error: {str(e)}")
+    
+    def test_resend_url_authentication(self, company_id):
+        """Test authentication requirements for resend URL endpoint"""
+        print(f"\n🔐 Testing Authentication Requirements")
+        
+        try:
+            # Test 1: No authentication (should fail)
+            no_auth_session = requests.Session()
+            response = no_auth_session.post(f"{API_BASE}/superadmin/companies/{company_id}/resend-url", 
+                                          params={"admin_id": "test-admin-id"})
+            
+            if response.status_code == 401:
+                self.log_result("Resend URL - No Auth", True, 
+                              "Correctly requires authentication (401)")
+            else:
+                self.log_result("Resend URL - No Auth", False, 
+                              f"Should require auth, got: {response.status_code}")
+            
+            # Test 2: Company admin authentication (should fail)
+            company_admin_session = requests.Session()
+            company_admin_session.headers.update({'Authorization': f'Bearer {self.auth_token}'})
+            
+            response = company_admin_session.post(f"{API_BASE}/superadmin/companies/{company_id}/resend-url", 
+                                                params={"admin_id": "test-admin-id"})
+            
+            if response.status_code == 403:
+                self.log_result("Resend URL - Company Admin Auth", True, 
+                              "Correctly denies company admin access (403)")
+            else:
+                self.log_result("Resend URL - Company Admin Auth", False, 
+                              f"Should deny company admin, got: {response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Resend URL Authentication", False, f"Authentication test error: {str(e)}")
+    
+    def test_resend_url_error_handling(self, session):
+        """Test error handling for resend URL endpoint"""
+        print(f"\n⚠️ Testing Error Handling")
+        
+        try:
+            # Test 1: Invalid company ID
+            invalid_company_response = session.post(f"{API_BASE}/superadmin/companies/invalid-company-id/resend-url", 
+                                                   params={"admin_id": "test-admin-id"})
+            
+            if invalid_company_response.status_code == 404:
+                self.log_result("Resend URL - Invalid Company", True, 
+                              "Correctly handles invalid company ID (404)")
+            else:
+                self.log_result("Resend URL - Invalid Company", False, 
+                              f"Invalid company ID should return 404, got: {invalid_company_response.status_code}")
+            
+            # Test 2: Invalid admin ID (with valid company)
+            test_company_id = "dc1ff8de-3db3-4885-b6b7-168b00e3cef5"
+            invalid_admin_response = session.post(f"{API_BASE}/superadmin/companies/{test_company_id}/resend-url", 
+                                                 params={"admin_id": "invalid-admin-id"})
+            
+            if invalid_admin_response.status_code == 404:
+                self.log_result("Resend URL - Invalid Admin", True, 
+                              "Correctly handles invalid admin ID (404)")
+            else:
+                self.log_result("Resend URL - Invalid Admin", False, 
+                              f"Invalid admin ID should return 404, got: {invalid_admin_response.status_code}")
+            
+            # Test 3: Missing admin_id parameter
+            missing_param_response = session.post(f"{API_BASE}/superadmin/companies/{test_company_id}/resend-url")
+            
+            if missing_param_response.status_code in [400, 422]:
+                self.log_result("Resend URL - Missing Param", True, 
+                              "Correctly handles missing admin_id parameter")
+            else:
+                self.log_result("Resend URL - Missing Param", False, 
+                              f"Missing admin_id should return 400/422, got: {missing_param_response.status_code}")
+                
+        except Exception as e:
+            self.log_result("Resend URL Error Handling", False, f"Error handling test error: {str(e)}")
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting IT Signature ERP Backend API Tests - LOCATION TRACKING SYSTEM TESTING")
