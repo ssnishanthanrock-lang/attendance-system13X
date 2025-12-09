@@ -3056,11 +3056,17 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
     attendance_map = {record["employee_id"]: record for record in attendance_records}
     employee_data_map = {emp["id"]: emp for emp in employees}
     
-    # Get company settings for working hours
+    # Get company settings for working hours and working days
     company = await db.companies.find_one({"id": current_user.company_id}, {"_id": 0})
     working_hours = company.get("working_hours", {})
     start_time = working_hours.get("start", "09:00")
     finish_time = working_hours.get("finish", "17:00")
+    
+    # Get working days for the month from settings
+    settings = company.get("settings", {})
+    year_month = date[:7]  # Extract YYYY-MM from date
+    working_days_data = settings.get("working_days", {}) if settings else {}
+    working_days = working_days_data.get(year_month, 26)  # Default 26 if not set
     
     # Calculate expected minutes per day
     from datetime import datetime, timezone
@@ -3084,7 +3090,7 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
             salary_per_minute = basic_salary / 30 / expected_minutes_per_day if expected_minutes_per_day > 0 else 0
         else:
             # For non-fixed: basic_salary is already total per month, divide by total work minutes
-            total_work_minutes_per_month = expected_minutes_per_day * 26  # 26 working days
+            total_work_minutes_per_month = expected_minutes_per_day * working_days  # Use actual working days from settings
             salary_per_minute = basic_salary / total_work_minutes_per_month if total_work_minutes_per_month > 0 else 0
         
         if employee["id"] in attendance_map:
