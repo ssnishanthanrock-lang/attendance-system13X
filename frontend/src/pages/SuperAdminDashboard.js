@@ -238,6 +238,10 @@ export default function SuperAdminDashboard() {
                         <p className="font-semibold">{company.invoicing_enabled ? 'Enabled' : 'Disabled'}</p>
                       </div>
                       <div>
+                        <p className="text-gray-500">Location Tracking</p>
+                        <p className="font-semibold">{company.location_tracking_enabled ? 'Enabled' : 'Disabled'}</p>
+                      </div>
+                      <div>
                         <p className="text-gray-500">Created</p>
                         <p className="font-semibold">{new Date(company.created_at).toLocaleDateString()}</p>
                       </div>
