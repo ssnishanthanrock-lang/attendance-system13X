@@ -483,6 +483,14 @@ export default function Dashboard() {
                       <p className="text-2xl font-bold text-blue-700">Rs {livePayroll.total_gross?.toLocaleString()}</p>
                     </CardContent>
                   </Card>
+                  {livePayroll.total_allowances > 0 && (
+                    <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                      <CardContent className="p-4 text-center">
+                        <p className="text-sm text-gray-600 mb-1">Total Allowances</p>
+                        <p className="text-2xl font-bold text-purple-700">Rs {livePayroll.total_allowances?.toLocaleString()}</p>
+                      </CardContent>
+                    </Card>
+                  )}
                   <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
                     <CardContent className="p-4 text-center">
                       <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
