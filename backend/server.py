@@ -3997,17 +3997,13 @@ IMPORTANT:
 - Process the FULL file content provided above"""
 
         print("DEBUG: Calling AI model")
-        response = client.chat.completions.create(
-            model="gemini-2.0-flash-exp",
-            messages=[
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.1,
-            timeout=60
+        response = client.chat(
+            messages=[prompt],
+            temperature=0.1
         )
         
         print("DEBUG: AI response received")
-        ai_response = response.choices[0].message.content.strip()
+        ai_response = response.strip()
         print(f"DEBUG: AI response length: {len(ai_response)}")
         
         # Clean markdown if present
