@@ -3062,11 +3062,20 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
     start_time = working_hours.get("start", "09:00")
     finish_time = working_hours.get("finish", "17:00")
     
-    # Get working days for the month from settings
-    settings = company.get("settings", {})
+    # Calculate working days dynamically for the month
     year_month = date[:7]  # Extract YYYY-MM from date
-    working_days_data = settings.get("working_days", {}) if settings else {}
-    working_days = working_days_data.get(year_month, 26)  # Default 26 if not set
+    year_int = int(year_month.split("-")[0])
+    month_int = int(year_month.split("-")[1])
+    
+    # Get settings for holidays and Saturday configuration
+    db_settings = await db.settings.find_one({"company_id": current_user.company_id})
+    holidays = db_settings.get("holidays", []) if db_settings else []
+    saturday_enabled = db_settings.get("saturday_enabled", True) if db_settings else True
+    saturday_type = db_settings.get("saturday_type", "full") if db_settings else "full"
+    
+    # Calculate working days for this month
+    working_days_result = calculate_working_days(year_int, month_int, holidays, saturday_enabled, saturday_type)
+    working_days = working_days_result["working_days"]
     
     # Calculate expected minutes per day
     from datetime import datetime, timezone
