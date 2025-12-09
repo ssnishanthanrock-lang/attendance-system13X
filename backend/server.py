@@ -3623,7 +3623,8 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
         "employees": detailed_records,
         "total_gross": round(sum([r["gross_salary"] for r in detailed_records]), 2),
         "total_net": round(sum([r["net_salary"] for r in detailed_records]), 2),
-        "total_deductions": round(sum([r["total_deductions"] for r in detailed_records]), 2)
+        "total_deductions": round(sum([r["total_deductions"] for r in detailed_records]), 2),
+        "total_allowances": round(sum([r["allowances"] for r in detailed_records]), 2)
     }
 
 
