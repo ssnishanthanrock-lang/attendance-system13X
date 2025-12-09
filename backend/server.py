@@ -3955,6 +3955,7 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
             import base64
             import io
             from openpyxl import load_workbook
+            from datetime import datetime, time
             
             excel_data = base64.b64decode(base64_data)
             excel_file = io.BytesIO(excel_data)
@@ -3963,16 +3964,154 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
             wb = load_workbook(excel_file)
             sheet = wb.active
             
-            # Convert Excel to text format
-            lines = []
-            for row in sheet.iter_rows(values_only=True):
-                if row and any(cell is not None for cell in row):
-                    # Join cells with tab
-                    line = '\t'.join(str(cell) if cell is not None else '' for cell in row)
-                    lines.append(line)
+            # Find the header row that contains 'Enroll No'
+            header_row_idx = None
+            date_columns = {}
+            enroll_col = None
             
-            request.file_content = '\n'.join(lines)
-            print(f"DEBUG: Converted Excel to {len(lines)} lines")
+            for i, row in enumerate(sheet.iter_rows(values_only=True), 1):
+                row_str = ' '.join(str(cell).lower() if cell else '' for cell in row)
+                if 'enroll' in row_str:
+                    header_row_idx = i
+                    # Identify column positions
+                    for col_idx, cell in enumerate(row):
+                        if cell and 'enroll' in str(cell).lower():
+                            enroll_col = col_idx
+                        # Check if it's a date column (format like 12/01)
+                        if cell and isinstance(cell, str) and '/' in cell:
+                            try:
+                                # This is a date column
+                                date_columns[col_idx] = cell
+                            except:
+                                pass
+                    break
+            
+            if header_row_idx is None or enroll_col is None:
+                raise HTTPException(status_code=400, detail="Could not find 'Enroll No' header in Excel file")
+            
+            print(f"DEBUG: Found header at row {header_row_idx}, Enroll column at {enroll_col}")
+            print(f"DEBUG: Found {len(date_columns)} date columns: {date_columns}")
+            
+            # Parse attendance records
+            records = []
+            unique_vendor_ids = set()
+            dates = set()
+            
+            # Process rows after header
+            current_enroll_no = None
+            in_times = {}
+            out_times = {}
+            
+            for row_idx in range(header_row_idx, sheet.max_row + 1):
+                row = list(sheet.iter_rows(min_row=row_idx, max_row=row_idx, values_only=True))[0]
+                
+                # Check if this row has an Enroll No (new employee)
+                if row[enroll_col] and str(row[enroll_col]).strip() and str(row[enroll_col]).strip() not in ['IN', 'OUT', 'WH']:
+                    current_enroll_no = str(row[enroll_col]).strip()
+                    unique_vendor_ids.add(current_enroll_no)
+                    in_times = {}
+                    out_times = {}
+                    continue
+                
+                if current_enroll_no is None:
+                    continue
+                
+                # Check if this is IN/OUT/WH row
+                row_type = None
+                for cell in row[:15]:  # Check first few columns for IN/OUT/WH
+                    if cell and isinstance(cell, str):
+                        if cell.strip() == 'IN':
+                            row_type = 'IN'
+                            break
+                        elif cell.strip() == 'OUT':
+                            row_type = 'OUT'
+                            break
+                        elif cell.strip() == 'WH':
+                            row_type = 'WH'
+                            break
+                
+                # Parse time data for each date column
+                if row_type in ['IN', 'OUT']:
+                    for col_idx, date_str in date_columns.items():
+                        time_val = row[col_idx] if col_idx < len(row) else None
+                        
+                        if time_val and str(time_val).strip() and str(time_val).strip() != '00:00':
+                            time_str = str(time_val).strip()
+                            
+                            # Convert date format (12/01 -> 2025-12-01, assuming year from report)
+                            try:
+                                # Extract year from report (from Row 6)
+                                month_day = date_str.split('/')
+                                if len(month_day) == 2:
+                                    # Get year from the "From Date" in the report
+                                    year = "2025"  # Default, will try to extract
+                                    for check_row in sheet.iter_rows(min_row=1, max_row=10, values_only=True):
+                                        for cell in check_row:
+                                            if cell and isinstance(cell, str) and '/' in cell and len(str(cell)) > 7:
+                                                # Found date like 2025/12/01
+                                                year = str(cell).split('/')[0]
+                                                break
+                                    
+                                    full_date = f"{year}-{month_day[0]}-{month_day[1]}"
+                                    dates.add(full_date)
+                                    
+                                    if row_type == 'IN':
+                                        in_times[full_date] = time_str
+                                    elif row_type == 'OUT':
+                                        out_times[full_date] = time_str
+                                        
+                                        # When we have OUT time, create a record (IN time might be missing)
+                                        in_time = in_times.get(full_date, "00:00")
+                                        
+                                        records.append({
+                                            "vendor_id": current_enroll_no,
+                                            "datetime": f"{full_date} {in_time}",
+                                            "date": full_date,
+                                            "time": in_time,
+                                            "record_type": "punch_in"
+                                        })
+                                        
+                                        records.append({
+                                            "vendor_id": current_enroll_no,
+                                            "datetime": f"{full_date} {time_str}",
+                                            "date": full_date,
+                                            "time": time_str,
+                                            "record_type": "punch_out"
+                                        })
+                            except Exception as e:
+                                print(f"DEBUG: Error parsing date/time: {e}")
+                                continue
+            
+            print(f"DEBUG: Parsed {len(records)} records from Excel for {len(unique_vendor_ids)} employees")
+            
+            # Sort dates to get range
+            sorted_dates = sorted(list(dates))
+            date_range = {
+                "start": sorted_dates[0] if sorted_dates else None,
+                "end": sorted_dates[-1] if sorted_dates else None
+            }
+            
+            # Create response for Excel format
+            parsed_data = {
+                "format_detected": "Excel WorkTime Report format",
+                "records": records,
+                "unique_vendor_ids": sorted(list(unique_vendor_ids)),
+                "date_range": date_range,
+                "total_records": len(records)
+            }
+            
+            await log_activity(
+                request.company_id,
+                current_user.id,
+                current_user.name,
+                "PARSE_DEVICE_IMPORT",
+                f"Parsed Excel device import: {len(records)} records found"
+            )
+            
+            return {
+                "success": True,
+                "data": parsed_data
+            }
         
         # Parse the file content
         lines = request.file_content.strip().split('\n')
