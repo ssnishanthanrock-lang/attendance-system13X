@@ -3652,6 +3652,8 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
             "role": {"$in": ["admin", "employee", "staff_member", "manager"]}
         }).to_list(length=None)
     
+    print(f"DEBUG LIVE PAYROLL: Found {len(employees)} employees for company {current_user.company_id}")
+    
     detailed_records = []
     today_total_earnings = 0  # Track today's earnings across all employees
     
