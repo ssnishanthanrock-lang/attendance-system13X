@@ -376,11 +376,13 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Location Tracking for All Users */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <LocationTracker />
-          <AttendanceWithLocation />
-        </div>
+        {/* Location Tracking for All Users - Only show if enabled */}
+        {companyInfo?.location_tracking_enabled && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <LocationTracker />
+            <AttendanceWithLocation />
+          </div>
+        )}
 
         {/* Recent Activities for Admin/Manager */}
         {isAdmin && (
