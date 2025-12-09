@@ -156,7 +156,7 @@ export default function Dashboard() {
                 icon={<CheckCircle className="w-6 h-6" />}
                 color="green"
                 testId="stat-attendance"
-                onClick={() => navigate('/attendance')}
+                onClick={() => navigate(`/attendance-details?date=${new Date().toISOString().split('T')[0]}`)}
                 clickable
               />
               <StatCard
