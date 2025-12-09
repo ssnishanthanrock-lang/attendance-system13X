@@ -16,11 +16,13 @@ export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [checkingIn, setCheckingIn] = useState(false);
   const [livePayroll, setLivePayroll] = useState(null);
+  const [companyInfo, setCompanyInfo] = useState(null);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     fetchStats();
+    fetchCompanyInfo();
     
     if (userData?.role === 'admin' || userData?.role === 'manager') {
       // Initial fetch
