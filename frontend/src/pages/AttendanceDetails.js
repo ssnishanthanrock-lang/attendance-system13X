@@ -53,14 +53,14 @@ export default function AttendanceDetails() {
   };
 
   const calculateHours = (checkIn, checkOut) => {
-    if (!checkIn || !checkOut) return '-';
+    if (!checkIn || !checkOut) return 'N/A';
     try {
       const start = new Date(checkIn);
       const end = new Date(checkOut);
       const diff = (end - start) / (1000 * 60 * 60); // hours
       return diff.toFixed(2);
     } catch {
-      return '-';
+      return 'N/A';
     }
   };
 
