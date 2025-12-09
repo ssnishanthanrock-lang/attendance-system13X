@@ -480,7 +480,6 @@ export default function Payroll() {
                   </div>
                 )}
               </>
-            )}
 
             {/* Table View */}
             {viewMode === 'table' && (
