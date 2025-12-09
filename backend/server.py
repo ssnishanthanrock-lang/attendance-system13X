@@ -1287,14 +1287,14 @@ async def get_employees(include_pending_increments: bool = False, include_delete
     # Build query - exclude super_admin role
     query = {"company_id": current_user.company_id, "role": {"$ne": "super_admin"}}
     
-    # By default, only show active employees (status != 0 or status doesn't exist)
+    # By default, only show active employees (status != 0 AND is_active != False)
     if not include_deleted:
-        query["$or"] = [
-            {"status": {"$ne": 0}},
-            {"status": {"$exists": False}}
+        query["$and"] = [
+            {"$or": [{"status": {"$ne": 0}}, {"status": {"$exists": False}}]},
+            {"$or": [{"is_active": {"$ne": False}}, {"is_active": {"$exists": False}}]}
         ]
     else:
-        # If include_deleted=True, only show deleted (status = 0 or is_active = false)
+        # If include_deleted=True, only show deleted (status = 0 OR is_active = false)
         query["$or"] = [
             {"status": 0},
             {"is_active": False}
