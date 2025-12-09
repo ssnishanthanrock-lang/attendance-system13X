@@ -941,7 +941,7 @@ export default function Attendance() {
                             </tr>
                             
                             {/* Records for this date */}
-                            {records.map((record) => (
+                            {records.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((record) => (
                               <tr key={record.id} className={`hover:bg-gray-50 transition-colors border-b border-gray-100 ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}>
                                 {/* Employee Column with Profile Picture */}
                                 <td className="px-4 py-3 text-sm font-medium text-gray-900">
