@@ -3819,6 +3819,8 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
         total_deductions = late_deduction + total_advances + other_deductions + loan_deduction
         net_salary = gross_salary + allowances_to_add - total_deductions
         
+        print(f"DEBUG LIVE PAYROLL EMPLOYEE: {employee['name']} - gross={gross_salary:.2f}, earnings={earnings:.2f}, minutes={total_attendance_minutes}")
+        
         # Calculate today's earnings for this employee (only for non-fixed)
         today_earnings = today_minutes * salary_per_minute if not employee.get("fixed_salary", False) else 0
         today_total_earnings += today_earnings
