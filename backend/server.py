@@ -3113,23 +3113,15 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
             elif record.get("check_in") and not record.get("check_out") and date == today_str:
                 # Ongoing attendance for today - calculate up to now
                 try:
+                    from datetime import timedelta
                     checkin_dt = datetime.fromisoformat(record["check_in"])
-                    # Use naive datetime - compare apples to apples (both local time)
-                    duration = now - checkin_dt
+                    # Server is in UTC, but check-ins are in Sri Lanka time (UTC+5:30)
+                    # Add 5.5 hours to server time to get Sri Lanka time
+                    now_srilanka = now + timedelta(hours=5, minutes=30)
+                    duration = now_srilanka - checkin_dt
                     minutes_worked = int(duration.total_seconds() / 60)
                     earnings = minutes_worked * salary_per_minute
-                    
-                    # Debug logging
-                    print(f"DEBUG EARNINGS: Employee {record.get('employee_name')}")
-                    print(f"  Check-in: {record['check_in']}")
-                    print(f"  Check-in parsed: {checkin_dt}")
-                    print(f"  Now: {now}")
-                    print(f"  Duration: {duration}")
-                    print(f"  Minutes: {minutes_worked}")
-                    print(f"  Per-minute rate: {salary_per_minute}")
-                    print(f"  Earnings: {earnings}")
                 except Exception as e:
-                    print(f"ERROR calculating earnings: {e}")
                     pass
             
             record["earnings"] = round(earnings, 2)
