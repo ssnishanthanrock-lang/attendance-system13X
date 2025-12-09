@@ -24,6 +24,7 @@ import Estimates from "./pages/Estimates";
 import InvoiceCustomers from "./pages/InvoiceCustomers";
 import InvoiceProducts from "./pages/InvoiceProducts";
 import LocationReports from "./pages/LocationReports";
+import AttendanceDetails from "./pages/AttendanceDetails";
 import { Toaster } from "./components/ui/sonner";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
