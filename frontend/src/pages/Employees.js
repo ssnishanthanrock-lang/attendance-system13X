@@ -394,12 +394,56 @@ export default function Employees() {
     setParsedEmployees(parsedEmployees.filter((_, i) => i !== index));
   };
 
-  const filteredEmployees = employees.filter(
-    (emp) =>
-      emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.employee_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      emp.mobile.includes(searchTerm)
-  );
+  const handleSort = (field) => {
+    if (sortField === field) {
+      // Toggle sort order if same field
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new field and default to ascending
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const filteredEmployees = employees
+    .filter(
+      (emp) =>
+        emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        emp.employee_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        emp.mobile.includes(searchTerm)
+    )
+    .sort((a, b) => {
+      let aValue, bValue;
+      
+      switch (sortField) {
+        case 'name':
+          aValue = a.name.toLowerCase();
+          bValue = b.name.toLowerCase();
+          break;
+        case 'mobile':
+          aValue = a.mobile;
+          bValue = b.mobile;
+          break;
+        case 'position':
+          aValue = (a.position || '').toLowerCase();
+          bValue = (b.position || '').toLowerCase();
+          break;
+        case 'salary':
+          aValue = a.basic_salary + (a.allowances || 0);
+          bValue = b.basic_salary + (b.allowances || 0);
+          break;
+        case 'role':
+          aValue = a.role.toLowerCase();
+          bValue = b.role.toLowerCase();
+          break;
+        default:
+          return 0;
+      }
+      
+      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
+      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
 
   if (loading) {
     return (
