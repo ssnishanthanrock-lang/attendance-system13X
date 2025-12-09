@@ -3328,6 +3328,11 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
                 try:
                     checkin_dt = datetime.fromisoformat(record["check_in"])
                     checkout_dt = datetime.fromisoformat(record["check_out"])
+                    # Make timezone-aware if needed
+                    if checkin_dt.tzinfo is None:
+                        checkin_dt = checkin_dt.replace(tzinfo=timezone.utc)
+                    if checkout_dt.tzinfo is None:
+                        checkout_dt = checkout_dt.replace(tzinfo=timezone.utc)
                     duration = checkout_dt - checkin_dt
                     total_attendance_minutes += int(duration.total_seconds() / 60)
                 except:
