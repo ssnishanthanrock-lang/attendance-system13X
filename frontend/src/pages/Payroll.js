@@ -834,7 +834,15 @@ export default function Payroll() {
                             </td>
                             
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-100">
-                              {emp.net_salary.toLocaleString()}
+                              <div className="flex items-center justify-end gap-1">
+                                <span>{emp.net_salary.toFixed(2)}</span>
+                                {!emp.fixed_salary && month === new Date().toISOString().slice(0, 7) && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 bg-green-100 text-green-600 rounded text-xs animate-pulse">
+                                    <Radio className="w-2 h-2 mr-0.5" />
+                                    LIVE
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             
                             <td className="border border-gray-300 px-2 py-3 text-center">
