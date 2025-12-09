@@ -555,7 +555,12 @@ export default function Payroll() {
                   <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                     <CardContent className="p-4 text-center">
                       <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
-                      <p className="text-2xl font-bold text-green-700">Rs {detailedPayroll.total_net?.toLocaleString()}</p>
+                      <p className="text-2xl font-bold text-green-700">
+                        Rs {detailedPayroll.total_net?.toFixed(2)}
+                        {month === new Date().toISOString().slice(0, 7) && (
+                          <span className="ml-2 text-xs opacity-90 animate-pulse">● LIVE</span>
+                        )}
+                      </p>
                     </CardContent>
                   </Card>
                 </div>
