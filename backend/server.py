@@ -3603,7 +3603,7 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
             "position": employee.get("position", "Staff"),
             "profile_picture": employee.get("profile_pic"),
             "basic_salary": round(basic_salary, 2),
-            "allowances": round(allowances, 2),
+            "allowances": round(allowances_to_add, 2),
             "earnings": round(earnings, 2),
             "working_days": working_days,
             "present_days": present_days,
