@@ -4022,24 +4022,55 @@ CRITICAL: Ensure dates are in YYYY-MM-DD format and times are in HH:MM format.
 Extract BOTH punch_in and punch_out records when available.
 If only timestamps are available (no explicit IN/OUT), alternate between punch_in and punch_out."""
                 ).with_model("openai", "gpt-4o")
-            
-            # Parse attendance records
-            records = []
-            unique_vendor_ids = set()
-            dates = set()
-            
-            # Process rows after header - collect all punch data first
-            current_enroll_no = None
-            employee_punches = {}  # {enroll_no: {date: {'in': time, 'out': time}}}
-            
-            # Extract year from the report
-            report_year = "2025"  # Default
-            for check_row in sheet.iter_rows(min_row=1, max_row=10, values_only=True):
-                for cell in check_row:
-                    if cell and isinstance(cell, str) and '/' in cell and len(str(cell)) > 7:
-                        # Found date like 2025/12/01
-                        report_year = str(cell).split('/')[0]
-                        break
+                
+                # Create file attachment for AI to analyze
+                excel_file_obj = FileContentWithMimeType(
+                    file_path=temp_file_path,
+                    mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+                
+                # Send message with file and context
+                user_message = UserMessage(
+                    text=f"""Analyze this attendance Excel file and extract ALL employee punch records.
+
+File name: {filename}
+
+Here's the structure I can see:
+{excel_text}
+
+Please extract:
+1. All unique employee/device IDs
+2. All punch records (IN and OUT times)
+3. Convert all dates to YYYY-MM-DD format
+4. Convert all times to HH:MM format
+
+Return ONLY the JSON response, no additional text.""",
+                    file_contents=[excel_file_obj]
+                )
+                
+                print("DEBUG: Sending Excel file to AI for analysis...")
+                response_text = await chat.send_message(user_message)
+                print(f"DEBUG: AI response received: {response_text[:500]}...")
+                
+                # Parse AI response
+                # Remove markdown code blocks if present
+                response_text = response_text.strip()
+                if response_text.startswith('```'):
+                    # Extract JSON from markdown code block
+                    lines = response_text.split('\n')
+                    response_text = '\n'.join(lines[1:-1])
+                
+                # Try to find JSON in the response
+                import re
+                json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+                if json_match:
+                    response_text = json_match.group(0)
+                
+                ai_result = json.loads(response_text)
+                
+                # Validate and process AI response
+                records = ai_result.get('records', [])
+                unique_vendor_ids = ai_result.get('unique_vendor_ids', [])
             
             for row_idx in range(header_row_idx + 1, sheet.max_row + 1):  # Skip header row
                 row = list(sheet.iter_rows(min_row=row_idx, max_row=row_idx, values_only=True))[0]
