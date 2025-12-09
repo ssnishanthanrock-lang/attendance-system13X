@@ -193,6 +193,9 @@ export default function Layout({ children }) {
     if (item.requiresInvoicing) {
       return hasRole && companyInfo?.invoicing_enabled;
     }
+    if (item.requiresLocationTracking) {
+      return hasRole && companyInfo?.location_tracking_enabled;
+    }
     return hasRole;
   });
 
