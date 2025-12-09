@@ -3973,35 +3973,55 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
             try:
                 # Also convert Excel to readable text format for better AI understanding
                 wb = load_workbook(io.BytesIO(excel_data))
-            sheet = wb.active
-            
-            # Find the header row that contains 'Enroll No'
-            header_row_idx = None
-            date_columns = {}
-            enroll_col = None
-            
-            for i, row in enumerate(sheet.iter_rows(values_only=True), 1):
-                row_str = ' '.join(str(cell).lower() if cell else '' for cell in row)
-                if 'enroll' in row_str:
-                    header_row_idx = i
-                    # Identify column positions
-                    for col_idx, cell in enumerate(row):
-                        if cell and 'enroll' in str(cell).lower():
-                            enroll_col = col_idx
-                        # Check if it's a date column (format like 12/01)
-                        if cell and isinstance(cell, str) and '/' in cell:
-                            try:
-                                # This is a date column
-                                date_columns[col_idx] = cell
-                            except:
-                                pass
-                    break
-            
-            if header_row_idx is None or enroll_col is None:
-                raise HTTPException(status_code=400, detail="Could not find 'Enroll No' header in Excel file")
-            
-            print(f"DEBUG: Found header at row {header_row_idx}, Enroll column at {enroll_col}")
-            print(f"DEBUG: Found {len(date_columns)} date columns: {date_columns}")
+                sheet = wb.active
+                
+                # Get first 30 rows to show structure to AI
+                excel_text = "EXCEL FILE STRUCTURE:\n"
+                excel_text += "=" * 80 + "\n"
+                for i, row in enumerate(sheet.iter_rows(values_only=True), 1):
+                    if i > 30:  # Show first 30 rows for context
+                        excel_text += f"\n... (showing first 30 rows of {sheet.max_row} total rows)\n"
+                        break
+                    if any(cell is not None for cell in row):
+                        excel_text += f"Row {i}: {row}\n"
+                
+                # Initialize AI chat with Emergent LLM Key
+                api_key = os.getenv('EMERGENT_LLM_KEY', '')
+                if not api_key:
+                    raise HTTPException(status_code=500, detail="LLM API key not configured")
+                
+                chat = LlmChat(
+                    api_key=api_key,
+                    session_id=f"attendance-parse-{request.company_id}",
+                    system_message="""You are an expert at analyzing fingerprint attendance device Excel files. 
+Your task is to extract employee attendance data (punch in/out times) from any Excel format, regardless of how it's structured.
+
+IMPORTANT INSTRUCTIONS:
+1. Identify the employee ID column (might be called: Enroll No, Employee ID, Badge ID, etc.)
+2. Identify date columns (could be in headers or in data rows)
+3. Identify time/punch data (IN/OUT times, or just timestamps)
+4. Extract ALL unique employee IDs
+5. Extract ALL punch records with: employee_id, date, time, type (in/out)
+
+Return your response as a valid JSON object with this EXACT structure:
+{
+  "unique_vendor_ids": ["id1", "id2", "id3", ...],
+  "records": [
+    {
+      "vendor_id": "employee_id",
+      "datetime": "YYYY-MM-DD HH:MM",
+      "date": "YYYY-MM-DD",
+      "time": "HH:MM",
+      "record_type": "punch_in" or "punch_out"
+    }
+  ],
+  "format_detected": "description of the format you detected"
+}
+
+CRITICAL: Ensure dates are in YYYY-MM-DD format and times are in HH:MM format.
+Extract BOTH punch_in and punch_out records when available.
+If only timestamps are available (no explicit IN/OUT), alternate between punch_in and punch_out."""
+                ).with_model("openai", "gpt-4o")
             
             # Parse attendance records
             records = []
