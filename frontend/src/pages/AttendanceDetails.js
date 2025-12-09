@@ -24,21 +24,19 @@ export default function AttendanceDetails() {
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
-    fetchAttendanceForDate(selectedDate);
+    fetchAttendanceForDate(selectedDate, false); // Initial load with loading spinner
 
     const today = new Date().toISOString().split('T')[0];
-    let liveCounterInterval;
     let refreshInterval;
     
     if (selectedDate === today) {
-      // Refresh from backend every 5 seconds to keep base values accurate
+      // Silent refresh from backend every 5 seconds to keep base values accurate (no page reload)
       refreshInterval = setInterval(() => {
-        fetchAttendanceForDate(selectedDate);
+        fetchAttendanceForDate(selectedDate, true); // Silent update (no loading spinner)
       }, 5000);
     }
 
     return () => {
-      if (liveCounterInterval) clearInterval(liveCounterInterval);
       if (refreshInterval) clearInterval(refreshInterval);
     };
   }, [selectedDate]);
