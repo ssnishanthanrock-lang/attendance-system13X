@@ -3505,7 +3505,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
             if is_current_month:
                 # For current month: pro-rate based on time passed
                 import calendar
-                now = datetime.now(timezone.utc)
+                now = datetime.now()
                 days_in_month = calendar.monthrange(int(year), int(month_num))[1]
                 current_day = now.day
                 hours_in_month = days_in_month * 24
