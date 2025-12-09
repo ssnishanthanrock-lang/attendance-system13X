@@ -366,7 +366,15 @@ export default function AttendanceDetails() {
                           {calculateHours(record.check_in, record.check_out) === 'N/A' ? 'N/A' : `${calculateHours(record.check_in, record.check_out)}h`}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
-                          {record.earnings ? `Rs ${record.earnings.toLocaleString()}` : 'Rs 0'}
+                          <div className="flex items-center gap-2">
+                            <span>Rs {record.earnings ? record.earnings.toFixed(2) : '0.00'}</span>
+                            {record.check_in && !record.check_out && selectedDate === new Date().toISOString().split('T')[0] && (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs animate-pulse">
+                                <Radio className="w-2 h-2" />
+                                LIVE
+                              </span>
+                            )}
+                          </div>
                         </td>
                         {canEdit && (
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
