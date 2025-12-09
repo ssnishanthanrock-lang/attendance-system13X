@@ -364,34 +364,19 @@ export default function AttendanceDetails() {
                   ) : (
                     attendance.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((record) => (
                       <tr key={record.id || record.employee_id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            {record.profile_pic ? (
-                              <img 
-                                src={record.profile_pic} 
-                                alt={record.employee_name} 
-                                className="w-10 h-10 rounded-full object-cover mr-3"
-                              />
-                            ) : (
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold mr-3">
-                                {record.employee_name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                              </div>
-                            )}
-                            <div>
-                              <div className="text-sm font-medium text-gray-900">{record.employee_name}</div>
-                            </div>
-                          </div>
+                        <td className="px-3 py-2 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">{record.employee_name}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
                           {new Date(record.date).toLocaleDateString()}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-3 py-2 whitespace-nowrap">
                           {getStatusBadge(record.status)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
                           {formatTime(record.check_in)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
                           {formatTime(record.check_out)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
