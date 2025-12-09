@@ -3604,6 +3604,8 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
     working_days_data = settings.get("working_days", {}) if settings else {}
     working_days = working_days_data.get(current_month, 26)
     
+    print(f"DEBUG WORKING DAYS: Month={current_month}, Settings={working_days_data}, Working Days={working_days}")
+    
     # Get all employees (only if employee role, show own data; if admin/manager, show all)
     if current_user.role == "employee":
         employees = await db.users.find({
