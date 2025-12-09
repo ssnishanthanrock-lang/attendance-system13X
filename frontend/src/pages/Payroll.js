@@ -789,7 +789,15 @@ export default function Payroll() {
                               className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50" 
                               title={emp.fixed_salary ? `Fixed Salary: Basic + Allowances` : `Total minutes: ${emp.total_attendance_minutes || 0} | Per minute: Rs ${perMinuteSalary.toFixed(2)}`}
                             >
-                              {earnings.toLocaleString(undefined, {maximumFractionDigits: 2})}
+                              <div className="flex items-center justify-end gap-1">
+                                <span>{earnings.toFixed(2)}</span>
+                                {!emp.fixed_salary && month === new Date().toISOString().slice(0, 7) && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs animate-pulse">
+                                    <Radio className="w-2 h-2 mr-0.5" />
+                                    LIVE
+                                  </span>
+                                )}
+                              </div>
                             </td>
                             
                             <td className="border border-gray-300 px-2 py-3 text-center text-sm font-semibold text-green-600 bg-green-50">
