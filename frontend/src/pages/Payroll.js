@@ -562,11 +562,6 @@ export default function Payroll() {
                   ))}
                 </div>
               </>
-            )}
-
-            {/* Table View */}
-            {viewMode === 'table' && (
-              <>
               <Card>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
