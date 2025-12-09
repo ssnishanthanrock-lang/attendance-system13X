@@ -449,7 +449,7 @@ export default function Payroll() {
                     <CardContent className="p-6">
                       <div className="text-center space-y-2">
                         <p className="text-sm text-gray-600">Total Gross</p>
-                        <p className="text-3xl font-bold text-blue-700">Rs {detailedPayroll.total_gross?.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-blue-700">Rs {detailedPayroll.total_gross?.toLocaleString()}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -459,7 +459,7 @@ export default function Payroll() {
                       <CardContent className="p-6">
                         <div className="text-center space-y-2">
                           <p className="text-sm text-gray-600">Total Allowances</p>
-                          <p className="text-3xl font-bold text-purple-700">Rs {detailedPayroll.total_allowances?.toLocaleString()}</p>
+                          <p className="text-2xl font-bold text-purple-700">Rs {detailedPayroll.total_allowances?.toLocaleString()}</p>
                         </div>
                       </CardContent>
                     </Card>
@@ -469,7 +469,7 @@ export default function Payroll() {
                     <CardContent className="p-6">
                       <div className="text-center space-y-2">
                         <p className="text-sm text-gray-600">Total Deductions</p>
-                        <p className="text-3xl font-bold text-red-700">Rs {detailedPayroll.total_deductions?.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-red-700">Rs {detailedPayroll.total_deductions?.toLocaleString()}</p>
                       </div>
                     </CardContent>
                   </Card>
@@ -478,7 +478,7 @@ export default function Payroll() {
                     <CardContent className="p-6">
                       <div className="text-center space-y-2">
                         <p className="text-sm text-gray-600">Total Net</p>
-                        <p className="text-3xl font-bold text-green-700">Rs {detailedPayroll.total_net?.toLocaleString()}</p>
+                        <p className="text-2xl font-bold text-green-700">Rs {detailedPayroll.total_net?.toLocaleString()}</p>
                       </div>
                     </CardContent>
                   </Card>
