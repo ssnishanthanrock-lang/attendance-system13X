@@ -176,24 +176,6 @@ export default function Payroll() {
                   Updates every second • Last updated: {new Date(livePayroll.timestamp).toLocaleTimeString()}
                 </p>
               </div>
-              
-              {/* View Toggle */}
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setViewMode('card')}
-                  variant={viewMode === 'card' ? 'default' : 'outline'}
-                  size="sm"
-                >
-                  Card View
-                </Button>
-                <Button
-                  onClick={() => setViewMode('table')}
-                  variant={viewMode === 'table' ? 'default' : 'outline'}
-                  size="sm"
-                >
-                  Table View
-                </Button>
-              </div>
             </div>
 
             {/* Summary Cards */}
