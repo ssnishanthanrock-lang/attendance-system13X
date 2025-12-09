@@ -3917,6 +3917,202 @@ async def upload_employee_profile_pic(
         await db.users.update_one(
             {"id": employee_id, "company_id": current_user.company_id},
             {"$set": {"profile_pic": data_url}}
+
+
+# ============= DEVICE ATTENDANCE IMPORT ENDPOINTS =============
+
+@api_router.post("/attendance/parse-device-import")
+async def parse_device_import(request: DeviceImportParseRequest, current_user: User = Depends(get_current_user)):
+    """Parse attendance device file using AI"""
+    
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    try:
+        from emergentintegrations import OpenAIClient
+        
+        # Get Emergent LLM key
+        emergent_key = os.environ.get("EMERGENT_LLM_KEY")
+        if not emergent_key:
+            raise HTTPException(status_code=500, detail="AI service not configured")
+        
+        client = OpenAIClient(api_key=emergent_key)
+        
+        # AI Prompt to parse the file
+        prompt = f"""You are an expert at parsing attendance device export files. Analyze this file content and extract attendance records.
+
+File Content:
+{request.file_content}
+
+Instructions:
+1. Identify the format (columns, delimiters, datetime format)
+2. Extract each record with: vendor_id (employee ID from device), datetime, date, time
+3. Group records by vendor_id and date to identify check-in and check-out pairs
+4. Return JSON array with structure:
+{{
+  "format_detected": "description of format",
+  "records": [
+    {{
+      "vendor_id": "15",
+      "datetime": "2025-12-01 04:33:19",
+      "date": "2025-12-01",
+      "time": "04:33:19",
+      "record_type": "check_in or check_out based on time pattern"
+    }}
+  ],
+  "unique_vendor_ids": ["15", "34", "28", ...],
+  "date_range": {{"start": "2025-12-01", "end": "2025-12-09"}},
+  "total_records": 150
+}}
+
+IMPORTANT: 
+- For each vendor_id per date, identify check-in (earliest time) and check-out (latest time)
+- Return ONLY valid JSON, no markdown or extra text"""
+
+        response = client.chat.completions.create(
+            model="gemini-2.0-flash-exp",
+            messages=[
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.1
+        )
+        
+        ai_response = response.choices[0].message.content.strip()
+        
+        # Clean markdown if present
+        if ai_response.startswith("```json"):
+            ai_response = ai_response.replace("```json", "").replace("```", "").strip()
+        elif ai_response.startswith("```"):
+            ai_response = ai_response.replace("```", "").strip()
+        
+        # Parse JSON response
+        import json
+        parsed_data = json.loads(ai_response)
+        
+        await log_activity(
+            request.company_id,
+            current_user.id,
+            current_user.name,
+            "PARSE_DEVICE_IMPORT",
+            f"Parsed device import file: {parsed_data.get('total_records', 0)} records found"
+        )
+        
+        return {
+            "success": True,
+            "data": parsed_data
+        }
+        
+    except json.JSONDecodeError as e:
+        print(f"JSON Parse Error: {e}")
+        print(f"AI Response: {ai_response}")
+        raise HTTPException(status_code=500, detail=f"Failed to parse AI response: {str(e)}")
+    except Exception as e:
+        print(f"Parse Error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to parse file: {str(e)}")
+
+
+@api_router.post("/attendance/import-device-data")
+async def import_device_data(request: DeviceImportRequest, current_user: User = Depends(get_current_user)):
+    """Import device attendance data with ID mapping"""
+    
+    if current_user.role not in ["admin", "manager"]:
+        raise HTTPException(status_code=403, detail="Admin or manager access required")
+    
+    # Create mapping dictionary
+    id_mapping = {mapping.vendor_id: mapping.employee_id for mapping in request.mappings}
+    
+    imported_count = 0
+    skipped_count = 0
+    overwritten_count = 0
+    errors = []
+    
+    # Group records by vendor_id and date
+    from collections import defaultdict
+    grouped_records = defaultdict(list)
+    
+    for record in request.parsed_records:
+        vendor_id = record.vendor_id
+        if vendor_id in id_mapping:
+            employee_id = id_mapping[vendor_id]
+            grouped_records[(employee_id, record.date)].append(record)
+    
+    # Process each employee-date group
+    for (employee_id, date), records in grouped_records.items():
+        try:
+            # Get employee
+            employee = await db.users.find_one({"id": employee_id, "company_id": request.company_id})
+            if not employee:
+                errors.append(f"Employee {employee_id} not found for date {date}")
+                continue
+            
+            # Sort records by time to get check-in and check-out
+            sorted_records = sorted(records, key=lambda r: r.time)
+            check_in_time = sorted_records[0].time
+            check_out_time = sorted_records[-1].time if len(sorted_records) > 1 else None
+            
+            # Check if attendance already exists
+            existing = await db.attendance.find_one({
+                "company_id": request.company_id,
+                "employee_id": employee_id,
+                "date": date
+            })
+            
+            if existing:
+                if request.duplicate_action == "skip":
+                    skipped_count += 1
+                    continue
+                elif request.duplicate_action == "overwrite":
+                    # Update existing record
+                    await db.attendance.update_one(
+                        {"id": existing["id"]},
+                        {"$set": {
+                            "check_in": f"{date}T{check_in_time}",
+                            "check_out": f"{date}T{check_out_time}" if check_out_time else None,
+                            "status": "present",
+                            "updated_at": datetime.now(timezone.utc).isoformat(),
+                            "updated_by": current_user.id
+                        }}
+                    )
+                    overwritten_count += 1
+                    continue
+            
+            # Create new attendance record
+            new_attendance = {
+                "id": str(uuid.uuid4()),
+                "company_id": request.company_id,
+                "employee_id": employee_id,
+                "employee_name": capitalize_name(employee["name"]),
+                "date": date,
+                "check_in": f"{date}T{check_in_time}",
+                "check_out": f"{date}T{check_out_time}" if check_out_time else None,
+                "status": "present",
+                "created_by": current_user.id,
+                "created_at": datetime.now(timezone.utc).isoformat()
+            }
+            
+            await db.attendance.insert_one(new_attendance)
+            imported_count += 1
+            
+        except Exception as e:
+            errors.append(f"Error processing {employee_id} on {date}: {str(e)}")
+    
+    await log_activity(
+        request.company_id,
+        current_user.id,
+        current_user.name,
+        "IMPORT_DEVICE_ATTENDANCE",
+        f"Imported {imported_count} records, skipped {skipped_count}, overwritten {overwritten_count}"
+    )
+    
+    return {
+        "success": True,
+        "imported": imported_count,
+        "skipped": skipped_count,
+        "overwritten": overwritten_count,
+        "errors": errors
+    }
+
+
         )
         
         employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
