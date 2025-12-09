@@ -3946,7 +3946,7 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
             raise HTTPException(status_code=500, detail="AI service not configured")
         
         print("DEBUG: Creating LlmChat client")
-        client = LlmChat(api_key=emergent_key, model="gemini-2.0-flash-exp")
+        client = LlmChat(api_key=emergent_key)
         
         # Check if it's an Excel file
         file_content_to_parse = request.file_content
