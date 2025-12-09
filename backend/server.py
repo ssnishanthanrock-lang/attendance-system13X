@@ -3981,17 +3981,22 @@ Instructions:
 
 IMPORTANT: 
 - For each vendor_id per date, identify check-in (earliest time) and check-out (latest time)
-- Return ONLY valid JSON, no markdown or extra text"""
+- Return ONLY valid JSON, no markdown or extra text
+- Process the FULL file content provided above"""
 
+        print("DEBUG: Calling AI model")
         response = client.chat.completions.create(
             model="gemini-2.0-flash-exp",
             messages=[
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.1
+            temperature=0.1,
+            timeout=60
         )
         
+        print("DEBUG: AI response received")
         ai_response = response.choices[0].message.content.strip()
+        print(f"DEBUG: AI response length: {len(ai_response)}")
         
         # Clean markdown if present
         if ai_response.startswith("```json"):
