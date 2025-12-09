@@ -15,6 +15,7 @@ export default function AttendanceDetails() {
   const [loading, setLoading] = useState(true);
   const [selectedDate, setSelectedDate] = useState(searchParams.get('date') || new Date().toISOString().split('T')[0]);
   const [stats, setStats] = useState({ present: 0, absent: 0, leave: 0, halfDay: 0, total: 0 });
+  const [totalEarnings, setTotalEarnings] = useState(0);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [user, setUser] = useState(null);
