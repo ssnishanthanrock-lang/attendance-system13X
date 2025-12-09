@@ -4002,16 +4002,19 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
             in_times = {}
             out_times = {}
             
-            for row_idx in range(header_row_idx, sheet.max_row + 1):
+            for row_idx in range(header_row_idx + 1, sheet.max_row + 1):  # Skip header row
                 row = list(sheet.iter_rows(min_row=row_idx, max_row=row_idx, values_only=True))[0]
                 
                 # Check if this row has an Enroll No (new employee)
-                if row[enroll_col] and str(row[enroll_col]).strip() and str(row[enroll_col]).strip() not in ['IN', 'OUT', 'WH']:
-                    current_enroll_no = str(row[enroll_col]).strip()
-                    unique_vendor_ids.add(current_enroll_no)
-                    in_times = {}
-                    out_times = {}
-                    continue
+                enroll_val = str(row[enroll_col]).strip() if row[enroll_col] else ''
+                if enroll_val and enroll_val not in ['IN', 'OUT', 'WH', 'Enroll No', '']:
+                    # Make sure it's numeric or alphanumeric ID
+                    if enroll_val.replace('-', '').replace('_', '').isalnum():
+                        current_enroll_no = enroll_val
+                        unique_vendor_ids.add(current_enroll_no)
+                        in_times = {}
+                        out_times = {}
+                        continue
                 
                 if current_enroll_no is None:
                     continue
