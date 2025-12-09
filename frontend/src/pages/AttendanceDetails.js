@@ -24,6 +24,20 @@ export default function AttendanceDetails() {
     const userData = JSON.parse(localStorage.getItem('user'));
     setUser(userData);
     fetchAttendanceForDate(selectedDate);
+
+    // If viewing today's date, refresh every 10 seconds for live earnings
+    const today = new Date().toISOString().split('T')[0];
+    let intervalId;
+    
+    if (selectedDate === today) {
+      intervalId = setInterval(() => {
+        fetchAttendanceForDate(selectedDate);
+      }, 10000); // Refresh every 10 seconds
+    }
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
   }, [selectedDate]);
 
   const fetchAttendanceForDate = async (date) => {
