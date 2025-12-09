@@ -3389,10 +3389,10 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
     
     print(f"DEBUG DETAILED PAYROLL: Month={month}, Calculated Working Days={working_days}")
     
-    # Get all employees
+    # Get all employees (include admin to match live payroll endpoint)
     employees = await db.users.find({
         "company_id": current_user.company_id,
-        "role": {"$in": ["employee", "staff_member", "manager"]}
+        "role": {"$in": ["admin", "employee", "staff_member", "manager"]}
     }).to_list(length=None)
     
     detailed_records = []
