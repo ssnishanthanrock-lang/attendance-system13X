@@ -4141,10 +4141,6 @@ async def import_device_data(request: DeviceImportRequest, current_user: User = 
         "overwritten": overwritten_count,
         "errors": errors
     }
-        
-        return {"message": "Profile picture uploaded successfully", "profile_pic": data_url}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @api_router.post("/upload/profile-pic")
 async def upload_profile_pic(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
