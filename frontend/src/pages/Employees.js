@@ -679,9 +679,10 @@ export default function Employees() {
           </div>
         )}
 
-        {/* Employees Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="employees-grid">
-          {filteredEmployees.map((employee) => (
+        {/* Employees Card View */}
+        {viewMode === 'card' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" data-testid="employees-grid">
+            {filteredEmployees.map((employee) => (
             <Card key={employee.id} className="overflow-hidden hover:shadow-lg transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4 mb-4">
