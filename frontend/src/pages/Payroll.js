@@ -167,12 +167,12 @@ export default function Payroll() {
                   <h1 className="text-xl sm:text-2xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
                     Live Salary Tracker - {formatMonthName(livePayroll.month).monthName} {formatMonthName(livePayroll.month).year}
                   </h1>
-                  <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold animate-pulse">
+                  <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold animate-pulse">
                     <Radio className="w-3 h-3" />
                     LIVE
                   </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-xs text-gray-600 mt-1">
                   Updates every second • Last updated: {new Date(livePayroll.timestamp).toLocaleTimeString()}
                 </p>
               </div>
@@ -182,27 +182,27 @@ export default function Payroll() {
             <div className={`grid grid-cols-1 ${livePayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
               <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                 <CardContent className="p-4 text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Gross (So Far)</p>
+                  <p className="text-xs text-gray-600 mb-1">Total Gross (So Far)</p>
                   <p className="text-2xl font-bold text-blue-700">Rs {livePayroll.total_gross.toLocaleString()}</p>
                 </CardContent>
               </Card>
               {livePayroll.total_allowances > 0 && (
                 <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
                   <CardContent className="p-4 text-center">
-                    <p className="text-sm text-gray-600 mb-1">Total Allowances</p>
+                    <p className="text-xs text-gray-600 mb-1">Total Allowances</p>
                     <p className="text-2xl font-bold text-purple-700">Rs {livePayroll.total_allowances.toLocaleString()}</p>
                   </CardContent>
                 </Card>
               )}
               <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
                 <CardContent className="p-4 text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                  <p className="text-xs text-gray-600 mb-1">Total Deductions</p>
                   <p className="text-2xl font-bold text-red-700">Rs {livePayroll.total_deductions.toLocaleString()}</p>
                 </CardContent>
               </Card>
               <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                 <CardContent className="p-4 text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Net (So Far)</p>
+                  <p className="text-xs text-gray-600 mb-1">Total Net (So Far)</p>
                   <p className="text-2xl font-bold text-green-700">Rs {livePayroll.total_net.toLocaleString()}</p>
                 </CardContent>
               </Card>
@@ -236,7 +236,7 @@ export default function Payroll() {
                           </div>
                           
                           <div className="pt-3 border-t border-gray-200">
-                            <p className="text-sm text-gray-500 mb-1">Total Salary</p>
+                            <p className="text-xs text-gray-500 mb-1">Total Salary</p>
                             <p className="text-2xl font-bold text-green-600">
                               Rs {(monthData.month === livePayroll.month && livePayroll.total_net ? livePayroll.total_net : monthData.total_salary).toLocaleString()}
                             </p>
@@ -276,13 +276,13 @@ export default function Payroll() {
                       {formatMonthName(month).monthName} Salary Sheet - {formatMonthName(month).year}
                     </h1>
                     {month === new Date().toISOString().slice(0, 7) && (
-                      <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-semibold animate-pulse">
+                      <div className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold animate-pulse">
                         <Radio className="w-3 h-3" />
                         LIVE
                       </div>
                     )}
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-xs text-gray-600">
                     Working Days - {detailedPayroll.employees[0]?.working_days || 26}
                     {month === new Date().toISOString().slice(0, 7) && detailedPayroll.timestamp && (
                       <> • Last updated: {new Date(detailedPayroll.timestamp).toLocaleTimeString()}</>
@@ -334,7 +334,7 @@ export default function Payroll() {
                             )}
                             <div className="flex-1">
                               <h3 className="font-bold text-gray-900">{emp.employee_name}</h3>
-                              <p className="text-sm text-gray-600">{emp.position}</p>
+                              <p className="text-xs text-gray-600">{emp.position}</p>
                               {emp.fixed_salary && (
                                 <span className="inline-block mt-1 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded">Fixed Salary</span>
                               )}
@@ -344,7 +344,7 @@ export default function Payroll() {
                           {/* Earnings Section */}
                           <div className="space-y-2 border-t pt-3">
                             <p className="text-xs font-semibold text-gray-500 uppercase">Earnings</p>
-                            <div className="space-y-1 text-sm">
+                            <div className="space-y-1 text-xs">
                               <div className="flex justify-between">
                                 <span className="text-gray-600">Basic Salary:</span>
                                 <span className="font-semibold">Rs {emp.basic_salary.toLocaleString()}</span>
@@ -373,7 +373,7 @@ export default function Payroll() {
                           {/* Deductions Section */}
                           <div className="space-y-2 border rounded-lg p-3 bg-red-50">
                             <p className="text-xs font-semibold text-gray-500 uppercase">Deductions</p>
-                            <div className="space-y-1 text-sm">
+                            <div className="space-y-1 text-xs">
                               {emp.late_deduction > 0 && (
                                 <div className="flex justify-between">
                                   <span className="text-gray-600">Late:</span>
@@ -440,7 +440,7 @@ export default function Payroll() {
                 <div className={`grid grid-cols-1 ${detailedPayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4 mt-6`}>
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
+                      <p className="text-xs text-gray-600 mb-1">Total Gross Salary</p>
                       <p className="text-2xl font-bold text-blue-700">
                         Rs {detailedPayroll.total_gross?.toFixed(2)}
                         {month === new Date().toISOString().slice(0, 7) && (
@@ -453,7 +453,7 @@ export default function Payroll() {
                   {detailedPayroll.total_allowances > 0 && (
                     <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
                       <CardContent className="p-4 text-center">
-                        <p className="text-sm text-gray-600 mb-1">Total Allowances</p>
+                        <p className="text-xs text-gray-600 mb-1">Total Allowances</p>
                         <p className="text-2xl font-bold text-purple-700">Rs {detailedPayroll.total_allowances?.toLocaleString()}</p>
                       </CardContent>
                     </Card>
@@ -461,14 +461,14 @@ export default function Payroll() {
                   
                   <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                      <p className="text-xs text-gray-600 mb-1">Total Deductions</p>
                       <p className="text-2xl font-bold text-red-700">Rs {detailedPayroll.total_deductions?.toLocaleString()}</p>
                     </CardContent>
                   </Card>
                   
                   <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
+                      <p className="text-xs text-gray-600 mb-1">Total Net Salary</p>
                       <p className="text-2xl font-bold text-green-700">
                         Rs {detailedPayroll.total_net?.toFixed(2)}
                         {month === new Date().toISOString().slice(0, 7) && (
@@ -491,22 +491,22 @@ export default function Payroll() {
                     {/* Header */}
                     <thead>
                       <tr className="bg-gray-100">
-                        <th colSpan="2" className="border border-gray-300 px-2 py-1 text-center font-bold text-sm bg-blue-100">
+                        <th colSpan="2" className="border border-gray-300 px-2 py-1 text-center font-bold text-xs bg-blue-100">
                           Employee Details
                         </th>
-                        <th colSpan="4" className="border border-gray-300 px-2 py-1 text-center font-bold text-sm bg-yellow-100">
+                        <th colSpan="4" className="border border-gray-300 px-2 py-1 text-center font-bold text-xs bg-yellow-100">
                           Salary
                         </th>
-                        <th colSpan="5" className="border border-gray-300 px-2 py-1 text-center font-bold text-sm bg-green-100">
+                        <th colSpan="5" className="border border-gray-300 px-2 py-1 text-center font-bold text-xs bg-green-100">
                           Attendance
                         </th>
-                        <th colSpan="2" className="border border-gray-300 px-2 py-1 text-center font-bold text-sm bg-blue-100">
+                        <th colSpan="2" className="border border-gray-300 px-2 py-1 text-center font-bold text-xs bg-blue-100">
                           Extra
                         </th>
-                        <th colSpan="3" className="border border-gray-300 px-2 py-1 text-center font-bold text-sm bg-red-100">
+                        <th colSpan="3" className="border border-gray-300 px-2 py-1 text-center font-bold text-xs bg-red-100">
                           Deductions
                         </th>
-                        <th colSpan="1" className="border border-gray-300 px-2 py-1 text-center font-bold text-sm bg-green-200">
+                        <th colSpan="1" className="border border-gray-300 px-2 py-1 text-center font-bold text-xs bg-green-200">
                           Net Salary
                         </th>
                       </tr>
@@ -546,9 +546,9 @@ export default function Payroll() {
                         
                         return (
                           <tr key={emp.employee_id} className="hover:bg-gray-50">
-                            <td className="border border-gray-300 px-2 py-1 text-center text-sm">{index + 1}</td>
+                            <td className="border border-gray-300 px-2 py-1 text-center text-xs">{index + 1}</td>
                             <td className="border border-gray-300 px-2 py-1">
-                              <p className="font-semibold text-sm whitespace-nowrap">
+                              <p className="font-semibold text-xs whitespace-nowrap">
                                 {emp.employee_name}
                                 {emp.fixed_salary && (
                                   <span className="text-xs text-blue-600 ml-1">(Fixed)</span>
@@ -556,17 +556,17 @@ export default function Payroll() {
                               </p>
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm font-semibold bg-yellow-50">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs font-semibold bg-yellow-50">
                               {emp.basic_salary.toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm bg-yellow-50">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs bg-yellow-50">
                               {daySalary.toLocaleString(undefined, {maximumFractionDigits: 2})}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm bg-yellow-50">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs bg-yellow-50">
                               {perMinuteSalary.toFixed(2)}
                             </td>
                             <td 
-                              className="border border-gray-300 px-2 py-1 text-right text-sm font-semibold bg-yellow-50" 
+                              className="border border-gray-300 px-2 py-1 text-right text-xs font-semibold bg-yellow-50" 
                               title={emp.fixed_salary ? `Fixed Salary: Basic + Allowances` : `Total minutes: ${emp.total_attendance_minutes || 0} | Per minute: Rs ${perMinuteSalary.toFixed(2)}`}
                             >
                               <div className="flex items-center justify-end gap-1">
@@ -580,40 +580,40 @@ export default function Payroll() {
                               </div>
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-1 text-center text-sm font-semibold text-green-600 bg-green-50">
+                            <td className="border border-gray-300 px-2 py-1 text-center text-xs font-semibold text-green-600 bg-green-50">
                               {emp.present_days}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-center text-sm text-orange-600 bg-green-50">
+                            <td className="border border-gray-300 px-2 py-1 text-center text-xs text-orange-600 bg-green-50">
                               {emp.leave_days}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-center text-sm text-blue-600 bg-green-50">
+                            <td className="border border-gray-300 px-2 py-1 text-center text-xs text-blue-600 bg-green-50">
                               {emp.allowed_leaves || 0}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-center text-sm text-blue-600 bg-green-50">
+                            <td className="border border-gray-300 px-2 py-1 text-center text-xs text-blue-600 bg-green-50">
                               {emp.allowed_half_days || 0}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm text-red-600 bg-green-50" title={`Late minutes: ${emp.late_minutes} | Deducted: Rs ${emp.late_deduction.toFixed(2)}`}>
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs text-red-600 bg-green-50" title={`Late minutes: ${emp.late_minutes} | Deducted: Rs ${emp.late_deduction.toFixed(2)}`}>
                               {emp.late_deduction.toLocaleString(undefined, {maximumFractionDigits: 2})}
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm bg-blue-50">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs bg-blue-50">
                               {emp.allowances.toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm text-green-600 bg-blue-50">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs text-green-600 bg-blue-50">
                               {(emp.extra_payment || 0).toLocaleString()}
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm text-red-600 bg-red-50">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs text-red-600 bg-red-50">
                               {emp.advances.toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm text-red-600 bg-red-50">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs text-red-600 bg-red-50">
                               {(emp.loan_deduction || 0).toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm text-red-600 bg-red-50">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs text-red-600 bg-red-50">
                               {emp.other_deductions.toLocaleString()}
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-1 text-right text-sm font-bold text-green-700 bg-green-100">
+                            <td className="border border-gray-300 px-2 py-1 text-right text-xs font-bold text-green-700 bg-green-100">
                               <div className="flex items-center justify-end gap-1">
                                 <span>{emp.net_salary.toFixed(2)}</span>
                                 {!emp.fixed_salary && month === new Date().toISOString().slice(0, 7) && (
@@ -645,43 +645,43 @@ export default function Payroll() {
                     {/* Footer Totals */}
                     <tfoot>
                       <tr className="bg-gray-200 font-bold">
-                        <td colSpan="2" className="border border-gray-300 px-3 py-3 text-center text-sm">
+                        <td colSpan="2" className="border border-gray-300 px-3 py-3 text-center text-xs">
                           TOTAL
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm">
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.basic_salary, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm">
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs">-</td>
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs">-</td>
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.earnings || 0), 0).toLocaleString(undefined, {maximumFractionDigits: 2})}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-center text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-1 text-center text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-1 text-center text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-1 text-center text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm">
+                        <td className="border border-gray-300 px-2 py-1 text-center text-xs">-</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center text-xs">-</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center text-xs">-</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center text-xs">-</td>
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.late_deduction, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm">
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm text-green-600">
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs text-green-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.extra_payment || 0), 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm text-red-600">
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs text-red-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.advances, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm text-red-600">
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs text-red-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.loan_deduction || 0), 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm text-red-600">
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs text-red-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.other_deductions, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-right text-sm font-bold text-green-700 bg-green-200">
+                        <td className="border border-gray-300 px-2 py-1 text-right text-xs font-bold text-green-700 bg-green-200">
                           {detailedPayroll.total_net.toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-1 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-1 text-center text-xs">-</td>
                       </tr>
                     </tfoot>
                     </table>
@@ -693,27 +693,27 @@ export default function Payroll() {
               <div className={`grid grid-cols-1 ${detailedPayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
                 <Card className="bg-blue-50 border-blue-200">
                   <CardContent className="p-4 text-center">
-                    <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
+                    <p className="text-xs text-gray-600 mb-1">Total Gross Salary</p>
                     <p className="text-2xl font-bold text-blue-700">Rs {detailedPayroll.total_gross.toLocaleString()}</p>
                   </CardContent>
                 </Card>
                 {detailedPayroll.total_allowances > 0 && (
                   <Card className="bg-purple-50 border-purple-200">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Allowances</p>
+                      <p className="text-xs text-gray-600 mb-1">Total Allowances</p>
                       <p className="text-2xl font-bold text-purple-700">Rs {detailedPayroll.total_allowances.toLocaleString()}</p>
                     </CardContent>
                   </Card>
                 )}
                 <Card className="bg-red-50 border-red-200">
                   <CardContent className="p-4 text-center">
-                    <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                    <p className="text-xs text-gray-600 mb-1">Total Deductions</p>
                     <p className="text-2xl font-bold text-red-700">Rs {detailedPayroll.total_deductions.toLocaleString()}</p>
                   </CardContent>
                 </Card>
                 <Card className="bg-green-50 border-green-200">
                   <CardContent className="p-4 text-center">
-                    <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
+                    <p className="text-xs text-gray-600 mb-1">Total Net Salary</p>
                     <p className="text-2xl font-bold text-green-700">Rs {detailedPayroll.total_net.toLocaleString()}</p>
                   </CardContent>
                 </Card>
