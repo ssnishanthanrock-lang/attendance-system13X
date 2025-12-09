@@ -830,11 +830,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Invoice Customers Management - Full CRUD"
-    - "Invoice Products Management - Full CRUD with Categories"
-    - "Estimates Management - Create, Edit, Convert"
-    - "Invoices Management - Create, Payments, Stock Reduction"
-  stuck_tasks: []
+    - "Super Admin Re-send URL to Admin Feature UI"
+  stuck_tasks:
+    - "Super Admin Re-send URL to Admin Feature UI"
   test_all: false
   test_priority: "high_first"
 
