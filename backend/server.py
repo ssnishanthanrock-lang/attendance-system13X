@@ -3917,6 +3917,11 @@ async def upload_employee_profile_pic(
         await db.users.update_one(
             {"id": employee_id, "company_id": current_user.company_id},
             {"$set": {"profile_pic": data_url}}
+        )
+        
+        return {"message": "Profile picture updated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to upload profile picture: {str(e)}")
 
 
 # ============= DEVICE ATTENDANCE IMPORT ENDPOINTS =============
