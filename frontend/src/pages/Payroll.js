@@ -459,8 +459,7 @@ export default function Payroll() {
                     </Card>
                   ))}
                 </div>
-              </>
-            )}
+                )}
 
             {/* Table View */}
             {viewMode === 'table' && (
