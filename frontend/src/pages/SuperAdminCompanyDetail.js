@@ -285,7 +285,7 @@ export default function SuperAdminCompanyDetail() {
 
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
-                <strong>Note:</strong> Company logo will appear in the sidebar and header for this company's users. Favicon will be used for browser tabs.
+                <strong>Note:</strong> Company logo will appear in the sidebar and header for this company&apos;s users. Favicon will be used for browser tabs.
               </p>
             </div>
           </CardContent>
