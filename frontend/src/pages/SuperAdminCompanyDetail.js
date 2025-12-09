@@ -330,6 +330,47 @@ export default function SuperAdminCompanyDetail() {
           </CardContent>
         </Card>
 
+
+        {/* Location Tracking Module */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg">
+              <div>
+                <p className="font-medium">Enable Location Tracking</p>
+                <p className="text-sm text-gray-600">Allow this company to use location tracking features (employee tracking, attendance with location, location reports)</p>
+              </div>
+              <Switch
+                checked={company?.location_tracking_enabled || false}
+                onCheckedChange={async (checked) => {
+                  try {
+                    // Optimistically update UI
+                    setCompany({ ...company, location_tracking_enabled: checked });
+                    
+                    await api.put(`/superadmin/companies/${companyId}/location-tracking`, { enabled: checked });
+                    toast.success(`Location tracking ${checked ? 'enabled' : 'disabled'} successfully`, {
+                      style: { background: '#10b981', color: 'white' }
+                    });
+                  } catch (error) {
+                    toast.error('Failed to update location tracking status', {
+                      style: { background: '#ef4444', color: 'white' }
+                    });
+                    // Revert on error
+                    fetchCompany();
+                  }
+                }}
+              />
+            </div>
+            {company?.location_tracking_enabled && (
+              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  ✅ Location tracking module is enabled. Employees can now use location tracking and mark attendance with location. Admins can view location reports.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+
         {/* SMS Configuration */}
         <Card>
           <CardContent className="space-y-4 pt-6">
