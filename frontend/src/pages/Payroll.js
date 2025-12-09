@@ -487,7 +487,7 @@ export default function Payroll() {
               <Card>
                 <CardContent className="p-0">
                   <div className="overflow-x-auto">
-                  <table className="w-full min-w-max border-collapse">
+                  <table className="w-full min-w-max border-collapse text-xs leading-tight">
                     {/* Header */}
                     <thead>
                       <tr className="bg-gray-100">
