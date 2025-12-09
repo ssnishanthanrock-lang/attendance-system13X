@@ -197,13 +197,21 @@ export default function Payroll() {
             </div>
 
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className={`grid grid-cols-1 ${livePayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
               <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                 <CardContent className="p-4 text-center">
                   <p className="text-sm text-gray-600 mb-1">Total Gross (So Far)</p>
                   <p className="text-2xl font-bold text-blue-700">Rs {livePayroll.total_gross.toLocaleString()}</p>
                 </CardContent>
               </Card>
+              {livePayroll.total_allowances > 0 && (
+                <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-gray-600 mb-1">Total Allowances</p>
+                    <p className="text-2xl font-bold text-purple-700">Rs {livePayroll.total_allowances.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+              )}
               <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
                 <CardContent className="p-4 text-center">
                   <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
