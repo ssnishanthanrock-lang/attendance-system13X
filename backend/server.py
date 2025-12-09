@@ -4078,19 +4078,11 @@ Return ONLY the JSON response, no additional text.""",
                     if 'date' in record:
                         dates.add(record['date'])
                 
-                # Check if this is IN/OUT/WH row
-                row_type = None
-                for cell in row[:15]:  # Check first few columns for IN/OUT/WH
-                    if cell and isinstance(cell, str):
-                        if cell.strip() == 'IN':
-                            row_type = 'IN'
-                            break
-                        elif cell.strip() == 'OUT':
-                            row_type = 'OUT'
-                            break
-                        elif cell.strip() == 'WH':
-                            row_type = 'WH'
-                            break
+                sorted_dates = sorted(list(dates))
+                date_range = {
+                    "start": sorted_dates[0] if sorted_dates else None,
+                    "end": sorted_dates[-1] if sorted_dates else None
+                }
                 
                 # Parse time data for each date column
                 if row_type in ['IN', 'OUT']:
