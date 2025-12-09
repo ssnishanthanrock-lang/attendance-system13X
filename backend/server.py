@@ -3140,6 +3140,7 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
                     pass
             
             record["earnings"] = round(earnings, 2)
+            record["salary_per_minute"] = round(salary_per_minute, 2)
             total_earnings += earnings
             all_attendance.append(record)
         else:
