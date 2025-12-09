@@ -3951,14 +3951,24 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
             filename = parts[1]
             base64_data = parts[2].split(',', 1)[1] if ',' in parts[2] else parts[2]
             
-            # Decode base64
+            # Decode base64 and save to temp file
             import base64
             import io
+            import os
+            import tempfile
+            import json
             from openpyxl import load_workbook
-            from datetime import datetime, time
+            from emergentintegrations.llm.chat import LlmChat, UserMessage, FileContentWithMimeType
+            from dotenv import load_dotenv
+            
+            load_dotenv()
             
             excel_data = base64.b64decode(base64_data)
-            excel_file = io.BytesIO(excel_data)
+            
+            # Save to temporary file for AI processing
+            with tempfile.NamedTemporaryFile(mode='wb', suffix='.xlsx', delete=False) as temp_file:
+                temp_file.write(excel_data)
+                temp_file_path = temp_file.name
             
             # Load workbook
             wb = load_workbook(excel_file)
