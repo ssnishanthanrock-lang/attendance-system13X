@@ -3648,11 +3648,7 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
                 try:
                     checkin_dt = datetime.fromisoformat(record["check_in"])
                     checkout_dt = datetime.fromisoformat(record["check_out"])
-                    # Make timezone-aware if needed
-                    if checkin_dt.tzinfo is None:
-                        checkin_dt = checkin_dt.replace(tzinfo=timezone.utc)
-                    if checkout_dt.tzinfo is None:
-                        checkout_dt = checkout_dt.replace(tzinfo=timezone.utc)
+                    # Work with naive datetimes - all in local time
                     duration = checkout_dt - checkin_dt
                     minutes_worked = int(duration.total_seconds() / 60)
                     total_attendance_minutes += minutes_worked
@@ -3665,10 +3661,7 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
             elif record_date == today_str and record.get("check_in") and not record.get("check_out"):
                 try:
                     checkin_dt = datetime.fromisoformat(record["check_in"])
-                    # Make timezone-aware if needed
-                    if checkin_dt.tzinfo is None:
-                        checkin_dt = checkin_dt.replace(tzinfo=timezone.utc)
-                    # Calculate up to current time
+                    # Use naive datetime - compare local to local
                     duration = now - checkin_dt
                     minutes_worked = int(duration.total_seconds() / 60)
                     total_attendance_minutes += minutes_worked
