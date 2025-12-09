@@ -222,7 +222,7 @@ export default function SuperAdminCompanyDetail() {
               </div>
             </div>
             {/* Status Change Actions */}
-            <div className="mt-6 pt-4 border-t border-gray-200 flex gap-3">
+            <div className="mt-6 pt-4 border-t border-gray-200 flex flex-wrap gap-3">
               {company?.status === 'pending' && (
                 <Button 
                   onClick={() => handleStatusChange('active')} 
@@ -251,9 +251,103 @@ export default function SuperAdminCompanyDetail() {
                   Reactivate Company
                 </Button>
               )}
+              
+              {/* Re-send URL Button */}
+              <Button 
+                onClick={handleResendUrl} 
+                variant="outline"
+                className="bg-blue-50 text-blue-700 border-blue-300 hover:bg-blue-100"
+              >
+                <Send className="w-4 h-4 mr-2" />
+                Re-send URL to Admin
+              </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Admin Selection Dialog (Multiple Admins) */}
+        <Dialog open={showAdminSelectDialog} onOpenChange={setShowAdminSelectDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Select Admin to Send URL</DialogTitle>
+              <DialogDescription>
+                Choose which admin should receive the company URL via SMS
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-2 py-4">
+              {admins.map((admin) => (
+                <div
+                  key={admin.id}
+                  className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer"
+                  onClick={() => {
+                    setSelectedAdmin(admin);
+                    setShowAdminSelectDialog(false);
+                    setShowConfirmDialog(true);
+                  }}
+                >
+                  <div>
+                    <p className="font-medium">{admin.name}</p>
+                    <p className="text-sm text-gray-600">{admin.mobile}</p>
+                  </div>
+                  <Send className="w-4 h-4 text-blue-600" />
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Confirmation Dialog */}
+        <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm SMS Send</DialogTitle>
+              <DialogDescription>
+                Send company URL to the following admin via SMS?
+              </DialogDescription>
+            </DialogHeader>
+            {selectedAdmin && (
+              <div className="py-4 space-y-2">
+                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <p className="font-medium text-lg">{selectedAdmin.name}</p>
+                  <p className="text-gray-600">{selectedAdmin.mobile}</p>
+                </div>
+                <div className="text-sm text-gray-600 p-3 bg-gray-50 rounded border">
+                  <strong>Message Preview:</strong>
+                  <p className="mt-1">Your company portal: {company?.name}. Login with mobile {selectedAdmin.mobile} at: https://paystack-app.preview.emergentagent.com</p>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowConfirmDialog(false);
+                  setSelectedAdmin(null);
+                }}
+                disabled={sendingUrl}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => handleSendUrlToAdmin(selectedAdmin.id)}
+                disabled={sendingUrl}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {sendingUrl ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4 mr-2" />
+                    Send SMS
+                  </>
+                )}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Logo & Branding */}
         <Card>
