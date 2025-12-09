@@ -2697,6 +2697,29 @@ async def toggle_invoicing(company_id: str, data: dict, current_user: User = Dep
     
     return {"message": f"Invoicing {'enabled' if data['enabled'] else 'disabled'} successfully"}
 
+
+@api_router.put("/superadmin/companies/{company_id}/location-tracking")
+async def toggle_location_tracking(company_id: str, data: dict, current_user: User = Depends(get_current_user)):
+    """Enable/disable location tracking for company"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    await db.companies.update_one(
+        {"id": company_id},
+        {"$set": {"location_tracking_enabled": data["enabled"]}}
+    )
+    
+    await log_activity(
+        company_id,
+        current_user.id,
+        current_user.name,
+        "TOGGLE_LOCATION_TRACKING",
+        f"Location tracking {'enabled' if data['enabled'] else 'disabled'} for company"
+    )
+    
+    return {"message": f"Location tracking {'enabled' if data['enabled'] else 'disabled'} successfully"}
+
+
 # ============= ATTENDANCE ENDPOINTS =============
 @api_router.get("/attendance")
 async def get_attendance(
