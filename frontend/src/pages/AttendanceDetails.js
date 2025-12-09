@@ -365,9 +365,9 @@ export default function AttendanceDetails() {
                     attendance.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((record) => (
                       <tr key={record.id || record.employee_id} className="hover:bg-gray-50">
                         <td className="px-2 py-1 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">{record.employee_name}</div>
+                          <div className="text-xs font-medium text-gray-900">{record.employee_name}</div>
                         </td>
-                        <td className="px-2 py-1 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-2 py-1 whitespace-nowrap text-xs text-gray-900">
                           {new Date(record.date).toLocaleDateString()}
                         </td>
                         <td className="px-2 py-1 whitespace-nowrap">
