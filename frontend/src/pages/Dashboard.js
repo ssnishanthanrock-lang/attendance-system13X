@@ -75,6 +75,10 @@ export default function Dashboard() {
     try {
       const response = await api.get('/payroll/live-current-month');
       setLivePayroll(response.data);
+      // Sync display value with backend data
+      if (response.data.today_total_earnings) {
+        setDisplayTodaySalary(response.data.today_total_earnings);
+      }
     } catch (error) {
       console.error('Failed to fetch live payroll:', error);
     }
