@@ -3970,8 +3970,9 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
                 temp_file.write(excel_data)
                 temp_file_path = temp_file.name
             
-            # Load workbook
-            wb = load_workbook(excel_file)
+            try:
+                # Also convert Excel to readable text format for better AI understanding
+                wb = load_workbook(io.BytesIO(excel_data))
             sheet = wb.active
             
             # Find the header row that contains 'Enroll No'
