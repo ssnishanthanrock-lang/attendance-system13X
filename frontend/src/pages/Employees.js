@@ -961,9 +961,7 @@ export default function Employees() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.employee_id || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.mobile}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.department || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.position || '-'}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">Rs. {employee.basic_salary.toLocaleString()}</div>
