@@ -402,29 +402,10 @@ export default function Payroll() {
                   </p>
                 </div>
               </div>
-              
-              {/* View Toggle */}
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => setViewMode('card')}
-                  variant={viewMode === 'card' ? 'default' : 'outline'}
-                  size="sm"
-                >
-                  Card View
-                </Button>
-                <Button
-                  onClick={() => setViewMode('table')}
-                  variant={viewMode === 'table' ? 'default' : 'outline'}
-                  size="sm"
-                >
-                  Table View
-                </Button>
-              </div>
             </div>
 
-            {/* Card View - Same as Live View */}
-            {viewMode === 'card' && (
-              <>
+            {/* Card View - Always Show */}
+            <>
                 {/* Summary Cards */}
                 <div className={`grid grid-cols-1 ${detailedPayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
