@@ -3997,10 +3997,18 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
             unique_vendor_ids = set()
             dates = set()
             
-            # Process rows after header
+            # Process rows after header - collect all punch data first
             current_enroll_no = None
-            in_times = {}
-            out_times = {}
+            employee_punches = {}  # {enroll_no: {date: {'in': time, 'out': time}}}
+            
+            # Extract year from the report
+            report_year = "2025"  # Default
+            for check_row in sheet.iter_rows(min_row=1, max_row=10, values_only=True):
+                for cell in check_row:
+                    if cell and isinstance(cell, str) and '/' in cell and len(str(cell)) > 7:
+                        # Found date like 2025/12/01
+                        report_year = str(cell).split('/')[0]
+                        break
             
             for row_idx in range(header_row_idx + 1, sheet.max_row + 1):  # Skip header row
                 row = list(sheet.iter_rows(min_row=row_idx, max_row=row_idx, values_only=True))[0]
@@ -4012,8 +4020,8 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
                     if enroll_val.replace('-', '').replace('_', '').isalnum():
                         current_enroll_no = enroll_val
                         unique_vendor_ids.add(current_enroll_no)
-                        in_times = {}
-                        out_times = {}
+                        if current_enroll_no not in employee_punches:
+                            employee_punches[current_enroll_no] = {}
                         continue
                 
                 if current_enroll_no is None:
@@ -4041,52 +4049,48 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
                         if time_val and str(time_val).strip() and str(time_val).strip() != '00:00':
                             time_str = str(time_val).strip()
                             
-                            # Convert date format (12/01 -> 2025-12-01, assuming year from report)
+                            # Convert date format (12/01 -> 2025-12-01)
                             try:
-                                # Extract year from report (from Row 6)
                                 month_day = date_str.split('/')
                                 if len(month_day) == 2:
-                                    # Get year from the "From Date" in the report
-                                    year = "2025"  # Default, will try to extract
-                                    for check_row in sheet.iter_rows(min_row=1, max_row=10, values_only=True):
-                                        for cell in check_row:
-                                            if cell and isinstance(cell, str) and '/' in cell and len(str(cell)) > 7:
-                                                # Found date like 2025/12/01
-                                                year = str(cell).split('/')[0]
-                                                break
-                                    
-                                    full_date = f"{year}-{month_day[0]}-{month_day[1]}"
+                                    full_date = f"{report_year}-{month_day[0]}-{month_day[1]}"
                                     dates.add(full_date)
                                     
+                                    # Initialize date entry if needed
+                                    if full_date not in employee_punches[current_enroll_no]:
+                                        employee_punches[current_enroll_no][full_date] = {}
+                                    
+                                    # Store IN or OUT time
                                     if row_type == 'IN':
-                                        in_times[full_date] = time_str
+                                        employee_punches[current_enroll_no][full_date]['in'] = time_str
                                     elif row_type == 'OUT':
-                                        out_times[full_date] = time_str
-                                        
-                                        # Create records for both IN and OUT times
-                                        in_time = in_times.get(full_date)
-                                        
-                                        # Only create IN record if we have a valid IN time
-                                        if in_time and in_time != "00:00":
-                                            records.append({
-                                                "vendor_id": current_enroll_no,
-                                                "datetime": f"{full_date} {in_time}",
-                                                "date": full_date,
-                                                "time": in_time,
-                                                "record_type": "punch_in"
-                                            })
-                                        
-                                        # Always create OUT record when we have OUT time
-                                        records.append({
-                                            "vendor_id": current_enroll_no,
-                                            "datetime": f"{full_date} {time_str}",
-                                            "date": full_date,
-                                            "time": time_str,
-                                            "record_type": "punch_out"
-                                        })
+                                        employee_punches[current_enroll_no][full_date]['out'] = time_str
                             except Exception as e:
                                 print(f"DEBUG: Error parsing date/time: {e}")
                                 continue
+            
+            # Now create records from collected punch data
+            for enroll_no, date_punches in employee_punches.items():
+                for date, times in date_punches.items():
+                    # Create IN record if exists
+                    if 'in' in times:
+                        records.append({
+                            "vendor_id": enroll_no,
+                            "datetime": f"{date} {times['in']}",
+                            "date": date,
+                            "time": times['in'],
+                            "record_type": "punch_in"
+                        })
+                    
+                    # Create OUT record if exists
+                    if 'out' in times:
+                        records.append({
+                            "vendor_id": enroll_no,
+                            "datetime": f"{date} {times['out']}",
+                            "date": date,
+                            "time": times['out'],
+                            "record_type": "punch_out"
+                        })
             
             print(f"DEBUG: Parsed {len(records)} records from Excel for {len(unique_vendor_ids)} employees")
             
