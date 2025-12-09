@@ -687,10 +687,9 @@ export default function Attendance() {
               onClick={() => setImportDialogOpen(true)}
               className="bg-gradient-to-r from-purple-600 to-pink-600"
               disabled={!canEdit}
-              title={!canEdit ? "Read-only access - Cannot import attendance" : ""}
+              title={!canEdit ? "Read-only access - Cannot import attendance" : "AI Attendance Import"}
             >
-              <Upload className="w-4 h-4 mr-2" />
-              Import from Device
+              <Upload className="w-4 h-4" />
             </Button>
             
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
