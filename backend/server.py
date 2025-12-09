@@ -3345,7 +3345,8 @@ async def get_payroll_months(current_user: User = Depends(get_current_user)):
 @api_router.get("/payroll/detailed/{month}")
 async def get_detailed_payroll(month: str, current_user: User = Depends(get_current_user)):
     """Get detailed salary breakdown for all employees in a month"""
-    # Get company settings
+    # Get company and settings
+    company = await db.companies.find_one({"id": current_user.company_id}, {"_id": 0})
     settings = await db.settings.find_one({"company_id": current_user.company_id})
     working_hours_per_day = 8
     start_time = "09:00"
