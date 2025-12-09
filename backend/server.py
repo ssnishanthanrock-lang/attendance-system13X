@@ -3942,7 +3942,7 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
         
         # Check if it's an Excel file
         if request.file_content.startswith('[EXCEL_FILE]'):
-            print("DEBUG: Processing Excel file")
+            print("DEBUG: Processing Excel file with AI")
             # Extract the base64 data
             parts = request.file_content.split('\n', 2)
             if len(parts) < 3:
