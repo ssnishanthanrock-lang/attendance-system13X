@@ -3040,10 +3040,10 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or manager access required")
     
-    # Get all employees in company
+    # Get all employees in company with salary info
     employees = await db.users.find(
         {"company_id": current_user.company_id, "role": {"$in": ["admin", "employee", "manager", "staff_member"]}},
-        {"_id": 0, "id": 1, "name": 1, "employee_id": 1, "profile_pic": 1}
+        {"_id": 0, "id": 1, "name": 1, "employee_id": 1, "profile_pic": 1, "basic_salary": 1, "allowances": 1, "fixed_salary": 1}
     ).to_list(length=None)
     
     # Get attendance for the date
@@ -3052,19 +3052,65 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
         {"_id": 0}
     ).to_list(length=None)
     
-    # Create a map of employee_id to attendance and profile pic
+    # Create maps
     attendance_map = {record["employee_id"]: record for record in attendance_records}
-    employee_profile_map = {emp["id"]: emp.get("profile_pic") for emp in employees}
-    employee_display_id_map = {emp["id"]: emp.get("employee_id") for emp in employees}
+    employee_data_map = {emp["id"]: emp for emp in employees}
     
-    # Build complete attendance list (including absent employees)
+    # Get company settings for working hours
+    company = await db.companies.find_one({"id": current_user.company_id}, {"_id": 0})
+    working_hours = company.get("working_hours", {})
+    start_time = working_hours.get("start", "09:00")
+    finish_time = working_hours.get("finish", "17:00")
+    
+    # Calculate expected minutes per day
+    from datetime import datetime, timezone
+    start_dt = datetime.strptime(start_time, "%H:%M")
+    finish_dt = datetime.strptime(finish_time, "%H:%M")
+    expected_minutes_per_day = int((finish_dt - start_dt).total_seconds() / 60)
+    
+    # Build complete attendance list with earnings
     all_attendance = []
+    total_earnings = 0
+    
     for employee in employees:
+        emp_data = employee_data_map[employee["id"]]
+        basic_salary = emp_data.get("basic_salary", 0)
+        allowances = emp_data.get("allowances", 0)
+        fixed_salary = emp_data.get("fixed_salary", False)
+        
+        # Calculate salary per minute
+        if fixed_salary:
+            # For fixed salary: (basic_salary / 30 days / expected_minutes_per_day)
+            salary_per_minute = basic_salary / 30 / expected_minutes_per_day if expected_minutes_per_day > 0 else 0
+        else:
+            # For non-fixed: basic_salary is already total per month, divide by total work minutes
+            total_work_minutes_per_month = expected_minutes_per_day * 26  # 26 working days
+            salary_per_minute = basic_salary / total_work_minutes_per_month if total_work_minutes_per_month > 0 else 0
+        
         if employee["id"] in attendance_map:
-            # Add profile pic to existing attendance record
+            # Add salary and earnings to existing attendance record
             record = attendance_map[employee["id"]]
-            record["profile_pic"] = employee_profile_map.get(employee["id"])
-            record["employee_id_display"] = employee_display_id_map.get(employee["id"])
+            record["profile_pic"] = emp_data.get("profile_pic")
+            record["employee_id_display"] = emp_data.get("employee_id")
+            
+            # Calculate earnings for this day
+            earnings = 0
+            if record.get("check_in") and record.get("check_out"):
+                try:
+                    checkin_dt = datetime.fromisoformat(record["check_in"])
+                    checkout_dt = datetime.fromisoformat(record["check_out"])
+                    if checkin_dt.tzinfo is None:
+                        checkin_dt = checkin_dt.replace(tzinfo=timezone.utc)
+                    if checkout_dt.tzinfo is None:
+                        checkout_dt = checkout_dt.replace(tzinfo=timezone.utc)
+                    duration = checkout_dt - checkin_dt
+                    minutes_worked = int(duration.total_seconds() / 60)
+                    earnings = minutes_worked * salary_per_minute
+                except:
+                    pass
+            
+            record["earnings"] = round(earnings, 2)
+            total_earnings += earnings
             all_attendance.append(record)
         else:
             # Employee has no record for this date - mark as absent
@@ -3072,16 +3118,22 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
                 "id": None,
                 "employee_id": employee["id"],
                 "employee_name": employee["name"],
-                "employee_id_display": employee.get("employee_id"),
-                "profile_pic": employee.get("profile_pic"),
+                "employee_id_display": emp_data.get("employee_id"),
+                "profile_pic": emp_data.get("profile_pic"),
                 "company_id": current_user.company_id,
                 "date": date,
                 "status": "absent",
                 "check_in": None,
-                "check_out": None
+                "check_out": None,
+                "earnings": 0
             })
     
-    return {"attendance": all_attendance, "date": date, "total": len(all_attendance)}
+    return {
+        "attendance": all_attendance, 
+        "date": date, 
+        "total": len(all_attendance),
+        "total_earnings": round(total_earnings, 2)
+    }
 
 @api_router.get("/attendance/deleted")
 async def get_deleted_attendance(current_user: User = Depends(get_current_user)):
