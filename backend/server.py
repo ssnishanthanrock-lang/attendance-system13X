@@ -3578,7 +3578,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
 @api_router.get("/payroll/live-current-month")
 async def get_live_current_month_payroll(current_user: User = Depends(get_current_user)):
     """Get real-time payroll calculation for current month up to this second"""
-    now = datetime.now(timezone.utc)
+    now = datetime.now()
     current_month = now.strftime("%Y-%m")
     
     # Get company settings
