@@ -31,26 +31,24 @@ export default function AttendanceDetails() {
     
     if (selectedDate === today) {
       intervalId = setInterval(() => {
-        // Update only the earnings and total without fetching
+        // Update earnings for ongoing attendance (checked in but not out)
         setAttendance(prevAttendance => {
           let newTotal = 0;
           const updatedAttendance = prevAttendance.map(record => {
-            if (record.check_in && !record.check_out && record.earnings) {
-              // Calculate updated earnings for ongoing attendance
+            if (record.check_in && !record.check_out && record.salary_per_minute) {
+              // Calculate live earnings for ongoing attendance
               const checkinTime = new Date(record.check_in);
               const now = new Date();
               const minutesWorked = Math.floor((now - checkinTime) / (1000 * 60));
               
-              // Estimate per-minute rate from current earnings
-              const originalCheckin = new Date(record.check_in);
-              const originalMinutes = Math.floor((new Date() - originalCheckin) / (1000 * 60));
-              const perMinuteRate = originalMinutes > 0 ? record.earnings / originalMinutes : 0;
-              
+              // Use the salary_per_minute from backend
+              const perMinuteRate = record.salary_per_minute || 0;
               const newEarnings = minutesWorked * perMinuteRate;
               newTotal += newEarnings;
               
               return { ...record, earnings: newEarnings };
             } else {
+              // For completed records or those without check-in, use existing earnings
               newTotal += record.earnings || 0;
               return record;
             }
