@@ -155,7 +155,7 @@ export default function Layout({ children }) {
     { path: '/', label: 'Dashboard', icon: LayoutDashboard, roles: ['admin', 'manager', 'employee', 'staff_member'] },
     { path: '/employees', label: 'Employees', icon: Users, roles: ['admin', 'manager'] },
     { path: '/attendance', label: 'Attendance', icon: Calendar, roles: ['admin', 'manager', 'employee', 'staff_member'] },
-    { path: '/location-reports', label: 'Location Reports', icon: MapPin, roles: ['admin', 'manager'] },
+    { path: '/location-reports', label: 'Location Reports', icon: MapPin, roles: ['admin', 'manager'], requiresLocationTracking: true },
     { path: '/payroll', label: 'Payroll', icon: Banknote, roles: ['admin', 'manager', 'employee', 'staff_member'] },
     { 
       label: 'Apply', 
