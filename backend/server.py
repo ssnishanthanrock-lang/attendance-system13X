@@ -4021,7 +4021,7 @@ Return your response as a valid JSON object with this EXACT structure:
 CRITICAL: Ensure dates are in YYYY-MM-DD format and times are in HH:MM format.
 Extract BOTH punch_in and punch_out records when available.
 If only timestamps are available (no explicit IN/OUT), alternate between punch_in and punch_out."""
-                ).with_model("openai", "gpt-4o")
+                ).with_model("gemini", "gemini-2.0-flash")
                 
                 # Create file attachment for AI to analyze
                 excel_file_obj = FileContentWithMimeType(
