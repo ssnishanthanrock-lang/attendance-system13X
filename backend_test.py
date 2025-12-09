@@ -1154,18 +1154,27 @@ class ERPTester:
     
     def test_payroll_discrepancy_investigation(self):
         """
-        REVIEW REQUEST FOCUS: Test both payroll endpoints to verify identical total_gross values
-        and confirm working_days fix for December 2025
+        DETAILED PAYROLL DISCREPANCY INVESTIGATION
+        
+        Investigate the total_gross discrepancy between Dashboard and Monthly Payroll view with ACTUAL data.
+        
+        **Context:**
+        - User reports total_gross differs between:
+          1. Dashboard Live Salary Tracker (uses `/api/payroll/live-current-month`)
+          2. Monthly Payroll `/payroll/month/2025-12` (uses `/api/payroll/detailed/2025-12`)
+        - Both were fixed to use 27 working days
+        - User believes monthly payroll is correct
+        - We have actual attendance data for December (13 records)
         """
-        print("\n=== TESTING PAYROLL DISCREPANCY INVESTIGATION (REVIEW REQUEST) ===")
+        print("\n🔍 === DETAILED PAYROLL DISCREPANCY INVESTIGATION ===")
         
         try:
-            # Step 1: Call /api/payroll/live-current-month
-            print("Step 1: Testing /api/payroll/live-current-month endpoint...")
+            # Step 1: Call /api/payroll/live-current-month and capture REAL values
+            print("📊 Step 1: Getting Dashboard Live Salary Tracker data...")
             live_response = self.session.get(f"{API_BASE}/payroll/live-current-month")
             
             if live_response.status_code != 200:
-                self.log_result("Payroll Discrepancy - Live Endpoint", False, 
+                self.log_result("Payroll Investigation - Live Endpoint Failed", False, 
                               f"Live payroll endpoint failed: {live_response.status_code}",
                               {"response": live_response.text})
                 return
@@ -1175,17 +1184,25 @@ class ERPTester:
             live_timestamp = live_data.get("timestamp", "")
             live_employees = live_data.get("employees", [])
             
-            # Get working_days from first employee in live endpoint
+            # Get working_days and sample employee data from live endpoint
             live_working_days = None
+            live_sample_employee = None
             if live_employees:
-                live_working_days = live_employees[0].get("working_days", 0)
+                live_sample_employee = live_employees[0]
+                live_working_days = live_sample_employee.get("working_days", 0)
             
-            self.log_result("Payroll Discrepancy - Live Endpoint Success", True, 
-                          f"Live payroll endpoint working",
+            print(f"   ✅ Live Endpoint Results:")
+            print(f"      - Total Gross: {live_total_gross} LKR")
+            print(f"      - Working Days: {live_working_days}")
+            print(f"      - Employee Count: {len(live_employees)}")
+            print(f"      - Timestamp: {live_timestamp}")
+            
+            self.log_result("Payroll Investigation - Live Endpoint Success", True, 
+                          f"Dashboard Live Salary Tracker data captured",
                           {"total_gross": live_total_gross, 
-                           "timestamp": live_timestamp,
+                           "working_days": live_working_days,
                            "employee_count": len(live_employees),
-                           "first_employee_working_days": live_working_days})
+                           "timestamp": live_timestamp})
             
             # Step 2: Call /api/payroll/detailed/2025-12
             print("Step 2: Testing /api/payroll/detailed/2025-12 endpoint...")
