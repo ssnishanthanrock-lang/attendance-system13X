@@ -3367,6 +3367,8 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
     working_days_data = settings.get("working_days", {}) if settings else {}
     working_days = working_days_data.get(month, 26)  # default 26
     
+    print(f"DEBUG DETAILED PAYROLL: Month={month}, Settings={working_days_data}, Working Days={working_days}")
+    
     # Get all employees
     employees = await db.users.find({
         "company_id": current_user.company_id,
