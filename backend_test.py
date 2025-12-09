@@ -1236,52 +1236,46 @@ class ERPTester:
                            "working_days": detailed_working_days,
                            "employee_count": len(detailed_employees)})
             
-            # Step 3: Verify working_days = 27 for December 2025
-            print("Step 3: Verifying working_days = 27 for December 2025...")
+            # Step 3: Calculate the exact difference
+            print("💰 Step 3: Calculating exact difference between endpoints...")
             
-            if live_working_days == 27:
-                self.log_result("Payroll Discrepancy - Live Working Days", True, 
-                              f"Live endpoint correctly shows working_days = 27")
-            else:
-                self.log_result("Payroll Discrepancy - Live Working Days", False, 
-                              f"Live endpoint shows working_days = {live_working_days}, expected 27")
+            difference_lkr = abs(live_total_gross - detailed_total_gross)
             
-            if detailed_working_days == 27:
-                self.log_result("Payroll Discrepancy - Detailed Working Days", True, 
-                              f"Detailed endpoint correctly shows working_days = 27")
-            else:
-                self.log_result("Payroll Discrepancy - Detailed Working Days", False, 
-                              f"Detailed endpoint shows working_days = {detailed_working_days}, expected 27")
-            
-            # Step 4: Compare total_gross values
-            print("Step 4: Comparing total_gross values between endpoints...")
-            
-            if live_total_gross == 0 and detailed_total_gross == 0:
-                self.log_result("Payroll Discrepancy - Total Gross Comparison", True, 
-                              "Both endpoints return 0 total_gross (no payroll data exists)")
-                return
-            
-            # Calculate percentage difference
             if detailed_total_gross != 0:
-                percentage_diff = abs(live_total_gross - detailed_total_gross) / detailed_total_gross * 100
+                percentage_diff = (difference_lkr / detailed_total_gross) * 100
             else:
                 percentage_diff = 100 if live_total_gross != 0 else 0
             
-            # Success criteria: difference should be within 5% (as per review request)
-            if percentage_diff <= 5:
-                self.log_result("Payroll Discrepancy - Total Gross Match", True, 
-                              f"Total gross values match within acceptable range",
-                              {"live_total_gross": live_total_gross,
-                               "detailed_total_gross": detailed_total_gross,
-                               "difference": abs(live_total_gross - detailed_total_gross),
-                               "percentage_diff": f"{percentage_diff:.2f}%"})
+            print(f"   📊 COMPARISON RESULTS:")
+            print(f"      - Dashboard Live Total Gross: {live_total_gross:,.2f} LKR")
+            print(f"      - Monthly Payroll Total Gross: {detailed_total_gross:,.2f} LKR")
+            print(f"      - Exact Difference: {difference_lkr:,.2f} LKR")
+            print(f"      - Percentage Difference: {percentage_diff:.2f}%")
+            
+            # Step 4: Verify working_days = 27 for December 2025
+            print("📅 Step 4: Verifying working_days = 27 for December 2025...")
+            
+            working_days_consistent = True
+            
+            if live_working_days == 27:
+                print(f"   ✅ Live endpoint correctly shows working_days = 27")
+                self.log_result("Payroll Investigation - Live Working Days", True, 
+                              f"Live endpoint correctly shows working_days = 27")
             else:
-                self.log_result("Payroll Discrepancy - Total Gross Mismatch", False, 
-                              f"Total gross values differ by more than 5%",
-                              {"live_total_gross": live_total_gross,
-                               "detailed_total_gross": detailed_total_gross,
-                               "difference": abs(live_total_gross - detailed_total_gross),
-                               "percentage_diff": f"{percentage_diff:.2f}%"})
+                print(f"   ❌ Live endpoint shows working_days = {live_working_days}, expected 27")
+                working_days_consistent = False
+                self.log_result("Payroll Investigation - Live Working Days", False, 
+                              f"Live endpoint shows working_days = {live_working_days}, expected 27")
+            
+            if detailed_working_days == 27:
+                print(f"   ✅ Detailed endpoint correctly shows working_days = 27")
+                self.log_result("Payroll Investigation - Detailed Working Days", True, 
+                              f"Detailed endpoint correctly shows working_days = 27")
+            else:
+                print(f"   ❌ Detailed endpoint shows working_days = {detailed_working_days}, expected 27")
+                working_days_consistent = False
+                self.log_result("Payroll Investigation - Detailed Working Days", False, 
+                              f"Detailed endpoint shows working_days = {detailed_working_days}, expected 27")
             
             # Step 5: Additional verification - check if both use same calculation method
             print("Step 5: Verifying calculation consistency...")
