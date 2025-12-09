@@ -494,13 +494,17 @@ export default function Dashboard() {
                   </p>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                  {/* Today Salary Card - Clean design */}
+                  {/* Today Salary Card - Clean design with live counter */}
                   <Card className="bg-white border-2 border-gray-200 shadow-md">
                     <CardContent className="p-5 text-center">
-                      <p className="text-xs text-gray-500 mb-2">Today Salary</p>
-                      <p className="text-3xl font-bold text-gray-900">
-                        Rs {livePayroll.today_total_earnings?.toLocaleString() || '0'}
+                      <div className="flex items-center justify-center gap-2 mb-2">
+                        <p className="text-xs text-gray-500">Today Salary</p>
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      </div>
+                      <p className="text-3xl font-bold text-gray-900 transition-all duration-300">
+                        Rs {Math.round(displayTodaySalary).toLocaleString()}
                       </p>
+                      <p className="text-xs text-green-600 mt-1">● Live counting</p>
                     </CardContent>
                   </Card>
 
