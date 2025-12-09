@@ -547,34 +547,13 @@ export default function Payroll() {
                         return (
                           <tr key={emp.employee_id} className="hover:bg-gray-50">
                             <td className="border border-gray-300 px-2 py-3 text-center text-sm">{index + 1}</td>
-                            <td className="border border-gray-300 px-3 py-3">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full flex-shrink-0">
-                                  {emp.profile_picture && emp.profile_picture.trim() !== '' ? (
-                                    <img 
-                                      src={emp.profile_picture} 
-                                      alt={emp.employee_name} 
-                                      className="w-8 h-8 rounded-full object-cover"
-                                      onError={(e) => {
-                                        e.target.outerHTML = '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
-                                      }}
-                                    />
-                                  ) : (
-                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                                      <User className="w-4 h-4 text-white" />
-                                    </div>
-                                  )}
-                                </div>
-                                <div>
-                                  <p className="font-semibold text-sm whitespace-nowrap">{emp.employee_name}</p>
-                                  {emp.position && (
-                                    <span className="text-xs text-gray-500">{emp.position}</span>
-                                  )}
-                                  {emp.fixed_salary && (
-                                    <span className="text-xs text-blue-600 ml-1">(Fixed)</span>
-                                  )}
-                                </div>
-                              </div>
+                            <td className="border border-gray-300 px-2 py-2">
+                              <p className="font-semibold text-sm whitespace-nowrap">
+                                {emp.employee_name}
+                                {emp.fixed_salary && (
+                                  <span className="text-xs text-blue-600 ml-1">(Fixed)</span>
+                                )}
+                              </p>
                             </td>
                             
                             <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
