@@ -659,7 +659,7 @@ export default function Payroll() {
 
                     {/* Body */}
                     <tbody>
-                      {detailedPayroll.employees.map((emp, index) => {
+                      {detailedPayroll.employees.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((emp, index) => {
                         const daySalary = emp.working_days > 0 ? (emp.basic_salary / emp.working_days) : 0;
                         const perMinuteSalary = emp.salary_per_minute || 0;
                         const earnings = emp.earnings || 0; // Use backend calculated earnings
