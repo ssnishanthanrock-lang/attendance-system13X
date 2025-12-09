@@ -222,6 +222,14 @@ function App() {
             }
           />
           <Route
+            path="/attendance-details"
+            element={
+              <ProtectedRoute allowedRoles={['admin', 'manager']}>
+                <AttendanceDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/invoices"
             element={
               <ProtectedRoute allowedRoles={['admin', 'manager']}>
