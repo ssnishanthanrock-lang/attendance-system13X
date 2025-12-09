@@ -54,7 +54,7 @@ export default function Payroll() {
 
   // Live counter effect - runs every second for smooth increments
   useEffect(() => {
-    if (!month || !detailedPayroll || !lastFetchTime) return;
+    if (!month || !lastFetchTime) return;
     
     const currentMonth = new Date().toISOString().slice(0, 7);
     if (month !== currentMonth) return; // Only for current month
@@ -63,7 +63,7 @@ export default function Payroll() {
       const secondsSinceLastFetch = Math.floor((Date.now() - lastFetchTime) / 1000);
       
       setDetailedPayroll(prevPayroll => {
-        if (!prevPayroll) return prevPayroll;
+        if (!prevPayroll || !prevPayroll.employees) return prevPayroll;
         
         let newTotalGross = 0;
         let newTotalNet = 0;
@@ -115,7 +115,7 @@ export default function Payroll() {
     }, 1000); // Update every second for smooth live counter
     
     return () => clearInterval(liveCounterInterval);
-  }, [month, detailedPayroll, lastFetchTime]);
+  }, [month, lastFetchTime]); // Removed detailedPayroll from dependencies to prevent multiple intervals
 
   // Live payroll update effect
   useEffect(() => {
