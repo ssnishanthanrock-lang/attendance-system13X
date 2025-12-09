@@ -66,6 +66,7 @@ export default function Employees() {
     return saved ? JSON.parse(saved) : [];
   });
   const [showFailedDialog, setShowFailedDialog] = useState(false);
+  const [viewMode, setViewMode] = useState('card'); // 'card' or 'table'
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
