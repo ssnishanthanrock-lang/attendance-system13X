@@ -129,13 +129,22 @@ class ERPTester:
             # This is a workaround for testing - in production, proper OTP verification is required
             import jwt
             
-            # Use real user data from database for mobile 0712345678
-            test_payload = {
-                "user_id": "cfb58f53-79c7-4f12-85b0-268dde3f3fe0",  # Real user ID from DB
-                "role": "admin", 
-                "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",  # Real company ID from DB
-                "mobile": mobile
-            }
+            # Use the specific mobile from review request: 0773769019
+            if mobile == "0773769019":
+                test_payload = {
+                    "user_id": "cfb58f53-79c7-4f12-85b0-268dde3f3fe0",  # Real user ID from DB
+                    "role": "admin", 
+                    "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",  # Real company ID from DB
+                    "mobile": mobile
+                }
+            else:
+                # Use real user data from database for mobile 0712345678
+                test_payload = {
+                    "user_id": "cfb58f53-79c7-4f12-85b0-268dde3f3fe0",  # Real user ID from DB
+                    "role": "admin", 
+                    "company_id": "dc1ff8de-3db3-4885-b6b7-168b00e3cef5",  # Real company ID from DB
+                    "mobile": mobile
+                }
             
             # Use the same JWT secret from the backend
             jwt_secret = "attendance-system-secret-key-change-in-production"
