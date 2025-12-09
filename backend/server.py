@@ -3933,14 +3933,18 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or manager access required")
     
+    print(f"DEBUG: Parsing device import, file length: {len(request.file_content)}")
+    
     try:
         from emergentintegrations import OpenAIClient
         
         # Get Emergent LLM key
         emergent_key = os.environ.get("EMERGENT_LLM_KEY")
         if not emergent_key:
+            print("ERROR: EMERGENT_LLM_KEY not found")
             raise HTTPException(status_code=500, detail="AI service not configured")
         
+        print("DEBUG: Creating OpenAI client")
         client = OpenAIClient(api_key=emergent_key)
         
         # AI Prompt to parse the file
