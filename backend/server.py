@@ -4141,12 +4141,6 @@ async def import_device_data(request: DeviceImportRequest, current_user: User = 
         "overwritten": overwritten_count,
         "errors": errors
     }
-
-
-        )
-        
-        employee = await db.users.find_one({"id": employee_id, "company_id": current_user.company_id})
-        await log_activity(current_user.company_id, current_user.id, current_user.name, "UPLOAD_PROFILE_PIC", f"Uploaded profile picture for employee: {employee.get('name', 'Unknown')}, Size: {len(contents)} bytes")
         
         return {"message": "Profile picture uploaded successfully", "profile_pic": data_url}
     except Exception as e:
