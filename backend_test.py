@@ -1152,27 +1152,35 @@ class ERPTester:
         except Exception as e:
             self.log_result("Payroll Data Integration", False, f"Payroll integration test error: {str(e)}")
     
-    def test_payroll_discrepancy_investigation(self):
+    def test_payroll_admin_inclusion_fix(self):
         """
-        DETAILED PAYROLL DISCREPANCY INVESTIGATION
+        PAYROLL ADMIN INCLUSION FIX VERIFICATION
         
-        Deep investigation of the 11,000 LKR discrepancy between Dashboard and Monthly Payroll.
+        **REVIEW REQUEST:**
+        - User reported: Dashboard shows 113,048.62 LKR, Monthly Payroll shows 102,362.66 LKR
+        - Difference: 10,685.96 LKR
+        - Root cause found: Dashboard includes "admin" role, Monthly Payroll didn't
+        - Fix applied: Added "admin" to Monthly Payroll endpoint's employee query
         
-        **CRITICAL INFO FROM USER:**
-        - Monthly Payroll `/payroll/month/2025-12`: **101,930.18 LKR**
-        - Dashboard Live Salary Tracker: **112,645.06 LKR**
-        - **Difference: 10,714.88 LKR** (User's concern!)
+        **TEST STEPS:**
+        1. Login with mobile 0773769019
+        2. Call both endpoints:
+           - GET `/api/payroll/live-current-month` → Capture total_gross and employee count
+           - GET `/api/payroll/detailed/2025-12` → Capture total_gross and employee count
+        3. Compare:
+           - Are employee counts now the same?
+           - Are total_gross values now the same?
+           - What is the difference (should be 0 or very close)?
         
-        **Deep Investigation Required:**
-        1. Call both endpoints and get REAL detailed values
-        2. Compare employee-by-employee data
-        3. Identify the source of 11K difference
-        4. Check if allowances are being included/excluded differently
-        5. Analyze backend logs
+        **EXPECTED RESULT:**
+        - Both endpoints should return the SAME employee count
+        - Both endpoints should return the SAME (or very close) total_gross
+        - Difference should be < 10 LKR (acceptable due to timing)
+        - The 10,685 LKR discrepancy should be RESOLVED
         """
-        print("\n🔍 === DETAILED PAYROLL DISCREPANCY INVESTIGATION ===")
-        print("🚨 USER REPORTED ISSUE: 10,714.88 LKR difference between endpoints")
-        print("📊 Monthly Payroll: 101,930.18 LKR vs Dashboard: 112,645.06 LKR")
+        print("\n🔍 === PAYROLL ADMIN INCLUSION FIX VERIFICATION ===")
+        print("🚨 TESTING FIX FOR: 10,685.96 LKR discrepancy between endpoints")
+        print("🎯 EXPECTED: Both endpoints should now include admin role and show same totals")
         
         try:
             # Step 1: Call Dashboard Live Current Month endpoint
