@@ -302,7 +302,6 @@ export default function AttendanceDetails() {
                             )}
                             <div>
                               <div className="text-sm font-medium text-gray-900">{record.employee_name}</div>
-                              <div className="text-sm text-gray-500">{record.employee_id_display || '-'}</div>
                             </div>
                           </div>
                         </td>
