@@ -4093,35 +4093,33 @@ Return ONLY the JSON response, no additional text.""",
                 }
                 
                 print(f"DEBUG: AI parsed {len(records)} records for {len(unique_vendor_ids)} employees")
-            
-            # Sort dates to get range
-            sorted_dates = sorted(list(dates))
-            date_range = {
-                "start": sorted_dates[0] if sorted_dates else None,
-                "end": sorted_dates[-1] if sorted_dates else None
-            }
-            
-            # Create response for Excel format
-            parsed_data = {
-                "format_detected": "Excel WorkTime Report format",
-                "records": records,
-                "unique_vendor_ids": sorted(list(unique_vendor_ids)),
-                "date_range": date_range,
-                "total_records": len(records)
-            }
-            
-            await log_activity(
-                request.company_id,
-                current_user.id,
-                current_user.name,
-                "PARSE_DEVICE_IMPORT",
-                f"Parsed Excel device import: {len(records)} records found"
-            )
-            
-            return {
-                "success": True,
-                "data": parsed_data
-            }
+                
+                await log_activity(
+                    request.company_id,
+                    current_user.id,
+                    current_user.name,
+                    "PARSE_DEVICE_IMPORT",
+                    f"AI parsed Excel import: {len(records)} records found"
+                )
+                
+                return {
+                    "success": True,
+                    "data": parsed_data
+                }
+                
+            except json.JSONDecodeError as e:
+                print(f"ERROR: Failed to parse AI response as JSON: {e}")
+                print(f"AI Response: {response_text}")
+                raise HTTPException(status_code=500, detail=f"AI returned invalid JSON: {str(e)}")
+            except Exception as e:
+                print(f"ERROR: AI parsing failed: {e}")
+                import traceback
+                traceback.print_exc()
+                raise HTTPException(status_code=500, detail=f"AI parsing error: {str(e)}")
+            finally:
+                # Clean up temp file
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
         
         # Parse the file content
         lines = request.file_content.strip().split('\n')
