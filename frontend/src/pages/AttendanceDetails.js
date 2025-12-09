@@ -379,10 +379,10 @@ export default function AttendanceDetails() {
                         <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
                           {formatTime(record.check_out)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-900">
                           {calculateHours(record.check_in, record.check_out) === 'N/A' ? 'N/A' : `${calculateHours(record.check_in, record.check_out)}h`}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-green-600">
+                        <td className="px-3 py-2 whitespace-nowrap text-sm font-semibold text-green-600">
                           <div className="flex items-center gap-2">
                             <span>Rs {record.earnings ? record.earnings.toFixed(2) : '0.00'}</span>
                             {record.check_in && !record.check_out && selectedDate === new Date().toISOString().split('T')[0] && (
@@ -394,7 +394,7 @@ export default function AttendanceDetails() {
                           </div>
                         </td>
                         {canEdit && (
-                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <td className="px-3 py-2 whitespace-nowrap text-sm">
                             <div className="flex gap-2">
                               <Button
                                 variant="outline"
