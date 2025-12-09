@@ -349,14 +349,21 @@ export default function Payroll() {
                   {months.map((monthData) => (
                     <Card
                       key={monthData.month}
-                      className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
+                      className={`cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1 ${monthData.month === livePayroll.month ? 'ring-2 ring-blue-500' : ''}`}
                       onClick={() => handleMonthClick(monthData.month)}
                     >
                       <CardContent className="p-6">
                         <div className="text-center space-y-3">
-                          <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
-                            {formatMonthName(monthData.month).monthName} {formatMonthName(monthData.month).year}
-                          </h3>
+                          <div className="flex items-center justify-center gap-2">
+                            <h3 className="text-xl font-bold text-gray-900" style={{ fontFamily: 'Work Sans, sans-serif' }}>
+                              {formatMonthName(monthData.month).monthName} {formatMonthName(monthData.month).year}
+                            </h3>
+                            {monthData.month === livePayroll.month && (
+                              <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full font-semibold">
+                                CURRENT
+                              </span>
+                            )}
+                          </div>
                           
                           <div className="pt-3 border-t border-gray-200">
                             <p className="text-sm text-gray-500 mb-1">Total Salary</p>
