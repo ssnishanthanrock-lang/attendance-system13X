@@ -870,6 +870,7 @@ async def get_superadmin_stats(current_user: User = Depends(get_current_user)):
             "last_login": company.get("last_login"),
             "sms_enabled": company.get("sms_enabled", False),
             "invoicing_enabled": company.get("invoicing_enabled", False),
+            "location_tracking_enabled": company.get("location_tracking_enabled", False),
             "created_at": company["created_at"]
         })
     
