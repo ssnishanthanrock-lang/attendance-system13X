@@ -153,10 +153,10 @@ const DeviceImportDialog = ({ open, onClose, employees, onImportComplete }) => {
           <div className="space-y-4">
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
               <Upload className="w-12 h-12 mx-auto text-gray-400 mb-4" />
-              <p className="text-gray-600 mb-4">Upload your fingerprint device export file (.dat, .txt, .csv)</p>
+              <p className="text-gray-600 mb-4">Upload your fingerprint device export file (.dat, .txt, .csv, .xlsx, .xls)</p>
               <input
                 type="file"
-                accept=".dat,.txt,.csv"
+                accept=".dat,.txt,.csv,.xlsx,.xls"
                 onChange={handleFileUpload}
                 className="hidden"
                 id="file-upload"
