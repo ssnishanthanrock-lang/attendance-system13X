@@ -546,7 +546,7 @@ export default function Payroll() {
                         
                         return (
                           <tr key={emp.employee_id} className="hover:bg-gray-50">
-                            <td className="border border-gray-300 px-2 py-3 text-center text-sm">{index + 1}</td>
+                            <td className="border border-gray-300 px-2 py-2 text-center text-sm">{index + 1}</td>
                             <td className="border border-gray-300 px-2 py-2">
                               <p className="font-semibold text-sm whitespace-nowrap">
                                 {emp.employee_name}
@@ -556,17 +556,17 @@ export default function Payroll() {
                               </p>
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm font-semibold bg-yellow-50">
                               {emp.basic_salary.toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm bg-yellow-50">
                               {daySalary.toLocaleString(undefined, {maximumFractionDigits: 2})}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm bg-yellow-50">
                               {perMinuteSalary.toFixed(2)}
                             </td>
                             <td 
-                              className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50" 
+                              className="border border-gray-300 px-2 py-2 text-right text-sm font-semibold bg-yellow-50" 
                               title={emp.fixed_salary ? `Fixed Salary: Basic + Allowances` : `Total minutes: ${emp.total_attendance_minutes || 0} | Per minute: Rs ${perMinuteSalary.toFixed(2)}`}
                             >
                               <div className="flex items-center justify-end gap-1">
@@ -580,40 +580,40 @@ export default function Payroll() {
                               </div>
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-3 text-center text-sm font-semibold text-green-600 bg-green-50">
+                            <td className="border border-gray-300 px-2 py-2 text-center text-sm font-semibold text-green-600 bg-green-50">
                               {emp.present_days}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-orange-600 bg-green-50">
+                            <td className="border border-gray-300 px-2 py-2 text-center text-sm text-orange-600 bg-green-50">
                               {emp.leave_days}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-blue-600 bg-green-50">
+                            <td className="border border-gray-300 px-2 py-2 text-center text-sm text-blue-600 bg-green-50">
                               {emp.allowed_leaves || 0}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-blue-600 bg-green-50">
+                            <td className="border border-gray-300 px-2 py-2 text-center text-sm text-blue-600 bg-green-50">
                               {emp.allowed_half_days || 0}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-green-50" title={`Late minutes: ${emp.late_minutes} | Deducted: Rs ${emp.late_deduction.toFixed(2)}`}>
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm text-red-600 bg-green-50" title={`Late minutes: ${emp.late_minutes} | Deducted: Rs ${emp.late_deduction.toFixed(2)}`}>
                               {emp.late_deduction.toLocaleString(undefined, {maximumFractionDigits: 2})}
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-blue-50">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm bg-blue-50">
                               {emp.allowances.toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600 bg-blue-50">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm text-green-600 bg-blue-50">
                               {(emp.extra_payment || 0).toLocaleString()}
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm text-red-600 bg-red-50">
                               {emp.advances.toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm text-red-600 bg-red-50">
                               {(emp.loan_deduction || 0).toLocaleString()}
                             </td>
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm text-red-600 bg-red-50">
                               {emp.other_deductions.toLocaleString()}
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-100">
+                            <td className="border border-gray-300 px-2 py-2 text-right text-sm font-bold text-green-700 bg-green-100">
                               <div className="flex items-center justify-end gap-1">
                                 <span>{emp.net_salary.toFixed(2)}</span>
                                 {!emp.fixed_salary && month === new Date().toISOString().slice(0, 7) && (
@@ -625,7 +625,7 @@ export default function Payroll() {
                               </div>
                             </td>
                             
-                            <td className="border border-gray-300 px-2 py-3 text-center">
+                            <td className="border border-gray-300 px-2 py-2 text-center">
                               <Button
                                 onClick={() => setViewingSalarySlip(emp)}
                                 size="sm"
@@ -648,40 +648,40 @@ export default function Payroll() {
                         <td colSpan="2" className="border border-gray-300 px-3 py-3 text-center text-sm">
                           TOTAL
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.basic_salary, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.earnings || 0), 0).toLocaleString(undefined, {maximumFractionDigits: 2})}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                        <td className="border border-gray-300 px-2 py-2 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-2 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-2 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-2 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.late_deduction, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600">
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm text-green-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.extra_payment || 0), 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm text-red-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.advances, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm text-red-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.loan_deduction || 0), 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm text-red-600">
                           {detailedPayroll.employees.reduce((sum, emp) => sum + emp.other_deductions, 0).toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-200">
+                        <td className="border border-gray-300 px-2 py-2 text-right text-sm font-bold text-green-700 bg-green-200">
                           {detailedPayroll.total_net.toLocaleString()}
                         </td>
-                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-2 text-center text-sm">-</td>
                       </tr>
                     </tfoot>
                     </table>
