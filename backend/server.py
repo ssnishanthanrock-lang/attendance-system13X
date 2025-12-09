@@ -3405,7 +3405,8 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         "employees": detailed_records,
         "total_gross": sum([r["gross_salary"] for r in detailed_records]),
         "total_net": sum([r["net_salary"] for r in detailed_records]),
-        "total_deductions": sum([r["total_deductions"] for r in detailed_records])
+        "total_deductions": sum([r["total_deductions"] for r in detailed_records]),
+        "total_allowances": sum([r["allowances"] for r in detailed_records])
     }
 
 
