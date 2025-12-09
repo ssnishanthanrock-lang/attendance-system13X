@@ -1400,59 +1400,6 @@ class ERPTester:
                 
         except Exception as e:
             self.log_result("Payroll Discrepancy Investigation", False, f"Investigation error: {str(e)}")
-                if live_sample_employee and detailed_sample_employee:
-                    # Check if it's a formula difference
-                    live_includes_extra = live_sample_employee.get("extra_payment", 0) > 0
-                    if live_includes_extra:
-                        root_causes.append("Live endpoint includes extra_payments, detailed endpoint may not")
-                    
-                    # Check if it's allowances handling
-                    live_allowances = live_sample_employee.get("allowances", 0)
-                    detailed_allowances = detailed_sample_employee.get("allowances", 0)
-                    if live_allowances != detailed_allowances:
-                        root_causes.append("Allowances calculation differs between endpoints")
-                
-                # Check if it's timing issue
-                if "timestamp" in live_data:
-                    root_causes.append("Timing issue - live endpoint fetched at different time")
-            
-            if not root_causes:
-                root_causes.append("No significant discrepancy found")
-            
-            print(f"   🔍 Identified Root Causes:")
-            for i, cause in enumerate(root_causes, 1):
-                print(f"      {i}. {cause}")
-            
-            # Step 7: Final assessment and recommendation
-            print("📋 Step 7: Final Assessment and Recommendation...")
-            
-            if difference_lkr == 0:
-                assessment = "✅ PERFECT MATCH - No discrepancy found"
-                recommendation = "No action needed - both endpoints return identical values"
-                success = True
-            elif difference_lkr <= 100:  # Within 100 LKR tolerance
-                assessment = f"✅ ACCEPTABLE DIFFERENCE - {difference_lkr:,.2f} LKR difference is within tolerance"
-                recommendation = "Monitor for consistency, but no immediate action required"
-                success = True
-            else:
-                assessment = f"❌ SIGNIFICANT DISCREPANCY - {difference_lkr:,.2f} LKR difference exceeds tolerance"
-                recommendation = f"Investigation required: {', '.join(root_causes)}"
-                success = False
-            
-            print(f"   {assessment}")
-            print(f"   💡 Recommendation: {recommendation}")
-            
-            self.log_result("Payroll Investigation - Final Assessment", success, 
-                          assessment,
-                          {"difference_lkr": difference_lkr,
-                           "percentage_diff": percentage_diff,
-                           "root_causes": root_causes,
-                           "recommendation": recommendation,
-                           "working_days_consistent": working_days_consistent})
-                
-        except Exception as e:
-            self.log_result("Payroll Discrepancy Investigation", False, 
-                          f"Payroll discrepancy test error: {str(e)}")
     
     def test_live_payroll_current_month(self):
         """Test GET /api/payroll/live-current-month endpoint (REVIEW REQUEST FOCUS)"""
