@@ -3043,7 +3043,7 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
     # Get all employees in company
     employees = await db.users.find(
         {"company_id": current_user.company_id, "role": {"$in": ["admin", "employee", "manager", "staff_member"]}},
-        {"_id": 0, "id": 1, "name": 1, "employee_id": 1}
+        {"_id": 0, "id": 1, "name": 1, "employee_id": 1, "profile_pic": 1}
     ).to_list(length=None)
     
     # Get attendance for the date
@@ -3052,14 +3052,20 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
         {"_id": 0}
     ).to_list(length=None)
     
-    # Create a map of employee_id to attendance
+    # Create a map of employee_id to attendance and profile pic
     attendance_map = {record["employee_id"]: record for record in attendance_records}
+    employee_profile_map = {emp["id"]: emp.get("profile_pic") for emp in employees}
+    employee_display_id_map = {emp["id"]: emp.get("employee_id") for emp in employees}
     
     # Build complete attendance list (including absent employees)
     all_attendance = []
     for employee in employees:
         if employee["id"] in attendance_map:
-            all_attendance.append(attendance_map[employee["id"]])
+            # Add profile pic to existing attendance record
+            record = attendance_map[employee["id"]]
+            record["profile_pic"] = employee_profile_map.get(employee["id"])
+            record["employee_id_display"] = employee_display_id_map.get(employee["id"])
+            all_attendance.append(record)
         else:
             # Employee has no record for this date - mark as absent
             all_attendance.append({
@@ -3067,6 +3073,7 @@ async def get_attendance_by_date(date: str, current_user: User = Depends(get_cur
                 "employee_id": employee["id"],
                 "employee_name": employee["name"],
                 "employee_id_display": employee.get("employee_id"),
+                "profile_pic": employee.get("profile_pic"),
                 "company_id": current_user.company_id,
                 "date": date,
                 "status": "absent",
