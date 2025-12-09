@@ -38,6 +38,15 @@ export default function Dashboard() {
     }
   }, []);
 
+  const fetchCompanyInfo = async () => {
+    try {
+      const response = await api.get('/company/info');
+      setCompanyInfo(response.data);
+    } catch (error) {
+      console.error('Error fetching company info:', error);
+    }
+  };
+
   const fetchStats = async () => {
     try {
       const response = await api.get('/dashboard/stats');
