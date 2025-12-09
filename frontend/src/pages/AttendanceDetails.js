@@ -74,7 +74,12 @@ export default function AttendanceDetails() {
     setLoading(true);
     try {
       const response = await api.get(`/attendance/date/${date}`);
-      setAttendance(response.data.attendance || []);
+      // Store base earnings for live increment calculation
+      const attendanceWithBase = (response.data.attendance || []).map(record => ({
+        ...record,
+        baseEarnings: record.earnings // Store initial earnings from backend
+      }));
+      setAttendance(attendanceWithBase);
       setTotalEarnings(response.data.total_earnings || 0);
       setLastFetchTime(Date.now()); // Track when we fetched from backend
       
