@@ -19,6 +19,7 @@ export default function AttendanceDetails() {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
   const [user, setUser] = useState(null);
+  const [lastFetchTime, setLastFetchTime] = useState(null);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem('user'));
