@@ -3385,7 +3385,7 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         
         # Calculate total attendance minutes
         total_attendance_minutes = 0
-        now = datetime.now(timezone.utc)
+        now = datetime.now()
         today_str = now.strftime("%Y-%m-%d")
         
         # For present days with check-in/out
