@@ -3590,7 +3590,11 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
                     if checkout_dt.tzinfo is None:
                         checkout_dt = checkout_dt.replace(tzinfo=timezone.utc)
                     duration = checkout_dt - checkin_dt
-                    total_attendance_minutes += int(duration.total_seconds() / 60)
+                    minutes_worked = int(duration.total_seconds() / 60)
+                    total_attendance_minutes += minutes_worked
+                    # If this is today's completed record, track it
+                    if record_date == today_str:
+                        today_minutes += minutes_worked
                 except Exception as e:
                     pass
             # For today's ongoing attendance (checked in but not out yet)
