@@ -3472,10 +3472,6 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         total_deductions = late_deduction + total_advances + other_deductions + loan_deduction
         net_salary = gross_salary + allowances_to_add - total_deductions
         
-        # Calculate today's earnings for this employee
-        today_earnings = today_minutes * salary_per_minute if not employee.get("fixed_salary", False) else 0
-        today_total_earnings += today_earnings
-        
         detailed_records.append({
             "employee_id": employee["id"],
             "employee_name": employee["name"],
