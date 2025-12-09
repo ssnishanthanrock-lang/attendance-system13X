@@ -355,6 +355,19 @@ export default function AttendanceDetails() {
                     ))
                   )}
                 </tbody>
+                {/* Total Earnings Footer */}
+                <tfoot className="bg-gradient-to-r from-green-50 to-emerald-50 border-t-4 border-green-500">
+                  <tr>
+                    <td colSpan={canEdit ? 7 : 6} className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        <span className="text-lg font-bold text-gray-700">Total Earnings:</span>
+                        <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-lg shadow-lg">
+                          <span className="text-2xl font-bold">Rs {totalEarnings.toLocaleString()}</span>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </CardContent>
