@@ -25,14 +25,41 @@ export default function AttendanceDetails() {
     setUser(userData);
     fetchAttendanceForDate(selectedDate);
 
-    // If viewing today's date, refresh every 10 seconds for live earnings
+    // For today's date, update earnings every second without page refresh
     const today = new Date().toISOString().split('T')[0];
     let intervalId;
     
     if (selectedDate === today) {
       intervalId = setInterval(() => {
-        fetchAttendanceForDate(selectedDate);
-      }, 10000); // Refresh every 10 seconds
+        // Update only the earnings and total without fetching
+        setAttendance(prevAttendance => {
+          let newTotal = 0;
+          const updatedAttendance = prevAttendance.map(record => {
+            if (record.check_in && !record.check_out && record.earnings) {
+              // Calculate updated earnings for ongoing attendance
+              const checkinTime = new Date(record.check_in);
+              const now = new Date();
+              const minutesWorked = Math.floor((now - checkinTime) / (1000 * 60));
+              
+              // Estimate per-minute rate from current earnings
+              const originalCheckin = new Date(record.check_in);
+              const originalMinutes = Math.floor((new Date() - originalCheckin) / (1000 * 60));
+              const perMinuteRate = originalMinutes > 0 ? record.earnings / originalMinutes : 0;
+              
+              const newEarnings = minutesWorked * perMinuteRate;
+              newTotal += newEarnings;
+              
+              return { ...record, earnings: newEarnings };
+            } else {
+              newTotal += record.earnings || 0;
+              return record;
+            }
+          });
+          
+          setTotalEarnings(newTotal);
+          return updatedAttendance;
+        });
+      }, 1000); // Update every second
     }
 
     return () => {
