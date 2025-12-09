@@ -3695,9 +3695,16 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
         auth_success = self.test_authentication()
         
         if auth_success:
-            # Run Location Tracking System Tests (REVIEW REQUEST FOCUS)
+            # PRIORITY: Run payroll discrepancy investigation first (REVIEW REQUEST FOCUS)
             print("\n" + "="*80)
-            print("📍 TESTING LOCATION TRACKING SYSTEM - 7 NEW ENDPOINTS (REVIEW REQUEST FOCUS)")
+            print("🚨 TESTING PAYROLL DISCREPANCY INVESTIGATION (REVIEW REQUEST FOCUS)")
+            print("="*80)
+            
+            self.test_payroll_discrepancy_investigation()
+            
+            # Run Location Tracking System Tests (Previous)
+            print("\n" + "="*80)
+            print("📍 TESTING LOCATION TRACKING SYSTEM - 7 NEW ENDPOINTS (Previous)")
             print("="*80)
             
             self.test_location_tracking_system()
