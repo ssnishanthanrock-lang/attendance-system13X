@@ -982,6 +982,18 @@ backend:
         agent: "testing"
         comment: "✅ DECEMBER 2025 WORKING DAYS BUG FIX VERIFIED: Successfully tested the fix for hardcoded working_days = 26 → dynamic calculation = 27. COMPREHENSIVE TEST RESULTS: 1) GET /api/payroll/detailed/2025-12 returns correct data with all 21 employees having working_days = 27.0 (not hardcoded 26). 2) Day salary calculations correctly use 27 working days: salary_per_minute = basic_salary / (27 * 8 * 60). 3) 50K salary employees: Expected day salary = 1851.85, actual = 1852.80 (0.95 difference due to rounding in salary_per_minute field, but calculation confirmed using 27 days not 26). 4) Backend logs show 'DEBUG DETAILED PAYROLL: Month=2025-12, Calculated Working Days=27' confirming calculate_working_days() function is working. 5) Comparison test: New calculation (27 days) = 3.86 per minute vs Old calculation (26 days) = 4.01 per minute - confirmed using NEW calculation. 6) All employees show working_days = 27.0 in response. BUG FIX SUCCESSFUL: The calculate_working_days() function is properly replacing the hardcoded 26 value with dynamic calculation of 27 for December 2025."
 
+  - task: "Super Admin Re-send URL to Admin Feature"
+    implemented: true
+    working: false
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: false
+        agent: "testing"
+        comment: "❌ SUPER ADMIN RE-SEND URL FEATURE TESTING FAILED - AUTHENTICATION ISSUES: Comprehensive testing of the newly implemented 'Re-send URL to Admin' feature revealed critical authentication problems. BACKEND IMPLEMENTATION VERIFIED: ✅ GET /api/superadmin/companies/{company_id}/admins endpoint implemented (lines 812-824), ✅ POST /api/superadmin/companies/{company_id}/resend-url endpoint implemented (lines 826-864), ✅ Both endpoints require super_admin role authentication, ✅ Response structure includes message, admin_name, admin_mobile fields, ✅ SMS sending uses default system gateway (same as OTP), ✅ Activity logging implemented for audit trail. CRITICAL AUTHENTICATION ISSUES: ❌ Super admin token creation fails - all requests return 403 'Super admin access required', ❌ Test company ID dc1ff8de-3db3-4885-b6b7-168b00e3cef5 cannot be accessed, ❌ Cannot test single admin scenario (expected: Test Admin 0712345678), ❌ Cannot test multiple admins scenario (expected: Second Admin 0778888888), ❌ Error handling tests fail due to authentication barrier. ROOT CAUSE: No valid super admin users exist in the system or JWT token generation for super admin role is not working correctly. RECOMMENDATION: Create a valid super admin user in the database or fix super admin authentication to enable proper testing of this feature. The backend implementation appears correct but cannot be verified due to authentication limitations."
+
   - task: "Timezone Bug Fix Verification - 330 Minute Discrepancy"
     implemented: true
     working: true
