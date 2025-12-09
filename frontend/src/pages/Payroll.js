@@ -447,7 +447,7 @@ export default function Payroll() {
                 <div className={`grid grid-cols-1 ${detailedPayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Gross</p>
+                      <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
                       <p className="text-2xl font-bold text-blue-700">Rs {detailedPayroll.total_gross?.toLocaleString()}</p>
                     </CardContent>
                   </Card>
@@ -470,7 +470,7 @@ export default function Payroll() {
                   
                   <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
                     <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Net</p>
+                      <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
                       <p className="text-2xl font-bold text-green-700">Rs {detailedPayroll.total_net?.toLocaleString()}</p>
                     </CardContent>
                   </Card>
