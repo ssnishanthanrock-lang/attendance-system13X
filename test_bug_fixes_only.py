@@ -14,7 +14,7 @@ import time
 
 # Load environment variables
 load_dotenv('/app/frontend/.env')
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://attendance-tracker-260.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://erp-attendance-5.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class BugFixTester:
