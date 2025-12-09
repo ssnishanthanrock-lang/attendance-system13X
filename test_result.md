@@ -968,6 +968,71 @@ backend:
       - Loading states during parse and import
       - Toast notifications for success/errors
 
+  - agent: "testing"
+    message: |
+      ❌ CRITICAL AUTHENTICATION ISSUE BLOCKING SUPER ADMIN FEATURE TESTING
+      
+      TESTING REQUEST: Test "Re-send URL to Admin" feature in SuperAdminCompanyDetail.js
+      
+      AUTHENTICATION FAILURE:
+      - Unable to login as Super Admin (0773966920) - "User not found" error in backend logs
+      - This is consistent with previous test results indicating no Super Admin users exist in system
+      - Backend logs show: "Token validation error: 401: User not found"
+      
+      FRONTEND CODE ANALYSIS COMPLETED (100% Implementation Verified):
+      
+      ✅ BUTTON IMPLEMENTATION:
+      - "Re-send URL to Admin" button correctly positioned after status change buttons
+      - Proper blue styling: bg-blue-50, text-blue-700, border-blue-300, hover:bg-blue-100
+      - Send icon from lucide-react included
+      - onClick handler: handleResendUrl()
+      
+      ✅ CONDITIONAL LOGIC:
+      - Single admin (admins.length === 1): Shows confirmation dialog directly
+      - Multiple admins: Shows admin selection dialog first
+      - No admins: Shows error toast "No admin users found for this company"
+      
+      ✅ ADMIN SELECTION DIALOG (Multiple Admins):
+      - Title: "Select Admin to Send URL"
+      - Description: "Choose which admin should receive the company URL via SMS"
+      - Admin list with name and mobile display
+      - Cursor pointer styling for clickable items
+      - Send icon for each admin
+      - Click handler to select admin and proceed to confirmation
+      
+      ✅ CONFIRMATION DIALOG:
+      - Title: "Confirm SMS Send"
+      - Admin details in blue box (bg-blue-50, border-blue-200)
+      - Message preview showing: "Your company portal: {company.name}. Login with mobile {admin.mobile} at: https://paystack-app.preview.emergentagent.com"
+      - Cancel button (closes dialog, resets state)
+      - Send SMS button with loading state
+      
+      ✅ LOADING STATES:
+      - Send SMS button shows spinner animation during API call
+      - Button text changes to "Sending..." with spinner
+      - Button disabled during loading (sendingUrl state)
+      
+      ✅ API INTEGRATION:
+      - POST /api/superadmin/companies/{companyId}/resend-url?admin_id={adminId}
+      - Proper error handling with try/catch
+      - Response data includes admin_name and admin_mobile
+      
+      ✅ TOAST NOTIFICATIONS:
+      - Success: Green toast with admin details "URL sent successfully to {admin_name} ({admin_mobile})"
+      - Error: Red toast with error message or "Failed to send SMS"
+      - Proper styling with background colors
+      
+      ✅ STATE MANAGEMENT:
+      - showAdminSelectDialog, showConfirmDialog, selectedAdmin, sendingUrl states
+      - Proper state cleanup after success/cancel
+      - Dialog open/close handling
+      
+      CRITICAL BLOCKER:
+      The feature UI is 100% correctly implemented per requirements, but cannot be functionally tested due to Super Admin authentication failure. The system needs a valid Super Admin user to proceed with testing.
+      
+      RECOMMENDATION:
+      Main agent must create Super Admin user in the system or fix authentication before this feature can be functionally verified.
+
   - task: "Live payroll endpoint for current month"
     implemented: true
     working: true
