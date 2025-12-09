@@ -17,6 +17,11 @@ export default function SuperAdminCompanyDetail() {
   const navigate = useNavigate();
   const [company, setCompany] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [admins, setAdmins] = useState([]);
+  const [showAdminSelectDialog, setShowAdminSelectDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+  const [sendingUrl, setSendingUrl] = useState(false);
   const [smsSettings, setSmsSettings] = useState({
     sms_gateway: 'textit',
     sms_enabled: false,
