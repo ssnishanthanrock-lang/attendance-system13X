@@ -478,29 +478,29 @@ export default function Dashboard() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Gross (So Far)</p>
-                      <p className="text-2xl font-bold text-blue-700">Rs {livePayroll.total_gross?.toLocaleString()}</p>
+                    <CardContent className="p-3 text-center">
+                      <p className="text-xs text-gray-600 mb-1">Total Gross (So Far)</p>
+                      <p className="text-xl font-bold text-blue-700">Rs {livePayroll.total_gross?.toLocaleString()}</p>
                     </CardContent>
                   </Card>
                   {livePayroll.total_allowances > 0 && (
                     <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
-                      <CardContent className="p-4 text-center">
-                        <p className="text-sm text-gray-600 mb-1">Total Allowances</p>
-                        <p className="text-2xl font-bold text-purple-700">Rs {livePayroll.total_allowances?.toLocaleString()}</p>
+                      <CardContent className="p-3 text-center">
+                        <p className="text-xs text-gray-600 mb-1">Total Allowances</p>
+                        <p className="text-xl font-bold text-purple-700">Rs {livePayroll.total_allowances?.toLocaleString()}</p>
                       </CardContent>
                     </Card>
                   )}
                   <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
-                      <p className="text-2xl font-bold text-red-700">Rs {livePayroll.total_deductions?.toLocaleString()}</p>
+                    <CardContent className="p-3 text-center">
+                      <p className="text-xs text-gray-600 mb-1">Total Deductions</p>
+                      <p className="text-xl font-bold text-red-700">Rs {livePayroll.total_deductions?.toLocaleString()}</p>
                     </CardContent>
                   </Card>
                   <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                    <CardContent className="p-4 text-center">
-                      <p className="text-sm text-gray-600 mb-1">Total Net (So Far)</p>
-                      <p className="text-2xl font-bold text-green-700">Rs {livePayroll.total_net?.toLocaleString()}</p>
+                    <CardContent className="p-3 text-center">
+                      <p className="text-xs text-gray-600 mb-1">Total Net (So Far)</p>
+                      <p className="text-xl font-bold text-green-700">Rs {livePayroll.total_net?.toLocaleString()}</p>
                     </CardContent>
                   </Card>
                 </CardContent>
