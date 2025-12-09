@@ -815,8 +815,135 @@ export default function Employees() {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+
+        {/* Employees Table View */}
+        {viewMode === 'table' && (
+          <div className="overflow-x-auto bg-white rounded-lg shadow">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mobile</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Position</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salary</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {filteredEmployees.map((employee) => (
+                  <tr key={employee.id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {employee.profile_pic ? (
+                          <img 
+                            src={employee.profile_pic} 
+                            alt={employee.name} 
+                            className="w-10 h-10 rounded-full object-cover mr-3"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold mr-3">
+                            {employee.name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                          </div>
+                        )}
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">{employee.name}</div>
+                          {employee.email && <div className="text-sm text-gray-500">{employee.email}</div>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.employee_id || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.mobile}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.department || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{employee.position || '-'}</td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">Rs. {employee.basic_salary.toLocaleString()}</div>
+                      {employee.allowances > 0 && (
+                        <div className="text-xs text-green-600">+{employee.allowances.toLocaleString()} (allowances)</div>
+                      )}
+                      {pendingIncrements[employee.id] && (
+                        <div className="text-xs text-amber-600 mt-1">
+                          Pending: +{pendingIncrements[employee.id].toLocaleString()}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-block text-xs px-2 py-1 rounded-full ${
+                        employee.role === 'admin'
+                          ? 'bg-red-100 text-red-700'
+                          : employee.role === 'manager'
+                          ? 'bg-blue-100 text-blue-700'
+                          : employee.role === 'employee'
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-700'
+                      }`}>
+                        {employee.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEditingEmployee(employee);
+                            setDialogOpen(true);
+                          }}
+                          disabled={!canEdit}
+                          title={!canEdit ? "Read-only access" : "Edit Employee"}
+                          className="disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setEmployeeToDelete(employee);
+                            setDeleteDialogOpen(true);
+                          }}
+                          disabled={!canEdit}
+                          title={!canEdit ? "Read-only access" : "Delete Employee"}
+                          className="text-red-600 border-red-200 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                        {user?.role === 'admin' && (
+                          <>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenIncrementDialog(employee)}
+                              disabled={!canEdit}
+                              title={!canEdit ? "Read-only access" : "Add Salary Increment"}
+                              className="border-green-200 text-green-600 hover:bg-green-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <TrendingUp className="w-4 h-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleOpenIncrementHistory(employee)}
+                              title="View Increment History"
+                              className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                            >
+                              <History className="w-4 h-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
 
         {filteredEmployees.length === 0 && (
           <div className="text-center py-12">
