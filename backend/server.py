@@ -3362,8 +3362,8 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         except:
             pass
     
-    # Get working days for the month
-    year, month_num = month.split("-")
+    # Get working days for the month from settings
+    settings = company.get("settings", {})
     working_days_data = settings.get("working_days", {}) if settings else {}
     working_days = working_days_data.get(month, 26)  # default 26
     
