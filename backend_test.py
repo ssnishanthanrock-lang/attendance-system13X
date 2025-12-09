@@ -4811,6 +4811,13 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
             
             self.test_super_admin_functionality()
             
+            # NEW: Super Admin Re-send URL to Admin Feature Testing (CURRENT REVIEW REQUEST)
+            print("\n" + "="*80)
+            print("📧 TESTING SUPER ADMIN RE-SEND URL TO ADMIN FEATURE (CURRENT REVIEW REQUEST)")
+            print("="*80)
+            
+            self.test_super_admin_resend_url_feature()
+            
             # Run Invoicing System Tests (Previous)
             print("\n" + "="*80)
             print("🧾 TESTING INVOICING SYSTEM (Previous)")
