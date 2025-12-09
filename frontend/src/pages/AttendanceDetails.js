@@ -26,12 +26,30 @@ export default function AttendanceDetails() {
     setUser(userData);
     fetchAttendanceForDate(selectedDate);
 
-    // For today's date, update earnings every second for SUPER LIVE VIEW
     const today = new Date().toISOString().split('T')[0];
-    let intervalId;
+    let liveCounterInterval;
+    let refreshInterval;
+    
+    if (selectedDate === today) {
+      // Refresh from backend every 5 seconds to keep base values accurate
+      refreshInterval = setInterval(() => {
+        fetchAttendanceForDate(selectedDate);
+      }, 5000);
+    }
+
+    return () => {
+      if (liveCounterInterval) clearInterval(liveCounterInterval);
+      if (refreshInterval) clearInterval(refreshInterval);
+    };
+  }, [selectedDate]);
+
+  // Separate effect for live counter - runs every second
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    let liveCounterInterval;
     
     if (selectedDate === today && lastFetchTime) {
-      intervalId = setInterval(() => {
+      liveCounterInterval = setInterval(() => {
         // Increment earnings from backend's base value by elapsed seconds
         const secondsSinceLastFetch = Math.floor((Date.now() - lastFetchTime) / 1000);
         
@@ -66,7 +84,7 @@ export default function AttendanceDetails() {
     }
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
+      if (liveCounterInterval) clearInterval(liveCounterInterval);
     };
   }, [selectedDate, lastFetchTime]);
 
