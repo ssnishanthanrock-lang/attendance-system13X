@@ -337,7 +337,8 @@ export default function Payroll() {
                   </Card>
                 </div>
                 
-                {/* Employee Cards Grid */}
+                {/* Card View */}
+                {viewMode === 'card' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {detailedPayroll.employees.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((emp) => (
                     <Card key={emp.employee_id} className="hover:shadow-lg transition-shadow">
