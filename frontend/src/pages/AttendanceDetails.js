@@ -285,7 +285,7 @@ export default function AttendanceDetails() {
                       </td>
                     </tr>
                   ) : (
-                    attendance.map((record) => (
+                    attendance.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((record) => (
                       <tr key={record.id || record.employee_id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
