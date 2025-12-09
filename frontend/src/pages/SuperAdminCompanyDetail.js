@@ -45,6 +45,7 @@ export default function SuperAdminCompanyDetail() {
 
   useEffect(() => {
     fetchCompany();
+    fetchAdmins();
   }, [companyId]);
 
   const fetchCompany = async () => {
@@ -71,6 +72,50 @@ export default function SuperAdminCompanyDetail() {
       toast.error('Failed to fetch company details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAdmins = async () => {
+    try {
+      const response = await api.get(`/superadmin/companies/${companyId}/admins`);
+      setAdmins(response.data);
+    } catch (error) {
+      console.error('Failed to fetch admins:', error);
+    }
+  };
+
+  const handleResendUrl = () => {
+    if (admins.length === 0) {
+      toast.error('No admin users found for this company');
+      return;
+    }
+    
+    if (admins.length === 1) {
+      // Only one admin - show confirmation dialog
+      setSelectedAdmin(admins[0]);
+      setShowConfirmDialog(true);
+    } else {
+      // Multiple admins - show selection dialog
+      setShowAdminSelectDialog(true);
+    }
+  };
+
+  const handleSendUrlToAdmin = async (adminId) => {
+    setSendingUrl(true);
+    try {
+      const response = await api.post(`/superadmin/companies/${companyId}/resend-url?admin_id=${adminId}`);
+      toast.success(`URL sent successfully to ${response.data.admin_name} (${response.data.admin_mobile})`, {
+        style: { background: '#10b981', color: 'white' }
+      });
+      setShowAdminSelectDialog(false);
+      setShowConfirmDialog(false);
+      setSelectedAdmin(null);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to send SMS', {
+        style: { background: '#ef4444', color: 'white' }
+      });
+    } finally {
+      setSendingUrl(false);
     }
   };
 
