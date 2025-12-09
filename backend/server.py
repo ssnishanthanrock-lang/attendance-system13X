@@ -3568,10 +3568,16 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
             elif record_date == today_str and record.get("check_in") and not record.get("check_out"):
                 try:
                     checkin_dt = datetime.fromisoformat(record["check_in"])
+                    # Make timezone-aware if needed
+                    if checkin_dt.tzinfo is None:
+                        checkin_dt = checkin_dt.replace(tzinfo=timezone.utc)
                     # Calculate up to current time
                     duration = now - checkin_dt
-                    total_attendance_minutes += int(duration.total_seconds() / 60)
-                except:
+                    minutes_worked = int(duration.total_seconds() / 60)
+                    total_attendance_minutes += minutes_worked
+                    print(f"DEBUG: Employee {employee['name']} - Today's ongoing attendance: {minutes_worked} minutes")
+                except Exception as e:
+                    print(f"DEBUG: Error calculating ongoing attendance: {e}")
                     pass
         
         # Add allowed leaves (count as worked time)
