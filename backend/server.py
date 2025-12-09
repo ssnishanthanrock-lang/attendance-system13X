@@ -3942,10 +3942,37 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
         
         # Check if it's an Excel file
         if request.file_content.startswith('[EXCEL_FILE]'):
-            raise HTTPException(
-                status_code=400, 
-                detail="Excel files are not yet supported. Please export your file as .dat, .txt, or .csv format from your device software."
-            )
+            print("DEBUG: Processing Excel file")
+            # Extract the base64 data
+            parts = request.file_content.split('\n', 2)
+            if len(parts) < 3:
+                raise HTTPException(status_code=400, detail="Invalid Excel file format")
+            
+            filename = parts[1]
+            base64_data = parts[2].split(',', 1)[1] if ',' in parts[2] else parts[2]
+            
+            # Decode base64
+            import base64
+            import io
+            from openpyxl import load_workbook
+            
+            excel_data = base64.b64decode(base64_data)
+            excel_file = io.BytesIO(excel_data)
+            
+            # Load workbook
+            wb = load_workbook(excel_file)
+            sheet = wb.active
+            
+            # Convert Excel to text format
+            lines = []
+            for row in sheet.iter_rows(values_only=True):
+                if row and any(cell is not None for cell in row):
+                    # Join cells with tab
+                    line = '\t'.join(str(cell) if cell is not None else '' for cell in row)
+                    lines.append(line)
+            
+            request.file_content = '\n'.join(lines)
+            print(f"DEBUG: Converted Excel to {len(lines)} lines")
         
         # Parse the file content
         lines = request.file_content.strip().split('\n')
