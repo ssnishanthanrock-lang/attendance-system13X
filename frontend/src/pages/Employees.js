@@ -67,6 +67,8 @@ export default function Employees() {
   });
   const [showFailedDialog, setShowFailedDialog] = useState(false);
   const [viewMode, setViewMode] = useState('table'); // 'card' or 'table' - default to table
+  const [sortField, setSortField] = useState('name'); // 'name', 'mobile', 'position', 'salary', 'role'
+  const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
 
   // Check if user can edit (not read-only impersonation)
   const canEdit = !isImpersonating() || canEditInImpersonation();
