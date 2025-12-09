@@ -3705,9 +3705,12 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
             # For today's ongoing attendance (checked in but not out yet)
             elif record_date == today_str and record.get("check_in") and not record.get("check_out"):
                 try:
+                    from datetime import timedelta
                     checkin_dt = datetime.fromisoformat(record["check_in"])
-                    # Use naive datetime - compare local to local (same as detailed payroll)
-                    duration = now - checkin_dt
+                    # Server is in UTC, but check-ins are in Sri Lanka time (UTC+5:30)
+                    # Add 5.5 hours to server time to get Sri Lanka time for ongoing attendance
+                    now_srilanka = now + timedelta(hours=5, minutes=30)
+                    duration = now_srilanka - checkin_dt
                     minutes_worked = int(duration.total_seconds() / 60)
                     total_attendance_minutes += minutes_worked
                     today_minutes += minutes_worked  # Track today's minutes
