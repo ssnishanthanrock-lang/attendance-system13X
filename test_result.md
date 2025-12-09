@@ -770,10 +770,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Location Tracking Component - Employee Interface"
-    - "Attendance with Location Component"
-    - "Location Reports Page - Admin Interface"
-    - "Dashboard Integration"
+    - "Invoice Customers Management - Full CRUD"
+    - "Invoice Products Management - Full CRUD with Categories"
+    - "Estimates Management - Create, Edit, Convert"
+    - "Invoices Management - Create, Payments, Stock Reduction"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
