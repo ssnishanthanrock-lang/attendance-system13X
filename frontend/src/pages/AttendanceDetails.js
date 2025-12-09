@@ -410,7 +410,10 @@ export default function AttendanceDetails() {
                       <div className="flex items-center justify-end gap-3">
                         <span className="text-lg font-bold text-gray-700">Total Earnings:</span>
                         <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-2 rounded-lg shadow-lg">
-                          <span className="text-2xl font-bold">Rs {totalEarnings.toLocaleString()}</span>
+                          <span className="text-2xl font-bold">Rs {totalEarnings.toFixed(2)}</span>
+                          {selectedDate === new Date().toISOString().split('T')[0] && (
+                            <span className="ml-2 text-xs opacity-90 animate-pulse">● LIVE</span>
+                          )}
                         </div>
                       </div>
                     </td>
