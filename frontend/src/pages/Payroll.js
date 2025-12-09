@@ -17,8 +17,8 @@ export default function Payroll() {
   const [user, setUser] = useState(null);
   const [livePayroll, setLivePayroll] = useState(null);
   const liveIntervalRef = useRef(null);
-  const [viewMode, setViewMode] = useState('table'); // For monthly view: 'card' or 'table'
   const [viewingSalarySlip, setViewingSalarySlip] = useState(null);
+  const [viewMode, setViewMode] = useState('card'); // Always show card view
 
   // Determine view mode based on URL
   const isLiveView = !month; // If no month param, show live view
@@ -311,6 +311,16 @@ export default function Payroll() {
             </div>
             )}
 
+            {/* Table View for Live Payroll - Coming Soon Note */}
+            {viewMode === 'table' && (
+              <Card>
+                <CardContent className="p-6 text-center text-gray-600">
+                  <p className="text-lg">Table view for live payroll uses the same table structure as detailed month view.</p>
+                  <p className="mt-2">Click on any month card below to see the full table view with all details.</p>
+                </CardContent>
+              </Card>
+            )}
+
             {/* Monthly History Section - Below Live Tracker */}
             {months.length > 0 && (
               <div className="mt-8 pt-8 border-t border-gray-200">
@@ -545,15 +555,297 @@ export default function Payroll() {
                               <span>Late: {emp.late_minutes} min</span>
                             </div>
                           </div>
+                          
+                          {/* View Salary Slip Button */}
+                          <Button
+                            onClick={() => setViewingSalarySlip(emp)}
+                            variant="outline"
+                            size="sm"
+                            className="w-full flex items-center justify-center gap-2"
+                          >
+                            <FileText className="w-4 h-4" />
+                            View Salary Slip
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
                 </div>
               </>
+            )}
+
+            {/* Table View */}
+            {viewMode === 'table' && (
+              <>
+              <Card>
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                  <table className="w-full min-w-max border-collapse">
+                    {/* Header */}
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th colSpan="2" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-blue-100">
+                          Employee Details
+                        </th>
+                        <th colSpan="4" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-yellow-100">
+                          Salary
+                        </th>
+                        <th colSpan="5" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-green-100">
+                          Attendance
+                        </th>
+                        <th colSpan="2" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-blue-100">
+                          Extra
+                        </th>
+                        <th colSpan="3" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-red-100">
+                          Deductions
+                        </th>
+                        <th colSpan="1" className="border border-gray-300 px-3 py-2 text-center font-bold text-sm bg-green-200">
+                          Net Salary
+                        </th>
+                      </tr>
+                      <tr className="bg-gray-50">
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">No</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Employee Name</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Basic Salary</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Day Salary</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Minute Salary</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-yellow-50">Gross</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Present</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Leave</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Allowed Leaves</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Allowed Half</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-50">Late Salary</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Allowances</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-blue-50">Extra Payment</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Advance</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Loan</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-red-50">Other</th>
+                        
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-green-100">Net</th>
+                        <th className="border border-gray-300 px-2 py-2 text-xs font-semibold bg-gray-100">Action</th>
+                      </tr>
+                    </thead>
+
+                    {/* Body */}
+                    <tbody>
+                      {detailedPayroll.employees.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((emp, index) => {
+                        const daySalary = emp.working_days > 0 ? (emp.basic_salary / emp.working_days) : 0;
+                        const perMinuteSalary = emp.salary_per_minute || 0;
+                        const earnings = emp.earnings || 0; // Use backend calculated earnings
+                        
+                        return (
+                          <tr key={emp.employee_id} className="hover:bg-gray-50">
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm">{index + 1}</td>
+                            <td className="border border-gray-300 px-3 py-3">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full flex-shrink-0">
+                                  {emp.profile_picture && emp.profile_picture.trim() !== '' ? (
+                                    <img 
+                                      src={emp.profile_picture} 
+                                      alt={emp.employee_name} 
+                                      className="w-8 h-8 rounded-full object-cover"
+                                      onError={(e) => {
+                                        e.target.outerHTML = '<div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center"><svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg></div>';
+                                      }}
+                                    />
+                                  ) : (
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                      <User className="w-4 h-4 text-white" />
+                                    </div>
+                                  )}
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-sm whitespace-nowrap">{emp.employee_name}</p>
+                                  {emp.position && (
+                                    <span className="text-xs text-gray-500">{emp.position}</span>
+                                  )}
+                                  {emp.fixed_salary && (
+                                    <span className="text-xs text-blue-600 ml-1">(Fixed)</span>
+                                  )}
+                                </div>
+                              </div>
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50">
+                              {emp.basic_salary.toLocaleString()}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
+                              {daySalary.toLocaleString(undefined, {maximumFractionDigits: 2})}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-yellow-50">
+                              {perMinuteSalary.toFixed(2)}
+                            </td>
+                            <td 
+                              className="border border-gray-300 px-2 py-3 text-right text-sm font-semibold bg-yellow-50" 
+                              title={emp.fixed_salary ? `Fixed Salary: Basic + Allowances` : `Total minutes: ${emp.total_attendance_minutes || 0} | Per minute: Rs ${perMinuteSalary.toFixed(2)}`}
+                            >
+                              <div className="flex items-center justify-end gap-1">
+                                <span>{earnings.toFixed(2)}</span>
+                                {!emp.fixed_salary && month === new Date().toISOString().slice(0, 7) && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 bg-green-100 text-green-700 rounded text-xs animate-pulse">
+                                    <Radio className="w-2 h-2 mr-0.5" />
+                                    LIVE
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm font-semibold text-green-600 bg-green-50">
+                              {emp.present_days}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-orange-600 bg-green-50">
+                              {emp.leave_days}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-blue-600 bg-green-50">
+                              {emp.allowed_leaves || 0}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-center text-sm text-blue-600 bg-green-50">
+                              {emp.allowed_half_days || 0}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-green-50" title={`Late minutes: ${emp.late_minutes} | Deducted: Rs ${emp.late_deduction.toFixed(2)}`}>
+                              {emp.late_deduction.toLocaleString(undefined, {maximumFractionDigits: 2})}
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm bg-blue-50">
+                              {emp.allowances.toLocaleString()}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600 bg-blue-50">
+                              {(emp.extra_payment || 0).toLocaleString()}
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                              {emp.advances.toLocaleString()}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                              {(emp.loan_deduction || 0).toLocaleString()}
+                            </td>
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600 bg-red-50">
+                              {emp.other_deductions.toLocaleString()}
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-100">
+                              <div className="flex items-center justify-end gap-1">
+                                <span>{emp.net_salary.toFixed(2)}</span>
+                                {!emp.fixed_salary && month === new Date().toISOString().slice(0, 7) && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 bg-green-100 text-green-600 rounded text-xs animate-pulse">
+                                    <Radio className="w-2 h-2 mr-0.5" />
+                                    LIVE
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            
+                            <td className="border border-gray-300 px-2 py-3 text-center">
+                              <Button
+                                onClick={() => setViewingSalarySlip(emp)}
+                                size="sm"
+                                variant="outline"
+                                className="text-xs"
+                                title="View Salary Slip"
+                              >
+                                <FileText className="w-3 h-3 mr-1" />
+                                Slip
+                              </Button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+
+                    {/* Footer Totals */}
+                    <tfoot>
+                      <tr className="bg-gray-200 font-bold">
+                        <td colSpan="2" className="border border-gray-300 px-3 py-3 text-center text-sm">
+                          TOTAL
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.basic_salary, 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.earnings || 0), 0).toLocaleString(undefined, {maximumFractionDigits: 2})}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.late_deduction, 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.allowances, 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-green-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.extra_payment || 0), 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.advances, 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + (emp.loan_deduction || 0), 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm text-red-600">
+                          {detailedPayroll.employees.reduce((sum, emp) => sum + emp.other_deductions, 0).toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-right text-sm font-bold text-green-700 bg-green-200">
+                          {detailedPayroll.total_net.toLocaleString()}
+                        </td>
+                        <td className="border border-gray-300 px-2 py-3 text-center text-sm">-</td>
+                      </tr>
+                    </tfoot>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Summary Cards at Bottom - Only for Table View */}
+              <div className={`grid grid-cols-1 ${detailedPayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
+                <Card className="bg-blue-50 border-blue-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
+                    <p className="text-2xl font-bold text-blue-700">Rs {detailedPayroll.total_gross.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+                {detailedPayroll.total_allowances > 0 && (
+                  <Card className="bg-purple-50 border-purple-200">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-sm text-gray-600 mb-1">Total Allowances</p>
+                      <p className="text-2xl font-bold text-purple-700">Rs {detailedPayroll.total_allowances.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                )}
+                <Card className="bg-red-50 border-red-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
+                    <p className="text-2xl font-bold text-red-700">Rs {detailedPayroll.total_deductions.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+                <Card className="bg-green-50 border-green-200">
+                  <CardContent className="p-4 text-center">
+                    <p className="text-sm text-gray-600 mb-1">Total Net Salary</p>
+                    <p className="text-2xl font-bold text-green-700">Rs {detailedPayroll.total_net.toLocaleString()}</p>
+                  </CardContent>
+                </Card>
+              </div>
+              </>
+            )}
           </div>
         )}
       </div>
+
+      {/* Salary Slip Dialog */}
+      {viewingSalarySlip && (
+        <EmployeeSalarySlip
+          employee={viewingSalarySlip}
+          month={month}
+          onClose={() => setViewingSalarySlip(null)}
+        />
+      )}
     </Layout>
   );
 }
