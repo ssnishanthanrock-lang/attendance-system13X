@@ -805,13 +805,21 @@ export default function Payroll() {
               </Card>
 
               {/* Summary Cards at Bottom - Only for Table View */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className={`grid grid-cols-1 ${detailedPayroll.total_allowances > 0 ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-4`}>
                 <Card className="bg-blue-50 border-blue-200">
                   <CardContent className="p-4 text-center">
                     <p className="text-sm text-gray-600 mb-1">Total Gross Salary</p>
                     <p className="text-2xl font-bold text-blue-700">Rs {detailedPayroll.total_gross.toLocaleString()}</p>
                   </CardContent>
                 </Card>
+                {detailedPayroll.total_allowances > 0 && (
+                  <Card className="bg-purple-50 border-purple-200">
+                    <CardContent className="p-4 text-center">
+                      <p className="text-sm text-gray-600 mb-1">Total Allowances</p>
+                      <p className="text-2xl font-bold text-purple-700">Rs {detailedPayroll.total_allowances.toLocaleString()}</p>
+                    </CardContent>
+                  </Card>
+                )}
                 <Card className="bg-red-50 border-red-200">
                   <CardContent className="p-4 text-center">
                     <p className="text-sm text-gray-600 mb-1">Total Deductions</p>
