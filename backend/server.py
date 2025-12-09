@@ -351,6 +351,30 @@ class AttendanceWithLocation(BaseModel):
     address: Optional[str] = None
     map_snapshot: Optional[str] = None  # base64 encoded image
 
+
+# ============= DEVICE IMPORT MODELS =============
+class DeviceImportParseRequest(BaseModel):
+    file_content: str  # Raw file content
+    company_id: str
+
+class ParsedDeviceRecord(BaseModel):
+    vendor_id: str
+    datetime: str
+    date: str
+    time: str
+
+class DeviceImportMapping(BaseModel):
+    vendor_id: str
+    employee_id: str
+    employee_name: str
+
+class DeviceImportRequest(BaseModel):
+    company_id: str
+    mappings: List[DeviceImportMapping]
+    parsed_records: List[ParsedDeviceRecord]
+    duplicate_action: str  # "skip" or "overwrite"
+
+
 # ============= HELPER FUNCTIONS =============
 def create_access_token(data: dict):
     to_encode = data.copy()
