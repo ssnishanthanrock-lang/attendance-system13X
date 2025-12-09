@@ -1060,7 +1060,7 @@ export default function Attendance() {
                     </>
                   ) : (
                     // Today view - normal list
-                    attendance.map((record) => (
+                    attendance.sort((a, b) => a.employee_name.localeCompare(b.employee_name)).map((record) => (
                       <tr key={record.id} className={`hover:bg-gray-50 transition-colors ${!record.check_out && record.status === 'present' ? 'bg-amber-50' : ''}`}>
                         <td className="px-4 py-3 text-sm font-medium text-gray-900">
                           <div className="flex items-center gap-3">
