@@ -433,11 +433,10 @@ export default function Employees() {
               variant="outline"
               onClick={() => setBulkImportDialogOpen(true)}
               disabled={!canEdit}
-              title={!canEdit ? "Read-only access - Cannot bulk import" : "Bulk Import (AI)"}
+              title={!canEdit ? "Read-only access - Cannot bulk import" : "AI Bulk Import"}
               className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Upload className="w-4 h-4 mr-2" />
-              Bulk Import (AI)
+              <Upload className="w-4 h-4" />
             </Button>
             
             {/* View Failed Imports Button */}
