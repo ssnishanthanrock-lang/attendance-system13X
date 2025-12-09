@@ -4501,16 +4501,23 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
         auth_success = self.test_authentication()
         
         if auth_success:
-            # PRIORITY: Run earnings comparison test first (SPECIFIC REVIEW REQUEST)
+            # HIGHEST PRIORITY: Run timezone bug fix verification (CURRENT REVIEW REQUEST)
             print("\n" + "="*80)
-            print("💰 TESTING EARNINGS COMPARISON - DASHBOARD vs ATTENDANCE DETAILS (REVIEW REQUEST)")
+            print("🕐 TESTING TIMEZONE BUG FIX VERIFICATION - 330 MINUTE DISCREPANCY (CURRENT REVIEW REQUEST)")
+            print("="*80)
+            
+            self.test_timezone_bug_fix_verification()
+            
+            # PRIORITY: Run earnings comparison test (PREVIOUS REVIEW REQUEST)
+            print("\n" + "="*80)
+            print("💰 TESTING EARNINGS COMPARISON - DASHBOARD vs ATTENDANCE DETAILS (PREVIOUS REVIEW REQUEST)")
             print("="*80)
             
             self.test_earnings_comparison_review_request()
             
-            # PRIORITY: Run admin inclusion fix verification (CURRENT REVIEW REQUEST)
+            # PRIORITY: Run admin inclusion fix verification (PREVIOUS REVIEW REQUEST)
             print("\n" + "="*80)
-            print("🚨 TESTING ADMIN INCLUSION FIX VERIFICATION (CURRENT REVIEW REQUEST)")
+            print("🚨 TESTING ADMIN INCLUSION FIX VERIFICATION (PREVIOUS REVIEW REQUEST)")
             print("="*80)
             
             self.test_payroll_admin_inclusion_fix()
