@@ -3611,12 +3611,21 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
         except:
             pass
     
-    # Get working days for current month
+    # Calculate working days dynamically for current month
     year, month_num = current_month.split("-")
-    working_days_data = settings.get("working_days", {}) if settings else {}
-    working_days = working_days_data.get(current_month, 26)
+    year_int = int(year)
+    month_int = int(month_num)
     
-    print(f"DEBUG WORKING DAYS: Month={current_month}, Settings={working_days_data}, Working Days={working_days}")
+    # Get holidays and Saturday settings
+    holidays = settings.get("holidays", []) if settings else []
+    saturday_enabled = settings.get("saturday_enabled", True) if settings else True
+    saturday_type = settings.get("saturday_type", "full") if settings else "full"
+    
+    # Calculate working days for this month
+    working_days_result = calculate_working_days(year_int, month_int, holidays, saturday_enabled, saturday_type)
+    working_days = working_days_result["working_days"]
+    
+    print(f"DEBUG WORKING DAYS: Month={current_month}, Calculated Working Days={working_days}")
     
     # Get all employees (only if employee role, show own data; if admin/manager, show all)
     if current_user.role == "employee":
