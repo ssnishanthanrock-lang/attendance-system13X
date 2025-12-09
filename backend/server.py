@@ -3563,6 +3563,8 @@ async def get_detailed_payroll(month: str, current_user: User = Depends(get_curr
         total_deductions = late_deduction + total_advances + other_deductions + loan_deduction
         net_salary = gross_salary + allowances_to_add - total_deductions
         
+        print(f"DEBUG DETAILED PAYROLL EMPLOYEE: {employee['name']} - gross={gross_salary:.2f}, earnings={earnings:.2f}, minutes={total_attendance_minutes}")
+        
         detailed_records.append({
             "employee_id": employee["id"],
             "employee_name": employee["name"],
