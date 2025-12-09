@@ -4091,31 +4091,8 @@ Return ONLY the JSON response, no additional text.""",
                     "date_range": date_range,
                     "total_records": len(records)
                 }
-            
-            # Now create records from collected punch data
-            for enroll_no, date_punches in employee_punches.items():
-                for date, times in date_punches.items():
-                    # Create IN record if exists
-                    if 'in' in times:
-                        records.append({
-                            "vendor_id": enroll_no,
-                            "datetime": f"{date} {times['in']}",
-                            "date": date,
-                            "time": times['in'],
-                            "record_type": "punch_in"
-                        })
-                    
-                    # Create OUT record if exists
-                    if 'out' in times:
-                        records.append({
-                            "vendor_id": enroll_no,
-                            "datetime": f"{date} {times['out']}",
-                            "date": date,
-                            "time": times['out'],
-                            "record_type": "punch_out"
-                        })
-            
-            print(f"DEBUG: Parsed {len(records)} records from Excel for {len(unique_vendor_ids)} employees")
+                
+                print(f"DEBUG: AI parsed {len(records)} records for {len(unique_vendor_ids)} employees")
             
             # Sort dates to get range
             sorted_dates = sorted(list(dates))
