@@ -3928,7 +3928,7 @@ async def upload_employee_profile_pic(
 
 @api_router.post("/attendance/parse-device-import")
 async def parse_device_import(request: DeviceImportParseRequest, current_user: User = Depends(get_current_user)):
-    """Parse attendance device file using AI"""
+    """Parse attendance device file - Direct Python parsing"""
     
     if current_user.role not in ["admin", "manager"]:
         raise HTTPException(status_code=403, detail="Admin or manager access required")
@@ -3937,92 +3937,80 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
     
     try:
         import json
-        from emergentintegrations.llm.openai import LlmChat
-        
-        # Get Emergent LLM key
-        emergent_key = os.environ.get("EMERGENT_LLM_KEY")
-        if not emergent_key:
-            print("ERROR: EMERGENT_LLM_KEY not found")
-            raise HTTPException(status_code=500, detail="AI service not configured")
-        
-        print("DEBUG: Creating LlmChat client")
-        client = LlmChat(api_key=emergent_key)
+        from collections import defaultdict
+        import re
         
         # Check if it's an Excel file
-        file_content_to_parse = request.file_content
-        
         if request.file_content.startswith('[EXCEL_FILE]'):
-            print("DEBUG: Detected Excel file")
-            # For now, ask user to export as CSV/TXT
             raise HTTPException(
                 status_code=400, 
                 detail="Excel files are not yet supported. Please export your file as .dat, .txt, or .csv format from your device software."
             )
         
-        # Limit file content if too large (take first 5000 chars for analysis)
-        file_sample = file_content_to_parse[:5000] if len(file_content_to_parse) > 5000 else file_content_to_parse
+        # Parse the file content
+        lines = request.file_content.strip().split('\n')
+        records = []
+        unique_vendor_ids = set()
+        dates = set()
         
-        print("DEBUG: Preparing AI prompt")
+        print(f"DEBUG: Processing {len(lines)} lines")
         
-        # AI Prompt to parse the file
-        prompt = f"""You are an expert at parsing attendance device export files. Analyze this file content and extract attendance records.
-
-File Content:
-{file_sample}
-
-Instructions:
-1. Identify the format (columns, delimiters, datetime format) - supports .dat, .txt, .csv, .xlsx
-2. Extract each record with: vendor_id (employee ID from device), datetime, date, time
-3. Group records by vendor_id and date to identify check-in and check-out pairs
-4. Return JSON array with structure:
-{{
-  "format_detected": "description of format",
-  "records": [
-    {{
-      "vendor_id": "15",
-      "datetime": "2025-12-01 04:33:19",
-      "date": "2025-12-01",
-      "time": "04:33:19",
-      "record_type": "check_in or check_out based on time pattern"
-    }}
-  ],
-  "unique_vendor_ids": ["15", "34", "28", ...],
-  "date_range": {{"start": "2025-12-01", "end": "2025-12-09"}},
-  "total_records": 150
-}}
-
-IMPORTANT: 
-- For each vendor_id per date, identify check-in (earliest time) and check-out (latest time)
-- Return ONLY valid JSON, no markdown or extra text
-- Process the FULL file content provided above"""
-
-        print("DEBUG: Calling AI model")
-        response = client.chat(
-            messages=[prompt],
-            model="gemini-2.0-flash-exp",
-            temperature=0.1
-        )
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Split by tabs or multiple spaces
+            parts = re.split(r'\t+|\s{2,}', line)
+            
+            if len(parts) >= 2:
+                vendor_id = parts[0].strip()
+                datetime_str = parts[1].strip()
+                
+                # Parse datetime
+                try:
+                    # Try to extract date and time
+                    if ' ' in datetime_str:
+                        date_part, time_part = datetime_str.split(' ', 1)
+                        
+                        records.append({
+                            "vendor_id": vendor_id,
+                            "datetime": datetime_str,
+                            "date": date_part,
+                            "time": time_part,
+                            "record_type": "punch"
+                        })
+                        
+                        unique_vendor_ids.add(vendor_id)
+                        dates.add(date_part)
+                except Exception as e:
+                    print(f"DEBUG: Failed to parse line: {line}, error: {e}")
+                    continue
         
-        print("DEBUG: AI response received")
-        ai_response = response.strip()
-        print(f"DEBUG: AI response length: {len(ai_response)}")
+        # Sort dates to get range
+        sorted_dates = sorted(list(dates))
+        date_range = {
+            "start": sorted_dates[0] if sorted_dates else None,
+            "end": sorted_dates[-1] if sorted_dates else None
+        }
         
-        # Clean markdown if present
-        if ai_response.startswith("```json"):
-            ai_response = ai_response.replace("```json", "").replace("```", "").strip()
-        elif ai_response.startswith("```"):
-            ai_response = ai_response.replace("```", "").strip()
+        # Create response
+        parsed_data = {
+            "format_detected": "Tab or space-separated format with vendor_id and datetime",
+            "records": records,
+            "unique_vendor_ids": sorted(list(unique_vendor_ids)),
+            "date_range": date_range,
+            "total_records": len(records)
+        }
         
-        # Parse JSON response
-        import json
-        parsed_data = json.loads(ai_response)
+        print(f"DEBUG: Parsed {len(records)} records, {len(unique_vendor_ids)} unique IDs")
         
         await log_activity(
             request.company_id,
             current_user.id,
             current_user.name,
             "PARSE_DEVICE_IMPORT",
-            f"Parsed device import file: {parsed_data.get('total_records', 0)} records found"
+            f"Parsed device import file: {len(records)} records found"
         )
         
         return {
@@ -4030,12 +4018,10 @@ IMPORTANT:
             "data": parsed_data
         }
         
-    except json.JSONDecodeError as e:
-        print(f"JSON Parse Error: {e}")
-        print(f"AI Response: {ai_response}")
-        raise HTTPException(status_code=500, detail=f"Failed to parse AI response: {str(e)}")
     except Exception as e:
         print(f"Parse Error: {e}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"Failed to parse file: {str(e)}")
 
 
