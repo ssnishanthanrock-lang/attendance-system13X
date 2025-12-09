@@ -1156,36 +1156,272 @@ class ERPTester:
         """
         DETAILED PAYROLL DISCREPANCY INVESTIGATION
         
-        Compare ACTUAL total_gross values between Dashboard and Monthly Payroll with REAL working data.
+        Deep investigation of the 11,000 LKR discrepancy between Dashboard and Monthly Payroll.
         
-        **Critical Investigation:**
-        User reports Dashboard shows DIFFERENT total_gross than Monthly Payroll view, and believes Monthly Payroll is correct.
+        **CRITICAL INFO FROM USER:**
+        - Monthly Payroll `/payroll/month/2025-12`: **101,930.18 LKR**
+        - Dashboard Live Salary Tracker: **112,645.06 LKR**
+        - **Difference: 10,714.88 LKR** (User's concern!)
         
-        **Detailed Test Required:**
-        1. Login with actual user (mobile: 0773769019 or any valid admin)
-        2. Check for employees with actual attendance: Does anyone have check-in records for December 2025?
-        3. Call both endpoints and get REAL values:
-           A. Dashboard endpoint: GET /api/payroll/live-current-month
-           B. Monthly Payroll endpoint: GET /api/payroll/detailed/2025-12
-        4. Calculate exact difference and identify root cause
+        **Deep Investigation Required:**
+        1. Call both endpoints and get REAL detailed values
+        2. Compare employee-by-employee data
+        3. Identify the source of 11K difference
+        4. Check if allowances are being included/excluded differently
+        5. Analyze backend logs
         """
         print("\n🔍 === DETAILED PAYROLL DISCREPANCY INVESTIGATION ===")
+        print("🚨 USER REPORTED ISSUE: 10,714.88 LKR difference between endpoints")
+        print("📊 Monthly Payroll: 101,930.18 LKR vs Dashboard: 112,645.06 LKR")
         
         try:
-            # Step 1: Check for employees with actual attendance in December 2025
-            print("📋 Step 1: Checking for employees with actual attendance in December 2025...")
+            # Step 1: Call Dashboard Live Current Month endpoint
+            print("\n📋 Step 1: Calling Dashboard Live Current Month endpoint...")
             
-            # Check attendance records for December 2025
-            attendance_response = self.session.get(f"{API_BASE}/attendance", 
-                                                 params={"from_date": "2025-12-01", "to_date": "2025-12-31"})
+            dashboard_response = self.session.get(f"{API_BASE}/payroll/live-current-month")
             
-            if attendance_response.status_code == 200:
-                attendance_records = attendance_response.json()
-                december_attendance_count = len(attendance_records)
+            dashboard_data = None
+            dashboard_total_gross = 0
+            dashboard_employees = []
+            
+            if dashboard_response.status_code == 200:
+                dashboard_data = dashboard_response.json()
+                dashboard_total_gross = dashboard_data.get("total_gross", 0)
+                dashboard_employees = dashboard_data.get("employees", [])
                 
-                if december_attendance_count > 0:
-                    # Get unique employees with attendance
-                    employees_with_attendance = set(record.get('employee_id') for record in attendance_records)
+                print(f"✅ Dashboard Live Endpoint Response:")
+                print(f"   📈 Total Gross: {dashboard_total_gross} LKR")
+                print(f"   👥 Employee Count: {len(dashboard_employees)}")
+                
+                self.log_result("Discrepancy Investigation - Dashboard Live", True, 
+                              f"Dashboard live endpoint returned {dashboard_total_gross} LKR for {len(dashboard_employees)} employees")
+            else:
+                print(f"❌ Dashboard Live Endpoint Failed: {dashboard_response.status_code}")
+                self.log_result("Discrepancy Investigation - Dashboard Live", False, 
+                              f"Dashboard live endpoint failed: {dashboard_response.status_code}")
+                return
+            
+            # Step 2: Call Monthly Payroll Detailed endpoint for December 2025
+            print("\n📋 Step 2: Calling Monthly Payroll Detailed endpoint for 2025-12...")
+            
+            monthly_response = self.session.get(f"{API_BASE}/payroll/detailed/2025-12")
+            
+            monthly_data = None
+            monthly_total_gross = 0
+            monthly_employees = []
+            
+            if monthly_response.status_code == 200:
+                monthly_data = monthly_response.json()
+                monthly_total_gross = monthly_data.get("total_gross", 0)
+                monthly_employees = monthly_data.get("employees", [])
+                
+                print(f"✅ Monthly Payroll Endpoint Response:")
+                print(f"   📈 Total Gross: {monthly_total_gross} LKR")
+                print(f"   👥 Employee Count: {len(monthly_employees)}")
+                
+                self.log_result("Discrepancy Investigation - Monthly Payroll", True, 
+                              f"Monthly payroll endpoint returned {monthly_total_gross} LKR for {len(monthly_employees)} employees")
+            else:
+                print(f"❌ Monthly Payroll Endpoint Failed: {monthly_response.status_code}")
+                self.log_result("Discrepancy Investigation - Monthly Payroll", False, 
+                              f"Monthly payroll endpoint failed: {monthly_response.status_code}")
+                return
+            
+            # Step 3: Calculate the actual difference
+            print(f"\n🔍 Step 3: Calculating Actual Difference...")
+            
+            actual_difference = dashboard_total_gross - monthly_total_gross
+            
+            print(f"📊 ACTUAL COMPARISON:")
+            print(f"   🟢 Dashboard Live Total: {dashboard_total_gross} LKR")
+            print(f"   🔵 Monthly Payroll Total: {monthly_total_gross} LKR")
+            print(f"   🔴 Difference: {actual_difference} LKR")
+            print(f"   📋 User Reported Difference: 10,714.88 LKR")
+            
+            if abs(actual_difference - 10714.88) < 1.0:  # Within 1 LKR tolerance
+                print("✅ CONFIRMED: Difference matches user report!")
+                self.log_result("Discrepancy Investigation - Difference Confirmed", True, 
+                              f"Confirmed difference of {actual_difference} LKR matches user report")
+            else:
+                print(f"⚠️  DIFFERENT: Actual difference ({actual_difference}) differs from user report (10,714.88)")
+                self.log_result("Discrepancy Investigation - Difference Mismatch", False, 
+                              f"Actual difference {actual_difference} differs from user report 10,714.88")
+            
+            # Step 4: Employee-by-Employee Comparison
+            print(f"\n🔍 Step 4: Employee-by-Employee Comparison...")
+            
+            # Create dictionaries for easy comparison
+            dashboard_emp_dict = {emp.get("employee_id", emp.get("employee_name", "unknown")): emp for emp in dashboard_employees}
+            monthly_emp_dict = {emp.get("employee_id", emp.get("employee_name", "unknown")): emp for emp in monthly_employees}
+            
+            print(f"📋 Dashboard Employees: {len(dashboard_emp_dict)}")
+            print(f"📋 Monthly Employees: {len(monthly_emp_dict)}")
+            
+            # Find employees in both datasets
+            common_employees = set(dashboard_emp_dict.keys()) & set(monthly_emp_dict.keys())
+            dashboard_only = set(dashboard_emp_dict.keys()) - set(monthly_emp_dict.keys())
+            monthly_only = set(monthly_emp_dict.keys()) - set(dashboard_emp_dict.keys())
+            
+            print(f"👥 Common Employees: {len(common_employees)}")
+            print(f"🟢 Dashboard Only: {len(dashboard_only)}")
+            print(f"🔵 Monthly Only: {len(monthly_only)}")
+            
+            if dashboard_only:
+                print(f"🟢 Employees ONLY in Dashboard: {list(dashboard_only)}")
+            if monthly_only:
+                print(f"🔵 Employees ONLY in Monthly: {list(monthly_only)}")
+            
+            # Step 5: Detailed Field Comparison for Common Employees
+            print(f"\n🔍 Step 5: Detailed Field Comparison...")
+            
+            total_difference_breakdown = 0
+            employees_with_differences = []
+            
+            for emp_id in common_employees:
+                dashboard_emp = dashboard_emp_dict[emp_id]
+                monthly_emp = monthly_emp_dict[emp_id]
+                
+                # Compare key fields
+                dashboard_gross = dashboard_emp.get("gross_salary", 0)
+                monthly_gross = monthly_emp.get("gross_salary", 0)
+                
+                dashboard_earnings = dashboard_emp.get("earnings", 0)
+                monthly_earnings = monthly_emp.get("earnings", 0)
+                
+                dashboard_extra = dashboard_emp.get("extra_payment", 0)
+                monthly_extra = monthly_emp.get("extra_payment", 0)
+                
+                dashboard_allowances = dashboard_emp.get("allowances", 0)
+                monthly_allowances = monthly_emp.get("allowances", 0)
+                
+                gross_diff = dashboard_gross - monthly_gross
+                earnings_diff = dashboard_earnings - monthly_earnings
+                extra_diff = dashboard_extra - monthly_extra
+                allowances_diff = dashboard_allowances - monthly_allowances
+                
+                if abs(gross_diff) > 0.01:  # Significant difference
+                    employees_with_differences.append({
+                        "employee_name": dashboard_emp.get("employee_name", "Unknown"),
+                        "employee_id": emp_id,
+                        "dashboard_gross": dashboard_gross,
+                        "monthly_gross": monthly_gross,
+                        "gross_difference": gross_diff,
+                        "dashboard_earnings": dashboard_earnings,
+                        "monthly_earnings": monthly_earnings,
+                        "earnings_difference": earnings_diff,
+                        "dashboard_extra": dashboard_extra,
+                        "monthly_extra": monthly_extra,
+                        "extra_difference": extra_diff,
+                        "dashboard_allowances": dashboard_allowances,
+                        "monthly_allowances": monthly_allowances,
+                        "allowances_difference": allowances_diff
+                    })
+                    
+                    total_difference_breakdown += gross_diff
+            
+            print(f"\n📊 EMPLOYEE DIFFERENCES FOUND: {len(employees_with_differences)}")
+            print(f"💰 Total Difference from Employee Breakdown: {total_difference_breakdown} LKR")
+            
+            # Step 6: Detailed Analysis of Differences
+            print(f"\n🔍 Step 6: Root Cause Analysis...")
+            
+            if employees_with_differences:
+                print(f"\n🚨 EMPLOYEES WITH GROSS SALARY DIFFERENCES:")
+                for i, emp in enumerate(employees_with_differences[:5]):  # Show first 5
+                    print(f"\n   👤 Employee {i+1}: {emp['employee_name']} (ID: {emp['employee_id']})")
+                    print(f"      🟢 Dashboard Gross: {emp['dashboard_gross']} LKR")
+                    print(f"      🔵 Monthly Gross: {emp['monthly_gross']} LKR")
+                    print(f"      🔴 Difference: {emp['gross_difference']} LKR")
+                    print(f"      📋 Earnings - Dashboard: {emp['dashboard_earnings']}, Monthly: {emp['monthly_earnings']}, Diff: {emp['earnings_difference']}")
+                    print(f"      💰 Extra Payment - Dashboard: {emp['dashboard_extra']}, Monthly: {emp['monthly_extra']}, Diff: {emp['extra_difference']}")
+                    print(f"      🎁 Allowances - Dashboard: {emp['dashboard_allowances']}, Monthly: {emp['monthly_allowances']}, Diff: {emp['allowances_difference']}")
+                
+                if len(employees_with_differences) > 5:
+                    print(f"   ... and {len(employees_with_differences) - 5} more employees with differences")
+            
+            # Step 7: Check for Formula Differences
+            print(f"\n🔍 Step 7: Formula Analysis...")
+            
+            # Check if allowances are being added to gross in one endpoint but not the other
+            dashboard_uses_allowances_in_gross = False
+            monthly_uses_allowances_in_gross = False
+            
+            if dashboard_employees:
+                first_dashboard = dashboard_employees[0]
+                dashboard_basic = first_dashboard.get("basic_salary", 0)
+                dashboard_allowances = first_dashboard.get("allowances", 0)
+                dashboard_earnings = first_dashboard.get("earnings", 0)
+                dashboard_gross = first_dashboard.get("gross_salary", 0)
+                
+                # Check if gross = earnings + extra_payments (without allowances)
+                # OR gross = earnings + extra_payments + allowances (with allowances)
+                expected_gross_without_allowances = dashboard_earnings + first_dashboard.get("extra_payment", 0)
+                expected_gross_with_allowances = expected_gross_without_allowances + dashboard_allowances
+                
+                if abs(dashboard_gross - expected_gross_with_allowances) < 0.01:
+                    dashboard_uses_allowances_in_gross = True
+                    print(f"🟢 Dashboard Formula: gross = earnings + extra_payments + allowances")
+                elif abs(dashboard_gross - expected_gross_without_allowances) < 0.01:
+                    dashboard_uses_allowances_in_gross = False
+                    print(f"🟢 Dashboard Formula: gross = earnings + extra_payments (no allowances)")
+                else:
+                    print(f"🟢 Dashboard Formula: Unknown/Complex")
+            
+            if monthly_employees:
+                first_monthly = monthly_employees[0]
+                monthly_basic = first_monthly.get("basic_salary", 0)
+                monthly_allowances = first_monthly.get("allowances", 0)
+                monthly_earnings = first_monthly.get("earnings", 0)
+                monthly_gross = first_monthly.get("gross_salary", 0)
+                
+                expected_gross_without_allowances = monthly_earnings + first_monthly.get("extra_payment", 0)
+                expected_gross_with_allowances = expected_gross_without_allowances + monthly_allowances
+                
+                if abs(monthly_gross - expected_gross_with_allowances) < 0.01:
+                    monthly_uses_allowances_in_gross = True
+                    print(f"🔵 Monthly Formula: gross = earnings + extra_payments + allowances")
+                elif abs(monthly_gross - expected_gross_without_allowances) < 0.01:
+                    monthly_uses_allowances_in_gross = False
+                    print(f"🔵 Monthly Formula: gross = earnings + extra_payments (no allowances)")
+                else:
+                    print(f"🔵 Monthly Formula: Unknown/Complex")
+            
+            # Step 8: Final Summary and Recommendations
+            print(f"\n📋 === INVESTIGATION SUMMARY ===")
+            print(f"🔴 Confirmed Difference: {actual_difference} LKR")
+            print(f"👥 Employees with Differences: {len(employees_with_differences)}")
+            print(f"💰 Total from Employee Breakdown: {total_difference_breakdown} LKR")
+            
+            if dashboard_uses_allowances_in_gross != monthly_uses_allowances_in_gross:
+                print(f"🚨 ROOT CAUSE IDENTIFIED: Different allowance handling in gross calculation!")
+                print(f"   🟢 Dashboard includes allowances in gross: {dashboard_uses_allowances_in_gross}")
+                print(f"   🔵 Monthly includes allowances in gross: {monthly_uses_allowances_in_gross}")
+                
+                self.log_result("Discrepancy Investigation - Root Cause", True, 
+                              f"ROOT CAUSE: Different allowance handling. Dashboard includes allowances: {dashboard_uses_allowances_in_gross}, Monthly includes allowances: {monthly_uses_allowances_in_gross}")
+            else:
+                print(f"🔍 Need deeper investigation - formulas appear similar")
+                self.log_result("Discrepancy Investigation - Root Cause", False, 
+                              "Root cause not immediately apparent - need deeper investigation")
+            
+            # Log comprehensive results
+            self.log_result("Payroll Discrepancy Investigation - COMPLETE", True, 
+                          f"Investigation complete: {actual_difference} LKR difference found between endpoints",
+                          {
+                              "dashboard_total": dashboard_total_gross,
+                              "monthly_total": monthly_total_gross,
+                              "difference": actual_difference,
+                              "user_reported_difference": 10714.88,
+                              "employees_with_differences": len(employees_with_differences),
+                              "dashboard_employee_count": len(dashboard_employees),
+                              "monthly_employee_count": len(monthly_employees),
+                              "dashboard_uses_allowances": dashboard_uses_allowances_in_gross,
+                              "monthly_uses_allowances": monthly_uses_allowances_in_gross
+                          })
+                
+        except Exception as e:
+            print(f"❌ Investigation Error: {str(e)}")
+            self.log_result("Payroll Discrepancy Investigation", False, f"Investigation error: {str(e)}")_attendance = set(record.get('employee_id') for record in attendance_records)
                     employee_names = set(record.get('employee_name', 'Unknown') for record in attendance_records)
                     
                     self.log_result("December 2025 Attendance Check", True, 
