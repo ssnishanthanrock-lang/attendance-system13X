@@ -3947,8 +3947,19 @@ async def parse_device_import(request: DeviceImportParseRequest, current_user: U
         print("DEBUG: Creating OpenAI client")
         client = OpenAIClient(api_key=emergent_key)
         
+        # Check if it's an Excel file
+        file_content_to_parse = request.file_content
+        
+        if request.file_content.startswith('[EXCEL_FILE]'):
+            print("DEBUG: Detected Excel file")
+            # For now, ask user to export as CSV/TXT
+            raise HTTPException(
+                status_code=400, 
+                detail="Excel files are not yet supported. Please export your file as .dat, .txt, or .csv format from your device software."
+            )
+        
         # Limit file content if too large (take first 5000 chars for analysis)
-        file_sample = request.file_content[:5000] if len(request.file_content) > 5000 else request.file_content
+        file_sample = file_content_to_parse[:5000] if len(file_content_to_parse) > 5000 else file_content_to_parse
         
         print("DEBUG: Preparing AI prompt")
         
