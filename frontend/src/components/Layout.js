@@ -74,7 +74,7 @@ export default function Layout({ children }) {
         
         // Update page title
         if (data.name) {
-          document.title = `${data.name} - ERP System`;
+          document.title = `${data.name} - IT Signature ERP`;
         }
         
         // Update favicon if company has one
