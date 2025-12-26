@@ -4799,6 +4799,105 @@ async def mark_attendance_with_location(attendance_data: AttendanceWithLocation,
     
     return {"message": "Attendance marked with location", "attendance": attendance_response}
 
+@api_router.get("/attendance/fingerprint/{fingerprint_id}")
+async def mark_attendance_by_fingerprint(fingerprint_id: str):
+    """
+    Mark attendance using fingerprint ID (no authentication required)
+    - If no attendance for today: Mark check-in
+    - If attendance exists without check-out and >10 minutes passed: Mark check-out
+    """
+    
+    # Find user by fingerprint_id
+    user = await db.users.find_one({"fingerprint_id": fingerprint_id}, {"_id": 0})
+    
+    if not user:
+        return {"success": False, "message": "No User"}
+    
+    # Get today's date
+    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    current_time = datetime.now(timezone.utc)
+    current_time_str = current_time.strftime("%H:%M")
+    
+    # Check if attendance record exists for today
+    attendance = await db.attendance.find_one({
+        "company_id": user.get("company_id"),
+        "employee_id": user["id"],
+        "date": today
+    }, {"_id": 0})
+    
+    if not attendance:
+        # No attendance for today - Mark check-in
+        check_in_datetime = f"{today}T{current_time_str}:00"
+        
+        new_attendance = {
+            "id": str(uuid.uuid4()),
+            "company_id": user.get("company_id"),
+            "employee_id": user["id"],
+            "employee_name": capitalize_name(user["name"]),
+            "date": today,
+            "check_in": check_in_datetime,
+            "check_out": None,
+            "status": "present",
+            "leave_type": "",
+            "created_by": user["id"],  # Self-marked via fingerprint
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        
+        await db.attendance.insert_one(new_attendance)
+        
+        return {
+            "success": True,
+            "message": f"Attendance Success - {capitalize_name(user['name'])}",
+            "action": "check_in",
+            "time": current_time_str
+        }
+    
+    else:
+        # Attendance exists - Check if we should mark check-out
+        if attendance.get("check_out"):
+            # Already has check-out
+            return {
+                "success": False,
+                "message": f"Attendance already completed for {capitalize_name(user['name'])} today"
+            }
+        
+        # Parse check-in time to verify 10-minute difference
+        check_in_str = attendance.get("check_in", "")
+        if check_in_str:
+            try:
+                # Parse check_in datetime (format: "2025-12-26T09:30:00")
+                check_in_dt = datetime.fromisoformat(check_in_str.replace("Z", "+00:00"))
+                if check_in_dt.tzinfo is None:
+                    check_in_dt = check_in_dt.replace(tzinfo=timezone.utc)
+                
+                # Calculate time difference
+                time_diff = (current_time - check_in_dt).total_seconds() / 60  # in minutes
+                
+                if time_diff < 10:
+                    return {
+                        "success": False,
+                        "message": f"Please wait {int(10 - time_diff)} more minutes before marking leaving"
+                    }
+                
+            except Exception as e:
+                print(f"Error parsing check_in time: {e}")
+                # Continue to mark check-out even if parsing fails
+        
+        # Mark check-out
+        check_out_datetime = f"{today}T{current_time_str}:00"
+        
+        await db.attendance.update_one(
+            {"id": attendance["id"]},
+            {"$set": {"check_out": check_out_datetime}}
+        )
+        
+        return {
+            "success": True,
+            "message": f"Leaving Marked Success - {capitalize_name(user['name'])}",
+            "action": "check_out",
+            "time": current_time_str
+        }
+
 @api_router.get("/location/tracking/history")
 async def get_tracking_history(
     from_date: Optional[str] = None,
