@@ -254,6 +254,7 @@ export default function Employees() {
       start_time: employee.start_time || defaultTimes.start_time,
       finish_time: employee.finish_time || defaultTimes.finish_time,
       fixed_salary: employee.fixed_salary || false,
+      fingerprint_id: employee.fingerprint_id || '',
       profile_picture: null
     });
     setDialogOpen(true);
