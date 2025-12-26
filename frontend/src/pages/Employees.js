@@ -673,6 +673,21 @@ export default function Employees() {
                       />
                     </div>
                   </div>
+                  {editingEmployee && (
+                    <div className="sm:col-span-2 grid grid-cols-12 gap-2">
+                      <label className="col-span-3 text-sm font-medium flex items-center">Fingerprint ID</label>
+                      <div className="col-span-9">
+                        <Input
+                          data-testid="fingerprint-id-input"
+                          value={formData.fingerprint_id}
+                          onChange={(e) => setFormData({ ...formData, fingerprint_id: e.target.value.replace(/\D/g, '') })}
+                          placeholder="Enter numeric fingerprint ID"
+                          type="text"
+                          inputMode="numeric"
+                        />
+                      </div>
+                    </div>
+                  )}
                   {editingEmployee?.profile_pic && (
                     <div className="sm:col-span-2">
                       <div className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
