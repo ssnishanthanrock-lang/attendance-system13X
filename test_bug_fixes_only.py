@@ -14,7 +14,7 @@ import time
 
 # Load environment variables
 load_dotenv('/app/frontend/.env')
-BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://paystack-app.preview.emergentagent.com')
+BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://admin-sms-portal.preview.emergentagent.com')
 API_BASE = f"{BACKEND_URL}/api"
 
 class BugFixTester:

@@ -1,262 +1,77 @@
 <analysis>**original_problem_statement:**
-The user initially requested an AI-powered system to import attendance data from various Excel file formats. Following that, the user requested a large number of UI/UX improvements and bug fixes across the application, including:
-1.  **Branding**: Remove Made with Emergent and change the application title to IT Signature ERP.
-2.  **UI Cleanup**: Change text-based import buttons to icon-only buttons.
-3.  **Employees Module**: Implement a table/card view toggle, default to table view, remove the ID and Department columns, and add sorting capabilities.
-4.  **Live Salary Tracker**: Fix incorrect live salary calculations, address server timezone discrepancies, add a Today Salary card, and make the salary counter visibly increment per second.
-5.  **Attendance Details**: Create a new page to show who was present/absent on a specific day, add a daily Earnings column with a total, and implement live, refresh-free updates for the current day's earnings.
-6.  **Payroll Module**: Sort employee lists alphabetically, move the Allowances column, and fix inconsistencies between the live tracker and monthly history totals.
-7.  **Salary Calculation Logic**: Ensure the per-day salary is calculated using the number of working days specified in the company settings for the given month, instead of a hardcoded value.
+The user initially requested an AI-powered system to import attendance data. This was followed by numerous UI/UX improvements, bug fixes, and a focus on data consistency between the Dashboard and Payroll modules.
+
+The latest request, which was the focus of this session, is to add a new feature for the Super Admin:
+- In the Manage Company section, on a specific company's detail page, add an option to resend the login URL to a company's admin via SMS.
+- The feature must handle cases where a company has more than one admin by allowing the Super Admin to choose which admin to send the SMS to.
+- It should use the system's existing SMS gateway.
+- A confirmation dialog should appear before sending the SMS.
+- Success and failure alerts should be displayed to the Super Admin.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application has a functional AI-powered attendance import system using the Gemini model. A significant number of UI/UX enhancements and bug fixes have been completed. The Employees module now features a sortable table view as the default. The Dashboard includes a Live Salary Tracker with a Today Salary card that visually counts up per second. A new Attendance Details page provides a daily breakdown of attendance with live earnings calculations. Timezone-related calculation errors have been resolved across multiple components. The system is mostly functional, with one remaining critical bug in the salary calculation logic.
+The application now includes the backend logic and frontend UI for the Resend Login URL feature. A Super Admin can view a company's details, see a list of associated admins, and trigger an SMS containing the login URL to a selected admin. The backend has been tested via  to confirm it correctly handles both single and multiple admin scenarios. The frontend code, including the button and necessary dialogs for admin selection and confirmation, has been implemented in the  page.
 
 **Last working item**:
-- **Last item agent was working**: The agent was debugging why the Day Salary in the monthly payroll view () is still calculated incorrectly. The user reported that the value shown is based on 26 working days, while the setting for the month is 27. The agent confirmed the backend logic *appears* to fetch the correct setting and identified that the final calculation is performed on the frontend. The agent's last action was to add debug logging to the  function in  to verify the  value being sent to the frontend.
+- **Last item agent was working**: Implementing and testing the Resend Login URL feature for Super Admins. The backend API endpoints were created and successfully tested with . The frontend UI components (button, dialogs) were added. The agent was attempting to perform a full end-to-end verification.
 - **Status**: IN PROGRESS
-- **Agent Testing Done**: N
-- **Which testing method agent to use?**: backend testing agent. The agent should restart the backend, trigger the API call from the frontend, and then check the backend logs (==> /var/log/supervisor/backend.err.log <==
-    raise BadRequestError(
-litellm.exceptions.BadRequestError: litellm.BadRequestError: OpenAIException - litellm.BadRequestError: GeminiException BadRequestError - {
-  "error": {
-    "code": 400,
-    "message": "Unable to submit request because it has a mimeType parameter with value application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, which is not supported. Update the mimeType and try again. Learn more: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini",
-    "status": "INVALID_ARGUMENT"
-  }
-}
-. Received Model Group=gemini/gemini-2.0-flash
-Available Model Group Fallbacks=None
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/app/backend/server.py", line 4208, in parse_device_import
-    response_text = await chat.send_message(user_message)
-                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/root/.venv/lib/python3.11/site-packages/emergentintegrations/llm/chat.py", line 121, in send_message
-    raise ChatError(f"Failed to generate chat completion: {str(e)}")
-emergentintegrations.llm.chat.ChatError: Failed to generate chat completion: litellm.BadRequestError: OpenAIException - litellm.BadRequestError: GeminiException BadRequestError - {
-  "error": {
-    "code": 400,
-    "message": "Unable to submit request because it has a mimeType parameter with value application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, which is not supported. Update the mimeType and try again. Learn more: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini",
-    "status": "INVALID_ARGUMENT"
-  }
-}
-. Received Model Group=gemini/gemini-2.0-flash
-Available Model Group Fallbacks=None
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/app/backend/server.py", line 4274, in parse_device_import
-    raise HTTPException(status_code=500, detail=f"AI parsing error: {str(e)}")
-fastapi.exceptions.HTTPException: 500: AI parsing error: Failed to generate chat completion: litellm.BadRequestError: OpenAIException - litellm.BadRequestError: GeminiException BadRequestError - {
-  "error": {
-    "code": 400,
-    "message": "Unable to submit request because it has a mimeType parameter with value application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, which is not supported. Update the mimeType and try again. Learn more: https://cloud.google.com/vertex-ai/generative-ai/docs/model-reference/gemini",
-    "status": "INVALID_ARGUMENT"
-  }
-}
-. Received Model Group=gemini/gemini-2.0-flash
-Available Model Group Fallbacks=None
-WARNING:  WatchFiles detected changes in 'server.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [8067]
-INFO:     Started server process [8453]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-WARNING:  WatchFiles detected changes in 'server.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [8453]
-INFO:     Started server process [8480]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-WARNING:  WatchFiles detected changes in 'server.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [8480]
-INFO:     Started server process [8502]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-WARNING:  WatchFiles detected changes in 'server.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [8502]
-INFO:     Started server process [8553]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-WARNING:  WatchFiles detected changes in 'server.py'. Reloading...
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [8553]
-INFO:     Started server process [8609]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Shutting down
-INFO:     Waiting for application shutdown.
-INFO:     Application shutdown complete.
-INFO:     Finished server process [8609]
-INFO:     Stopping reloader process [7601]
-INFO:     Will watch for changes in these directories: ['/app/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-INFO:     Started reloader process [8690] using WatchFiles
-INFO:     Started server process [8692]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-INFO:     Will watch for changes in these directories: ['/app/backend']
-INFO:     Uvicorn running on http://0.0.0.0:8001 (Press CTRL+C to quit)
-INFO:     Started reloader process [29] using WatchFiles
-INFO:     Started server process [51]
-INFO:     Waiting for application startup.
-INFO:     Application startup complete.
-
-==> /var/log/supervisor/backend.out.log <==
-INFO:     10.64.128.5:40188 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:55218 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.5:40188 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.128.9:46782 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.62:50454 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:55218 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.5:40188 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.62:50454 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:34620 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.162.106:34620 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:55218 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.62:50454 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:55218 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.9:40862 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.128.62:50454 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.162.77:55218 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.128.5:40188 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.5:40188 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:34620 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:55218 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.128.62:50454 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.9:40862 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:34620 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:55218 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:55218 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:55218 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.62:50454 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:34620 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:34620 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:34620 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.5:40188 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.128.5:40188 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:34620 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.162.106:34620 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.128.5:40188 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.5:40188 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.9:46364 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.128.9:46380 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.9:46364 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.9:46364 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.62:51262 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.5:47966 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.62:51262 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.162.106:42406 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.162.106:42406 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.5:47966 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.62:51262 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.62:51262 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.5:47966 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.162.77:53204 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.9:57012 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.162.77:53204 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.9:57012 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.162.77:53204 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.162.106:57412 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.162.106:57412 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.162.77:53204 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.5:60474 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.5:60474 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-DEBUG DETAILED PAYROLL: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.128.5:37268 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.9:39908 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:41796 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-DEBUG DETAILED PAYROLL: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:44938 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-INFO:     10.64.128.9:43890 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.77:42532 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-DEBUG DETAILED PAYROLL: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.162.106:60944 - "GET /api/payroll/detailed/2025-12 HTTP/1.1" 200 OK
-INFO:     10.64.128.5:56770 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK
-DEBUG WORKING DAYS: Month=2025-12, Settings={}, Working Days=26
-INFO:     10.64.201.178:51124 - "GET /api/payroll/live-current-month HTTP/1.1" 200 OK) to inspect the debug output for the  variable.
+- **Agent Testing Done**: Y (Backend via curl), N (Frontend E2E)
+- **Which testing method agent to use?**: screenshot tool. The authentication process for the super admin is tricky. The next agent must log in, handle the role selection, navigate to the company details page, and then use the screenshot tool to verify the UI and test the full feature flow.
 - **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: (P0) Per-day salary calculation is incorrect in the monthly payroll view.**
-  - **Description**: The Day Salary for employees in the detailed monthly payroll view is wrong. It appears to be using a hardcoded value of 26 days for division, instead of using the actual number of working days for that month (e.g., 27 for December) as configured in the company settings. This results in an incorrect daily salary value (e.g.,  instead of ).
-  - **Attempted fixes**: The agent fixed a similar hardcoded value in another endpoint (). It verified the code in the detailed payroll endpoint () seems to fetch the setting correctly. Debug logging has been added to the backend to confirm the value being passed to the frontend.
-  - **Next debug checklist**:
-    1.  Restart the backend service.
-    2.  Check the backend logs after loading the monthly payroll page on the frontend.
-    3.  Examine the debug output for the  variable in the  endpoint call.
-    4.  If the log shows the wrong number of days (26), the logic fetching company settings in  is flawed.
-    5.  If the log shows the correct number (27), verify that the  value is correctly included in the employee object within the JSON response sent to the frontend. The frontend () relies on this field.
-  - **Why fix this issue and what will be achieved with the fix?**: Accurate salary calculation is a core requirement of the application.
-  - **Status**: IN PROGRESS
-  - **Is recurring issue?**: Y
-  - **Should Test frontend/backend/both after fix?**: Both.
-  - **Blocked on other issue**: None
+  - **Issue 1**: End-to-end verification of the Resend Login URL feature is pending. (Priority: P0)
+  - **Issue 2**: The user's previous request to verify the ultra-compact table layout was superseded by the new feature request and never completed. (Priority: P2)
+  
+  **Issues Detail**:
+  - **Issue 1**: 
+     - **Attempted fixes**: The agent successfully implemented and tested the backend APIs ( and ) using . The frontend code was written in . However, automated testing via  and  failed at the authentication step for the multi-role super admin user.
+     - **Next debug checklist**:
+       1.  Using the , log in as the Super Admin (). **Crucially**, the underlying login script must pass  after OTP verification.
+       2.  Navigate to a company details page that has multiple admins (e.g., Test Company Pvt Ltd).
+       3.  Take a screenshot to confirm the Resend Login URL button is visible and correctly styled.
+       4.  Simulate a click on the button and verify the admin selection dialog appears.
+       5.  Simulate selecting an admin and clicking Send, and verify the success/failure dialog appears.
+     - **Why fix this issue and what will be achieved with the fix?**: This will complete the user's latest feature request and make it available for them to use.
+     - **Status**:  IN PROGRESS
+     - **Is recurring issue?**: N
+     - **Should Test frontend/backend/both after fix?**: Frontend
+     - **Blocked on other issue**: None
+
+  - **Issue 2**:
+     - **Attempted fixes**: The previous agent applied CSS changes (, , ) to make tables more compact.
+     - **Next debug checklist**:
+       1. Take a screenshot of .
+       2. Take a screenshot of .
+       3. Confirm with the user if the compactness meets their expectations.
+     - **Why fix this issue and what will be achieved with the fix?**: This closes out a pending UI feedback item from the user.
+     - **Status**: USER VERIFICATION PENDING
+     - **Is recurring issue?**: N
+     - **Should Test frontend/backend/both after fix?**: Frontend
+     - **Blocked on other issue**: None
 
 **In progress Task List**:
-- None
+- There are no other in-progress tasks. The work is captured in the issue list above.
 
 **Upcoming and Future Tasks**
+- **Upcoming Tasks**:
+    - P1: Refactor the duplicated payroll calculation logic in the backend into a single, reusable utility function to improve maintainability.
 - **Future Tasks**:
-  - Invoice PDF/JPEG Generation.
-  - Basic Inventory (stock reduction for invoicing).
-  - Advanced search and filtering for Invoices and Estimates.
-  - Tracking for advance and balance payments for invoices.
-  - Category support for products in the invoicing system.
+    - P1: Invoice PDF/JPEG Generation.
+    - P2: Basic Inventory (stock reduction for invoicing).
+    - P2: Advanced search and filtering for Invoices and Estimates.
+    - P2: Tracking for advance and balance payments for invoices.
+    - P2: Category support for products in the invoicing system.
 
 **Completed work in this session**
-- **AI Attendance Import**: Implemented a universal Excel file parser using the Gemini LLM.
-- **Branding & UI**: Removed Made with Emergent branding, updated the app title, and converted several buttons to icon-only.
-- **Employees Module**: Overhauled with a new sortable table view, which is now the default.
-- **Live Salary Tracker**: Fixed critical timezone bugs, added a Today Salary card, and implemented a live, per-second incrementing counter on the Dashboard.
-- **Attendance Details Page**: Created a new page showing daily attendance with an Earnings column, a total earnings footer, and live, refresh-free updates.
-- **Payroll & Attendance Sorting**: Implemented alphabetical sorting of employees on the Payroll, Attendance, and Attendance-Details pages.
-- **Payroll UI**: Re-organized the monthly payroll view by moving the Allowances column.
-- **Bug Fix**: Resolved a  crash on the Employees page.
+- **Resend Login URL Feature (Backend)**:
+  - Implemented  to send an SMS to a specified admin.
+  - Implemented  to retrieve all admins for a company.
+  - Both endpoints were rigorously tested via , including creating a multi-admin company to validate the logic.
+- **Resend Login URL Feature (Frontend)**:
+  - Added a Resend Login URL button to the company details page ().
+  - Implemented React state and dialogs () to handle the user flow: fetching admins, selecting an admin (for multi-admin companies), confirming the action, and displaying success/failure notifications.
 
 **Earlier issues found/mentioned but not fixed**
 - None.
@@ -268,69 +83,58 @@ INFO:     10.64.201.178:51124 - "GET /api/payroll/live-current-month HTTP/1.1" 2
 
 
 **Key Technical Concepts**
-- **Backend**: FastAPI, MongoDB,  for manual timezone correction (adding UTC+5:30 offset to server's UTC time).
-- **Frontend**: React (, , ), client-side calculations and UI updates for creating a real-time feel without page reloads.
-- **AI**:  library to call the Gemini model for parsing unstructured Excel files.
+- **Backend (FastAPI)**: Creating new authenticated API endpoints, complex database queries to find users by  and , and handling multi-role user authentication via a  parameter.
+- **Frontend (React)**: Using  and  for asynchronous data fetching and state management. Implementing a multi-step user interaction flow using  Dialog components for conditional rendering.
 
 **key DB schema**
-- No schema changes were made. The implementation relied on existing schemas for users, attendance, and company settings (specifically the  field).
+- No schema changes. Key finding: A  has one  but can be associated with multiple  having  and a matching .
 
 **changes in tech stack**
-- ****: Added to the backend to integrate with the Gemini LLM.
-- ****: Used in the backend to handle timezone conversions correctly.
+- None.
 
 **All files of reference**
-- : Contains all business logic for payroll, attendance, and AI parsing.
-- : The frontend component for displaying monthly payroll, where the current bug is visible.
-- : Contains the Live Salary Tracker.
-- : Contains the new table/card view.
-- : The new page for daily attendance reports.
+- : Contains the new backend endpoints.
+- : Contains the new frontend UI and logic.
 
 **Areas that need refactoring**:
-- The payroll calculation logic is duplicated across multiple backend endpoints (, , ). This redundancy has led to bugs where a fix was applied in one place but missed in another. This logic should be centralized into a single, reusable utility function.
+- The payroll calculation logic is still duplicated across multiple backend endpoints. It should be centralized into a single utility function for better maintainability.
 
 **key api endpoints**
-- ****: Modified to use Gemini for Excel parsing.
-- ****: Heavily modified to fix timezone issues and add today's earnings calculation.
-- ****: The endpoint related to the current bug. Modified to fix timezone issues, but the working days logic is still suspect.
-- ****: New endpoint to support the Attendance Details page, including live earnings calculation.
+- 
+- 
+-  (Note: Requires  parameter for multi-role users).
 
 **Critical Info for New Agent**
-- **Timezone is Critical**: The server runs in UTC, while user data is stored in local Sri Lanka time (UTC+5:30) as naive datetimes. The correct pattern, established after much debugging, is to get the current time in UTC, add a 5.5-hour offset, and then perform calculations. This is crucial for any time-based feature.
-- **Duplicated Payroll Logic**: Be aware that payroll calculations are spread across multiple endpoints. A fix in one might be needed in others. Proposing a refactor to unify this logic would be a valuable step.
-- The current bug is subtle. The backend code *looks* like it's fetching the right , but the frontend shows a result based on the wrong value. Your first step should be to check the backend logs for the debug output that the previous agent added.
+- **Super Admin Login is Tricky**: The primary super admin user () has multiple roles. To log in successfully via the API, the call to  **must** include  in the JSON body. Any automated testing or UI interaction must account for this.
+- **Backend Logic is Confirmed**: The agent thoroughly tested the new backend endpoints with  and confirmed they work correctly for both single and multiple admin scenarios. The immediate priority is verifying the frontend connects to this logic correctly.
+- **Frontend Work is Centralized**: All frontend changes for the new feature are located in .
 
 **documents created in this job**
-- 
-- 
+- None.
 
 **Last 10 User Messages and any pending user messages**
-1.  **User**: Fixes the timezone issue for live earnings. (Completed)
-2.  **User**: Confirms the live earnings timezone issue is still present. (Completed)
-3.  **User**: Adds debug logging to investigate the timezone issue. (Completed)
-4.  **User**: Identifies the root cause of the timezone issue (server time vs. local time). (Completed)
-5.  **User**: Asks to remove page refreshing from the  page. (Completed)
-6.  **User**: Reports the Today Salary on the dashboard still has the timezone issue. (Completed)
-7.  **User**: Requests to make the Today Salary counter visually increment per second. (Completed)
-8.  **User**: Requests to move the Allowances column in the payroll view. (Completed)
-9.  **User**: Reports that the per-day salary is using the wrong number of working days. (In Progress)
-10. **User**: Confirms that the incorrect day salary is still showing after the agent's initial fix attempt. (In Progress)
+1.  **Request**: Add a feature for Super Admins to resend the login URL to company admins via SMS, handling multiple admins. (In Progress)
+2.  **Clarification**: User confirmed requirements for SMS gateway, message format, UI placement, multi-admin handling, confirmation dialogs, and alerts. (Implemented)
 
 **Project Health Check:**
-- **Broken**:
-  - The Day Salary calculation in the monthly payroll view.
-- **Mocked**:
-  - None.
+- **Broken**: None
+- **Mocked**: None
 
 **3rd Party Integrations**
-- **Gemini**: Used for AI-based Excel file parsing, accessed via the Emergent LLM Key.
+- **Gemini**: Used via the Emergent LLM Key for AI-based Excel file parsing.
 - **Leaflet/OpenStreetMap**: Used for map displays in the location tracking feature.
 
 **Testing status**
-- **Testing agent used after significant changes**: NO
+- **Testing agent used after significant changes**: YES, but they failed due to authentication complexity.
 - **Troubleshoot agent used after agent stuck in loop**: NO
-- **Test files created**: []
-- **Known regressions**: None currently, but timezone and calculation issues have recurred due to duplicated logic.
+- **Test files created**: None.
+- **Known regressions**: None.
 
 **Credentials to test flow:**
-- User has been logging in via OTP to test. No static credentials are required.</analysis>
+- **Role**: Super Admin
+- **Mobile**: 
+- **Login Note**: The API call for OTP verification requires an additional parameter: .
+
+**What agent forgot to execute**
+- The agent correctly prioritized the user's new feature request but did not circle back to get user verification for the ultra-compact table UI change from the previous session. This remains a pending (low-priority) task.
+- The recommended refactoring of centralizing the payroll logic in the backend was not performed.</analysis>

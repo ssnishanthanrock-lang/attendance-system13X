@@ -736,7 +736,7 @@ async def create_company(company: CompanyCreate, current_user: User = Depends(ge
     await db.users.insert_one(admin_user.model_dump())
     
     # Send SMS
-    message = f"Welcome to IT Signature ERP! Your company '{company.name}' has been created. Login with mobile {company.admin_mobile}. URL: https://paystack-app.preview.emergentagent.com"
+    message = f"Welcome to IT Signature ERP! Your company '{company.name}' has been created. Login with mobile {company.admin_mobile}. URL: https://admin-sms-portal.preview.emergentagent.com"
     send_sms(company.admin_mobile, message)
     
     await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "CREATE_COMPANY", f"Created company: {company.name}")
@@ -843,7 +843,7 @@ async def resend_company_url(company_id: str, admin_id: str, current_user: User 
         raise HTTPException(status_code=404, detail="Admin not found")
     
     # Send SMS using default system gateway (same as OTP)
-    message = f"Your company portal: {company['name']}. Login with mobile {admin['mobile']} at: https://paystack-app.preview.emergentagent.com"
+    message = f"Your company portal: {company['name']}. Login with mobile {admin['mobile']} at: https://admin-sms-portal.preview.emergentagent.com"
     sms_sent = send_sms(admin['mobile'], message, None)  # None = use default system gateway
     
     if not sms_sent:
