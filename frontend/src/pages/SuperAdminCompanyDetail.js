@@ -205,6 +205,27 @@ export default function SuperAdminCompanyDetail() {
                 </div>
               </div>
               <div>
+                <label className="text-sm font-medium text-gray-600">Company Short Code</label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={company?.short_code || ''}
+                    onChange={(e) => setCompany({ ...company, short_code: e.target.value.slice(0, 20) })}
+                    placeholder="Enter short code (max 20 chars)"
+                    maxLength={20}
+                    className="max-w-xs"
+                  />
+                  <Button 
+                    onClick={handleSaveShortCode} 
+                    size="sm"
+                    variant="outline"
+                    className="bg-blue-50 text-blue-700"
+                  >
+                    <Save className="w-4 h-4 mr-1" />
+                    Save
+                  </Button>
+                </div>
+              </div>
+              <div>
                 <label className="text-sm font-medium text-gray-600">Admin Name</label>
                 <p className="font-semibold">{company?.admin_name}</p>
               </div>
