@@ -5182,3 +5182,17 @@ logger = logging.getLogger(__name__)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+@api_router.get("/download-database-backup")
+async def download_database_backup():
+    """Download MongoDB database backup file"""
+    backup_file = "/app/mongodb_backup.tar.gz"
+    
+    if not os.path.exists(backup_file):
+        raise HTTPException(status_code=404, detail="Backup file not found")
+    
+    return FileResponse(
+        path=backup_file,
+        filename="attendance_system_backup.tar.gz",
+        media_type="application/gzip"
+    )
