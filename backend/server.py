@@ -4813,10 +4813,15 @@ async def mark_attendance_by_fingerprint(fingerprint_id: str):
     if not user:
         return {"success": False, "message": "No User"}
     
-    # Get today's date
-    today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    current_time = datetime.now(timezone.utc)
-    current_time_str = current_time.strftime("%H:%M")
+    # Get current time in Sri Lanka timezone (UTC+5:30)
+    import pytz
+    sri_lanka_tz = pytz.timezone('Asia/Colombo')
+    current_time_lk = datetime.now(sri_lanka_tz)
+    today = current_time_lk.strftime("%Y-%m-%d")
+    current_time_str = current_time_lk.strftime("%H:%M")
+    
+    # For time comparison, use UTC
+    current_time_utc = datetime.now(timezone.utc)
     
     # Check if attendance record exists for today
     attendance = await db.attendance.find_one({
