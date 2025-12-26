@@ -38,6 +38,7 @@ export default function Employees() {
     start_time: '09:00',
     finish_time: '17:00',
     fixed_salary: false,
+    fingerprint_id: '',
     profile_picture: null
   });
   
