@@ -4871,12 +4871,15 @@ async def mark_attendance_by_fingerprint(fingerprint_id: str):
         if check_in_str:
             try:
                 # Parse check_in datetime (format: "2025-12-26T09:30:00")
-                check_in_dt = datetime.fromisoformat(check_in_str.replace("Z", "+00:00"))
-                if check_in_dt.tzinfo is None:
-                    check_in_dt = check_in_dt.replace(tzinfo=timezone.utc)
+                # The stored time is in Sri Lanka timezone (naive datetime)
+                check_in_dt = datetime.fromisoformat(check_in_str)
                 
-                # Calculate time difference
-                time_diff = (current_time_utc - check_in_dt).total_seconds() / 60  # in minutes
+                # Make it timezone-aware in Sri Lanka timezone
+                if check_in_dt.tzinfo is None:
+                    check_in_dt = sri_lanka_tz.localize(check_in_dt)
+                
+                # Calculate time difference using Sri Lanka timezone
+                time_diff = (current_time_lk - check_in_dt).total_seconds() / 60  # in minutes
                 
                 if time_diff < 10:
                     return {
