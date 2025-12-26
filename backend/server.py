@@ -50,6 +50,7 @@ class Company(BaseModel):
     email: Optional[str] = None
     address: Optional[str] = None
     contact_number: Optional[str] = None
+    short_code: Optional[str] = None  # Company short code for fingerprint device (max 20 chars)
     status: str = "pending"  # pending, active, suspended
     sms_gateway: str = "textit"
     sms_enabled: bool = False
