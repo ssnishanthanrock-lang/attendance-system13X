@@ -275,6 +275,7 @@ export default function Employees() {
       start_time: defaultTimes.start_time,
       finish_time: defaultTimes.finish_time,
       fixed_salary: false,
+      fingerprint_id: '',
       profile_picture: null
     });
   };
