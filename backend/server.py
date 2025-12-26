@@ -814,6 +814,38 @@ async def update_company_sms(company_id: str, sms_settings: SMSSettings, current
     
     return {"message": "SMS settings updated"}
 
+@api_router.put("/superadmin/companies/{company_id}/short-code")
+async def update_company_short_code(company_id: str, data: dict, current_user: User = Depends(get_current_user)):
+    """Update company short code for fingerprint attendance"""
+    if current_user.role != "super_admin":
+        raise HTTPException(status_code=403, detail="Super admin access required")
+    
+    short_code = data.get("short_code", "").strip()
+    
+    if not short_code:
+        raise HTTPException(status_code=400, detail="Short code cannot be empty")
+    
+    if len(short_code) > 20:
+        raise HTTPException(status_code=400, detail="Short code must be max 20 characters")
+    
+    # Check if short code already exists for another company
+    existing = await db.companies.find_one({"short_code": short_code, "id": {"$ne": company_id}})
+    if existing:
+        raise HTTPException(status_code=400, detail="This short code is already in use by another company")
+    
+    result = await db.companies.update_one(
+        {"id": company_id},
+        {"$set": {"short_code": short_code}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Company not found")
+    
+    company = await db.companies.find_one({"id": company_id}, {"_id": 0})
+    await log_activity("SUPER_ADMIN", current_user.id, current_user.name, "UPDATE_SHORT_CODE", f"Updated short code for {company['name']} to '{short_code}'")
+    
+    return {"message": "Short code updated successfully"}
+
 @api_router.get("/superadmin/companies/{company_id}/admins")
 async def get_company_admins(company_id: str, current_user: User = Depends(get_current_user)):
     """Get all admin users for a specific company"""
