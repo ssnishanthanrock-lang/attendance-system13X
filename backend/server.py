@@ -112,6 +112,7 @@ class User(BaseModel):
     custom_end_time: Optional[str] = None
     ot_allowed: bool = False
     sms_notifications: bool = False
+    fingerprint_id: Optional[str] = None
     is_active: bool = True
     can_full_access_companies: bool = False  # For super admins: allow full edit access when viewing company portals
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
@@ -129,6 +130,7 @@ class UserCreate(BaseModel):
     start_time: Optional[str] = None
     finish_time: Optional[str] = None
     fixed_salary: Optional[bool] = False
+    fingerprint_id: Optional[str] = None
 
 
 class BulkEmployeeParsed(BaseModel):
