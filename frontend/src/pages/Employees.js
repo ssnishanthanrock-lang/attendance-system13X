@@ -1010,10 +1010,7 @@ export default function Employees() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            setEditingEmployee(employee);
-                            setDialogOpen(true);
-                          }}
+                          onClick={() => handleEdit(employee)}
                           disabled={!canEdit}
                           title={!canEdit ? "Read-only access" : "Edit Employee"}
                           className="disabled:opacity-50 disabled:cursor-not-allowed"
