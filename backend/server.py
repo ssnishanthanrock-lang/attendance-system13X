@@ -4876,7 +4876,7 @@ async def mark_attendance_by_fingerprint(fingerprint_id: str):
                     check_in_dt = check_in_dt.replace(tzinfo=timezone.utc)
                 
                 # Calculate time difference
-                time_diff = (current_time - check_in_dt).total_seconds() / 60  # in minutes
+                time_diff = (current_time_utc - check_in_dt).total_seconds() / 60  # in minutes
                 
                 if time_diff < 10:
                     return {
