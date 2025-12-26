@@ -4834,16 +4834,31 @@ async def mark_attendance_with_location(attendance_data: AttendanceWithLocation,
     
     return {"message": "Attendance marked with location", "attendance": attendance_response}
 
-@api_router.get("/attendance/fingerprint/{fingerprint_id}")
-async def mark_attendance_by_fingerprint(fingerprint_id: str):
+@api_router.get("/attendance/fingerprint/{company_short_code}/{fingerprint_id}")
+async def mark_attendance_by_fingerprint(company_short_code: str, fingerprint_id: str):
     """
-    Mark attendance using fingerprint ID (no authentication required)
+    Mark attendance using company short code and fingerprint ID (no authentication required)
+    - company_short_code: Company identifier (max 20 chars)
+    - fingerprint_id: Employee fingerprint ID
     - If no attendance for today: Mark check-in
     - If attendance exists without check-out and >10 minutes passed: Mark check-out
     """
     
-    # Find user by fingerprint_id
-    user = await db.users.find_one({"fingerprint_id": fingerprint_id}, {"_id": 0})
+    # Validate company short code
+    if not company_short_code or company_short_code.strip() == '':
+        return {"success": False, "message": "Missing company short code"}
+    
+    # Find company by short code
+    company = await db.companies.find_one({"short_code": company_short_code}, {"_id": 0})
+    
+    if not company:
+        return {"success": False, "message": "Invalid company short code"}
+    
+    # Find user by fingerprint_id within this specific company
+    user = await db.users.find_one({
+        "fingerprint_id": fingerprint_id,
+        "company_id": company["id"]
+    }, {"_id": 0})
     
     if not user:
         return {"success": False, "message": "No User"}
