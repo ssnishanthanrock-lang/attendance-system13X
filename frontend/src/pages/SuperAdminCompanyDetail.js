@@ -133,6 +133,26 @@ export default function SuperAdminCompanyDetail() {
     }
   };
 
+  const handleSaveShortCode = async () => {
+    try {
+      if (!company.short_code || company.short_code.trim() === '') {
+        toast.error('Please enter a short code');
+        return;
+      }
+      await api.put(`/superadmin/companies/${companyId}/short-code`, {
+        short_code: company.short_code
+      });
+      toast.success('Company short code updated successfully', { 
+        style: { background: '#10b981', color: 'white' } 
+      });
+      fetchCompany();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to update short code', {
+        style: { background: '#ef4444', color: 'white' }
+      });
+    }
+  };
+
   const handleStatusChange = async (status) => {
     try {
       await api.put(`/superadmin/companies/${companyId}/status?status=${status}`);
