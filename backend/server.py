@@ -4815,7 +4815,6 @@ async def mark_attendance_by_fingerprint(fingerprint_id: str):
         return {"success": False, "message": "No User"}
     
     # Get current time in Sri Lanka timezone (UTC+5:30)
-    import pytz
     sri_lanka_tz = pytz.timezone('Asia/Colombo')
     current_time_lk = datetime.now(sri_lanka_tz)
     today = current_time_lk.strftime("%Y-%m-%d")
