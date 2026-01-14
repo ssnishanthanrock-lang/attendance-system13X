@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Switch } from '../components/ui/switch';
 import { Badge } from '../components/ui/badge';
 import { toast } from 'sonner';
-import { Settings, Clock, Calendar, Plus, Trash2 } from 'lucide-react';
+import { Settings, Clock, Calendar, Plus, Trash2, Save } from 'lucide-react';
 
 export default function CompanySettings() {
   const [settings, setSettings] = useState(null);
@@ -17,6 +17,9 @@ export default function CompanySettings() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [holidayForm, setHolidayForm] = useState({ date: '', name: '', type: 'public' });
+  const [pendingChanges, setPendingChanges] = useState({});
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchSettings();
