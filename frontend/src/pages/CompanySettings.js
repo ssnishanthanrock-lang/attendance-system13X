@@ -383,7 +383,14 @@ export default function CompanySettings() {
                           headers: { 'Content-Type': 'multipart/form-data' }
                         });
                         toast.success('Favicon uploaded successfully');
-                        fetchSettings();
+                        await fetchSettings();
+                        // Update favicon in the HTML head
+                        const favicon = document.querySelector("link[rel*='icon']");
+                        if (favicon) {
+                          favicon.href = response.data.favicon + '?v=' + Date.now(); // Cache busting
+                        }
+                        // Force refresh to update favicon everywhere
+                        setTimeout(() => window.location.reload(), 500);
                       } catch (error) {
                         toast.error('Failed to upload favicon');
                       }
