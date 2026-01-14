@@ -350,7 +350,9 @@ export default function CompanySettings() {
                           headers: { 'Content-Type': 'multipart/form-data' }
                         });
                         toast.success('Logo uploaded successfully');
-                        fetchSettings();
+                        await fetchSettings();
+                        // Force refresh to update logo everywhere
+                        window.location.reload();
                       } catch (error) {
                         toast.error('Failed to upload logo');
                       }
