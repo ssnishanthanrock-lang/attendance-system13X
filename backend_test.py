@@ -4759,6 +4759,319 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
         except Exception as e:
             self.log_result("Resend URL Error Handling", False, f"Error handling test error: {str(e)}")
 
+    def test_bug_fix_employee_initials_capitalization(self):
+        """
+        BUG FIX 1: Employee Initials/Name Capitalization
+        Test creating and editing employees with initials like "A.S.N.Ranasinghe"
+        Verify it saves as "A.S.N.Ranasinghe" (NOT "A.s.n.ranasinghe")
+        """
+        print("\n=== TESTING BUG FIX 1: EMPLOYEE INITIALS CAPITALIZATION ===")
+        
+        test_employee_id = None
+        
+        try:
+            # Test 1: Create employee with initials
+            print("🔍 Testing employee creation with initials...")
+            
+            new_employee = {
+                "employee_id": f"EMP{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                "mobile": f"077{datetime.now().strftime('%H%M%S')}2",
+                "name": "A.S.N.Ranasinghe",  # Test case with initials
+                "role": "employee",
+                "department": "IT",
+                "position": "Software Developer",
+                "basic_salary": 50000.0,
+                "join_date": datetime.now().date().isoformat()
+            }
+            
+            response = self.session.post(f"{API_BASE}/employees", json=new_employee)
+            
+            if response.status_code == 200:
+                created_employee = response.json()
+                test_employee_id = created_employee.get('id')
+                created_name = created_employee.get('name')
+                
+                # Verify the name is stored correctly (capitalization preserved)
+                if created_name == "A.S.N.Ranasinghe":
+                    self.log_result("Bug Fix 1 - Create Employee with Initials", True, 
+                                  f"Employee name correctly preserved: '{created_name}'",
+                                  {"expected": "A.S.N.Ranasinghe", "actual": created_name})
+                else:
+                    self.log_result("Bug Fix 1 - Create Employee with Initials", False, 
+                                  f"Employee name capitalization incorrect: expected 'A.S.N.Ranasinghe', got '{created_name}'",
+                                  {"expected": "A.S.N.Ranasinghe", "actual": created_name})
+            else:
+                self.log_result("Bug Fix 1 - Create Employee with Initials", False, 
+                              f"Failed to create employee: {response.status_code}",
+                              {"response": response.text})
+                return
+            
+            # Test 2: Verify by retrieving the employee
+            print("🔍 Verifying employee data retrieval...")
+            
+            employees_response = self.session.get(f"{API_BASE}/employees")
+            if employees_response.status_code == 200:
+                employees = employees_response.json()
+                created_emp = next((emp for emp in employees if emp.get('id') == test_employee_id), None)
+                
+                if created_emp:
+                    retrieved_name = created_emp.get('name')
+                    if retrieved_name == "A.S.N.Ranasinghe":
+                        self.log_result("Bug Fix 1 - Retrieve Employee with Initials", True, 
+                                      f"Employee name correctly retrieved: '{retrieved_name}'")
+                    else:
+                        self.log_result("Bug Fix 1 - Retrieve Employee with Initials", False, 
+                                      f"Retrieved name incorrect: expected 'A.S.N.Ranasinghe', got '{retrieved_name}'")
+                else:
+                    self.log_result("Bug Fix 1 - Retrieve Employee with Initials", False, 
+                                  "Created employee not found in employee list")
+            
+            # Test 3: Edit employee with different initials
+            if test_employee_id:
+                print("🔍 Testing employee update with different initials...")
+                
+                update_data = {
+                    "name": "B.K.M.Fernando",  # Different initials pattern
+                    "position": "Senior Developer"
+                }
+                
+                update_response = self.session.put(f"{API_BASE}/employees/{test_employee_id}", json=update_data)
+                
+                if update_response.status_code == 200:
+                    # Verify the update
+                    employees_response = self.session.get(f"{API_BASE}/employees")
+                    if employees_response.status_code == 200:
+                        employees = employees_response.json()
+                        updated_emp = next((emp for emp in employees if emp.get('id') == test_employee_id), None)
+                        
+                        if updated_emp:
+                            updated_name = updated_emp.get('name')
+                            if updated_name == "B.K.M.Fernando":
+                                self.log_result("Bug Fix 1 - Update Employee with Initials", True, 
+                                              f"Employee name correctly updated: '{updated_name}'")
+                            else:
+                                self.log_result("Bug Fix 1 - Update Employee with Initials", False, 
+                                              f"Updated name incorrect: expected 'B.K.M.Fernando', got '{updated_name}'")
+                        else:
+                            self.log_result("Bug Fix 1 - Update Employee with Initials", False, 
+                                          "Updated employee not found")
+                    else:
+                        self.log_result("Bug Fix 1 - Update Employee with Initials", False, 
+                                      "Cannot retrieve employees after update")
+                else:
+                    self.log_result("Bug Fix 1 - Update Employee with Initials", False, 
+                                  f"Failed to update employee: {update_response.status_code}")
+            
+            # Test 4: Test various initials patterns
+            print("🔍 Testing various initials patterns...")
+            
+            test_patterns = [
+                "J.R.R.Tolkien",
+                "M.A.K.Silva", 
+                "P.D.Q.Bach",
+                "A.B.C.D.E.Fernando"
+            ]
+            
+            pattern_results = []
+            
+            for pattern in test_patterns:
+                pattern_employee = {
+                    "employee_id": f"EMP{datetime.now().strftime('%Y%m%d%H%M%S')}{len(pattern_results)}",
+                    "mobile": f"077{datetime.now().strftime('%H%M%S')}{len(pattern_results)}3",
+                    "name": pattern,
+                    "role": "employee",
+                    "basic_salary": 45000.0,
+                    "join_date": datetime.now().date().isoformat()
+                }
+                
+                pattern_response = self.session.post(f"{API_BASE}/employees", json=pattern_employee)
+                
+                if pattern_response.status_code == 200:
+                    pattern_created = pattern_response.json()
+                    pattern_name = pattern_created.get('name')
+                    
+                    if pattern_name == pattern:
+                        pattern_results.append(f"✅ {pattern}")
+                    else:
+                        pattern_results.append(f"❌ {pattern} → {pattern_name}")
+                else:
+                    pattern_results.append(f"❌ {pattern} → Failed to create")
+            
+            # Log pattern test results
+            successful_patterns = len([r for r in pattern_results if r.startswith("✅")])
+            total_patterns = len(pattern_results)
+            
+            if successful_patterns == total_patterns:
+                self.log_result("Bug Fix 1 - Various Initials Patterns", True, 
+                              f"All {total_patterns} initials patterns preserved correctly",
+                              {"patterns": pattern_results})
+            else:
+                self.log_result("Bug Fix 1 - Various Initials Patterns", False, 
+                              f"Only {successful_patterns}/{total_patterns} patterns preserved correctly",
+                              {"patterns": pattern_results})
+                
+        except Exception as e:
+            self.log_result("Bug Fix 1 - Employee Initials Capitalization", False, 
+                          f"Test error: {str(e)}")
+        
+        finally:
+            # Clean up test employees
+            if test_employee_id:
+                try:
+                    self.session.delete(f"{API_BASE}/employees/{test_employee_id}")
+                except:
+                    pass
+    
+    def test_bug_fix_delete_employee(self):
+        """
+        BUG FIX 3: Delete Employee
+        Test deleting an employee (soft delete - sets is_active: false)
+        Verify no runtime errors occur and employee is removed from list
+        """
+        print("\n=== TESTING BUG FIX 3: DELETE EMPLOYEE ===")
+        
+        test_employee_id = None
+        
+        try:
+            # Step 1: Create a test employee to delete
+            print("🔍 Creating test employee for deletion...")
+            
+            test_employee = {
+                "employee_id": f"DEL{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                "mobile": f"077{datetime.now().strftime('%H%M%S')}9",
+                "name": "Test Delete Employee",
+                "role": "employee",
+                "department": "Test",
+                "position": "Test Position",
+                "basic_salary": 40000.0,
+                "join_date": datetime.now().date().isoformat()
+            }
+            
+            create_response = self.session.post(f"{API_BASE}/employees", json=test_employee)
+            
+            if create_response.status_code == 200:
+                created_employee = create_response.json()
+                test_employee_id = created_employee.get('id')
+                employee_name = created_employee.get('name')
+                
+                self.log_result("Bug Fix 3 - Create Test Employee", True, 
+                              f"Test employee created: {employee_name}")
+            else:
+                self.log_result("Bug Fix 3 - Create Test Employee", False, 
+                              f"Failed to create test employee: {create_response.status_code}")
+                return
+            
+            # Step 2: Verify employee exists in active list
+            print("🔍 Verifying employee exists in active list...")
+            
+            employees_before = self.session.get(f"{API_BASE}/employees")
+            if employees_before.status_code == 200:
+                active_employees = employees_before.json()
+                employee_exists = any(emp.get('id') == test_employee_id for emp in active_employees)
+                
+                if employee_exists:
+                    self.log_result("Bug Fix 3 - Employee in Active List", True, 
+                                  "Employee found in active employee list")
+                else:
+                    self.log_result("Bug Fix 3 - Employee in Active List", False, 
+                                  "Employee not found in active list")
+                    return
+            
+            # Step 3: Delete the employee (soft delete)
+            print("🔍 Testing employee deletion (soft delete)...")
+            
+            delete_response = self.session.delete(f"{API_BASE}/employees/{test_employee_id}")
+            
+            if delete_response.status_code == 200:
+                delete_result = delete_response.json()
+                self.log_result("Bug Fix 3 - Delete Employee API", True, 
+                              "Employee deletion API call successful",
+                              {"message": delete_result.get('message')})
+            else:
+                self.log_result("Bug Fix 3 - Delete Employee API", False, 
+                              f"Employee deletion failed: {delete_response.status_code}",
+                              {"response": delete_response.text})
+                return
+            
+            # Step 4: Verify employee is removed from active list
+            print("🔍 Verifying employee removed from active list...")
+            
+            employees_after = self.session.get(f"{API_BASE}/employees")
+            if employees_after.status_code == 200:
+                active_employees_after = employees_after.json()
+                employee_still_active = any(emp.get('id') == test_employee_id for emp in active_employees_after)
+                
+                if not employee_still_active:
+                    self.log_result("Bug Fix 3 - Employee Removed from Active List", True, 
+                                  "Employee correctly removed from active employee list")
+                else:
+                    self.log_result("Bug Fix 3 - Employee Removed from Active List", False, 
+                                  "Employee still appears in active list after deletion")
+            else:
+                self.log_result("Bug Fix 3 - Employee Removed from Active List", False, 
+                              "Cannot verify employee removal - API error")
+            
+            # Step 5: Verify employee appears in deleted list
+            print("🔍 Verifying employee appears in deleted list...")
+            
+            deleted_employees = self.session.get(f"{API_BASE}/employees", params={"include_deleted": True})
+            if deleted_employees.status_code == 200:
+                deleted_list = deleted_employees.json()
+                employee_in_deleted = any(emp.get('id') == test_employee_id for emp in deleted_list)
+                
+                if employee_in_deleted:
+                    # Find the deleted employee and check is_active status
+                    deleted_emp = next((emp for emp in deleted_list if emp.get('id') == test_employee_id), None)
+                    if deleted_emp:
+                        is_active = deleted_emp.get('is_active', True)
+                        if is_active == False:
+                            self.log_result("Bug Fix 3 - Soft Delete Verification", True, 
+                                          "Employee correctly soft deleted (is_active: false)",
+                                          {"is_active": is_active})
+                        else:
+                            self.log_result("Bug Fix 3 - Soft Delete Verification", False, 
+                                          f"Employee not properly soft deleted (is_active: {is_active})")
+                    else:
+                        self.log_result("Bug Fix 3 - Soft Delete Verification", False, 
+                                      "Employee not found in deleted list")
+                else:
+                    self.log_result("Bug Fix 3 - Soft Delete Verification", False, 
+                                  "Employee not found in deleted list")
+            else:
+                self.log_result("Bug Fix 3 - Soft Delete Verification", False, 
+                              "Cannot access deleted employees list")
+            
+            # Step 6: Test deleting non-existent employee
+            print("🔍 Testing deletion of non-existent employee...")
+            
+            fake_id = "non-existent-employee-id"
+            fake_delete_response = self.session.delete(f"{API_BASE}/employees/{fake_id}")
+            
+            if fake_delete_response.status_code == 404:
+                self.log_result("Bug Fix 3 - Delete Non-existent Employee", True, 
+                              "Correctly returns 404 for non-existent employee")
+            else:
+                self.log_result("Bug Fix 3 - Delete Non-existent Employee", False, 
+                              f"Unexpected response for non-existent employee: {fake_delete_response.status_code}")
+            
+            # Step 7: Check backend logs for errors (if accessible)
+            print("🔍 Checking for runtime errors...")
+            
+            # Since we can't directly access backend logs, we'll check if subsequent API calls work
+            test_api_response = self.session.get(f"{API_BASE}/employees")
+            if test_api_response.status_code == 200:
+                self.log_result("Bug Fix 3 - No Runtime Errors", True, 
+                              "No runtime errors detected - subsequent API calls work")
+            else:
+                self.log_result("Bug Fix 3 - No Runtime Errors", False, 
+                              "Possible runtime errors - subsequent API calls failing")
+                
+        except Exception as e:
+            self.log_result("Bug Fix 3 - Delete Employee", False, 
+                          f"Test error: {str(e)}")
+        
+        # Note: We don't clean up the test employee since it's already deleted
+
     def run_all_tests(self):
         """Run all backend tests"""
         print("🚀 Starting IT Signature ERP Backend API Tests - LOCATION TRACKING SYSTEM TESTING")
