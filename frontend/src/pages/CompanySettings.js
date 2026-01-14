@@ -161,13 +161,13 @@ export default function CompanySettings() {
                 type="time"
                 placeholder="Start Time"
                 value={settings?.office_start_time || '09:00'}
-                onChange={(e) => handleUpdateSettings({ office_start_time: e.target.value })}
+                onChange={(e) => handleFieldChange({ office_start_time: e.target.value })}
               />
               <Input
                 type="time"
                 placeholder="End Time"
                 value={settings?.office_end_time || '17:00'}
-                onChange={(e) => handleUpdateSettings({ office_end_time: e.target.value })}
+                onChange={(e) => handleFieldChange({ office_end_time: e.target.value })}
               />
             </div>
           </CardContent>
@@ -186,7 +186,7 @@ export default function CompanySettings() {
               </div>
               <Switch
                 checked={settings?.saturday_enabled || false}
-                onCheckedChange={(checked) => handleUpdateSettings({ saturday_enabled: checked })}
+                onCheckedChange={(checked) => handleFieldChange({ saturday_enabled: checked })}
               />
             </div>
 
@@ -194,7 +194,7 @@ export default function CompanySettings() {
               <>
                 <Select
                   value={settings?.saturday_type || 'full'}
-                  onValueChange={(value) => handleUpdateSettings({ saturday_type: value })}
+                  onValueChange={(value) => handleFieldChange({ saturday_type: value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Saturday Type" />
@@ -210,13 +210,13 @@ export default function CompanySettings() {
                     type="time"
                     placeholder="Saturday Start Time"
                     value={settings?.saturday_start_time || '09:00'}
-                    onChange={(e) => handleUpdateSettings({ saturday_start_time: e.target.value })}
+                    onChange={(e) => handleFieldChange({ saturday_start_time: e.target.value })}
                   />
                   <Input
                     type="time"
                     placeholder="Saturday End Time"
                     value={settings?.saturday_end_time || '14:00'}
-                    onChange={(e) => handleUpdateSettings({ saturday_end_time: e.target.value })}
+                    onChange={(e) => handleFieldChange({ saturday_end_time: e.target.value })}
                   />
                 </div>
               </>
@@ -413,14 +413,14 @@ export default function CompanySettings() {
                   <Input
                     placeholder="Company Address"
                     value={settings?.invoice_address || ''}
-                    onChange={(e) => handleUpdateSettings({ invoice_address: e.target.value })}
+                    onChange={(e) => handleFieldChange({ invoice_address: e.target.value })}
                   />
                 </div>
                 <div className="col-span-3">
                   <Input
                     placeholder="Mobile Number (10 digits)"
                     value={settings?.invoice_mobile || ''}
-                    onChange={(e) => handleUpdateSettings({ invoice_mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    onChange={(e) => handleFieldChange({ invoice_mobile: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                     maxLength={10}
                   />
                 </div>
@@ -428,7 +428,7 @@ export default function CompanySettings() {
                   <Input
                     placeholder="Hotline (10 digits)"
                     value={settings?.invoice_hotline || ''}
-                    onChange={(e) => handleUpdateSettings({ invoice_hotline: e.target.value.replace(/\D/g, '').slice(0, 10) })}
+                    onChange={(e) => handleFieldChange({ invoice_hotline: e.target.value.replace(/\D/g, '').slice(0, 10) })}
                     maxLength={10}
                   />
                 </div>
@@ -441,28 +441,28 @@ export default function CompanySettings() {
                     <Input
                       placeholder="Bank Name (e.g., Commercial Bank)"
                       value={settings?.bank_name || ''}
-                      onChange={(e) => handleUpdateSettings({ bank_name: e.target.value })}
+                      onChange={(e) => handleFieldChange({ bank_name: e.target.value })}
                     />
                   </div>
                   <div className="col-span-3">
                     <Input
                       placeholder="Account Holder Name"
                       value={settings?.bank_account_name || ''}
-                      onChange={(e) => handleUpdateSettings({ bank_account_name: e.target.value })}
+                      onChange={(e) => handleFieldChange({ bank_account_name: e.target.value })}
                     />
                   </div>
                   <div className="col-span-3">
                     <Input
                       placeholder="Bank Account Number"
                       value={settings?.bank_account_number || ''}
-                      onChange={(e) => handleUpdateSettings({ bank_account_number: e.target.value })}
+                      onChange={(e) => handleFieldChange({ bank_account_number: e.target.value })}
                     />
                   </div>
                   <div className="col-span-3">
                     <Input
                       placeholder="Branch Name"
                       value={settings?.bank_branch || ''}
-                      onChange={(e) => handleUpdateSettings({ bank_branch: e.target.value })}
+                      onChange={(e) => handleFieldChange({ bank_branch: e.target.value })}
                     />
                   </div>
                 </div>
