@@ -4835,6 +4835,14 @@ Jane Smith, jane@example.com, 0772345678, Employee, HR, 2024-02-20"""
             self.test_bug_fix_live_payroll_fixed_salary()
             self.test_bug_fix_payroll_months_current_month()
             
+            # NEW: Bug Fix Tests from Current Review Request
+            print("\n" + "="*80)
+            print("🐛 TESTING BUG FIXES FROM CURRENT REVIEW REQUEST")
+            print("="*80)
+            
+            self.test_bug_fix_employee_initials_capitalization()
+            self.test_bug_fix_delete_employee()
+            
             # Run priority tests from review request - LIVE PAYROLL FOCUS
             print("\n🎯 HIGH PRIORITY LIVE PAYROLL TESTS")
             self.test_live_payroll_current_month()
