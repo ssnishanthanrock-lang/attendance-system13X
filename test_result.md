@@ -851,6 +851,36 @@ frontend:
         agent: "main"
         comment: "Installed npm packages: react-leaflet@5.0.0 (React wrapper for Leaflet maps), leaflet@1.9.4 (mapping library for OpenStreetMap), html2canvas@1.4.1 (for capturing map snapshots), @react-leaflet/core@3.0.0 (peer dependency). All packages installed successfully via yarn. Leaflet CSS imported in components using 'leaflet/dist/leaflet.css'. Fixed Leaflet marker icon issue by configuring default icons in each component using Leaflet markers."
 
+  - task: "Bug Fix 2: Settings Auto-Save Removed"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/CompanySettings.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Removed auto-save functionality from CompanySettings page. Added manual save with 'Save Settings' button and 'Unsaved Changes' badge. Changes are tracked locally and only saved when button is clicked."
+      - working: true
+        agent: "testing"
+        comment: "✅ BUG FIX 2 VERIFIED: Settings auto-save removal correctly implemented. FRONTEND CODE ANALYSIS COMPLETED: ✅ Manual save state management (pendingChanges, hasUnsavedChanges, saving states), ✅ handleFieldChange() tracks changes locally without API calls, ✅ 'Save Settings' button with blue gradient styling and loading state, ✅ 'Unsaved Changes' badge with yellow styling, ✅ handleSaveSettings() function with proper validation and success toast, ✅ Auto-save completely removed - no onChange API calls. All requirements met: changes tracked locally, manual save only, proper user feedback."
+
+  - task: "Bug Fix 4: Logo/Favicon Update with Auto-Refresh"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/CompanySettings.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Added auto-refresh functionality after logo/favicon uploads. Logo upload triggers immediate page refresh, favicon upload updates HTML head with cache-busting and refreshes after 500ms delay."
+      - working: true
+        agent: "testing"
+        comment: "✅ BUG FIX 4 VERIFIED: Logo/favicon auto-refresh correctly implemented. FRONTEND CODE ANALYSIS COMPLETED: ✅ Logo upload auto-refresh (window.location.reload() on line 355), ✅ Favicon upload auto-refresh with 500ms delay (line 393), ✅ Cache-busting implementation (favicon.href + '?v=' + Date.now()), ✅ File upload inputs with proper FormData handling, ✅ Success toasts for both uploads, ✅ Favicon HTML head update before refresh. All requirements met: auto-refresh after uploads, cache-busting, proper timing delays."
+
 
 metadata:
   created_by: "main_agent"
