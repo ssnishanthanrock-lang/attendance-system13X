@@ -3930,8 +3930,16 @@ async def get_live_current_month_payroll(current_user: User = Depends(get_curren
 
 # ============= UTILITY FUNCTIONS =============
 def capitalize_name(name: str) -> str:
-    """Capitalize first letter of each word in a name"""
-    return ' '.join(word.capitalize() for word in name.split())
+    """Capitalize first letter of each word in a name, preserving existing uppercase (e.g., initials)"""
+    words = []
+    for word in name.split():
+        # If word has uppercase letters (like initials A.S.N), keep it as-is
+        if any(c.isupper() for c in word[1:]):
+            words.append(word)
+        else:
+            # Only capitalize if no internal uppercase letters exist
+            words.append(word.capitalize())
+    return ' '.join(words)
 
 def calculate_working_days(year: int, month: int, holidays: List[dict], saturday_enabled: bool = True, saturday_type: str = "full") -> dict:
     """
