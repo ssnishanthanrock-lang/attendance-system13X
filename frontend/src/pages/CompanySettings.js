@@ -30,6 +30,8 @@ export default function CompanySettings() {
     try {
       const response = await api.get('/settings');
       setSettings(response.data);
+      setPendingChanges({}); // Reset pending changes when fetching fresh data
+      setHasUnsavedChanges(false);
     } catch (error) {
       toast.error('Failed to fetch settings');
     } finally {
@@ -47,13 +49,35 @@ export default function CompanySettings() {
     }
   };
 
-  const handleUpdateSettings = async (updates) => {
+  const handleFieldChange = (updates) => {
+    // Track changes locally without saving
+    setPendingChanges(prev => ({ ...prev, ...updates }));
+    setHasUnsavedChanges(true);
+    // Update local settings display
+    setSettings(prev => ({ ...prev, ...updates }));
+  };
+
+  const handleSaveSettings = async () => {
+    if (Object.keys(pendingChanges).length === 0) {
+      toast.info('No changes to save');
+      return;
+    }
+
+    setSaving(true);
     try {
-      await api.put('/settings', updates);
-      toast.success('Settings updated successfully');
-      fetchSettings();
+      await api.put('/settings', pendingChanges);
+      toast.success('Settings saved successfully', {
+        style: { background: '#10b981', color: 'white' }
+      });
+      setPendingChanges({});
+      setHasUnsavedChanges(false);
+      fetchSettings(); // Refresh to get latest data
     } catch (error) {
-      toast.error('Failed to update settings');
+      toast.error('Failed to save settings', {
+        style: { background: '#ef4444', color: 'white' }
+      });
+    } finally {
+      setSaving(false);
     }
   };
 
