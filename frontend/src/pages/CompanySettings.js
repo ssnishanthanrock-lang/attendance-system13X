@@ -121,6 +121,30 @@ export default function CompanySettings() {
           <h1 className="text-xl sm:text-2xl font-bold" style={{ fontFamily: 'Work Sans, sans-serif' }}>
             Company Settings
           </h1>
+          <div className="flex items-center gap-3">
+            {hasUnsavedChanges && (
+              <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-300">
+                Unsaved Changes
+              </Badge>
+            )}
+            <Button 
+              onClick={handleSaveSettings}
+              disabled={!hasUnsavedChanges || saving}
+              className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+            >
+              {saving ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4 mr-2" />
+                  Save Settings
+                </>
+              )}
+            </Button>
+          </div>
         </div>
 
         {/* Working Hours */}
