@@ -491,6 +491,36 @@ backend:
         agent: "testing"
         comment: "✅ TESTED: Activity logs endpoint (GET /api/activity-logs) working perfectly. Pagination with custom limit parameter working (default 100, tested with 50). Date range filtering (from_date, to_date) functional. Search functionality working across user_name, action, and details fields. All logs properly filtered by company_id for multi-tenancy."
 
+  - task: "Bug Fix 1: Employee Initials/Name Capitalization"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Bug fix implemented for employee name capitalization. Employee names with initials like 'A.S.N.Ranasinghe' should preserve uppercase letters and not be converted to 'A.s.n.ranasinghe'."
+      - working: true
+        agent: "testing"
+        comment: "✅ BUG FIX 1 TESTED: Employee initials/name capitalization working correctly. Successfully tested: 1) Creating employee with initials 'A.S.N.Ranasinghe' - name correctly preserved. 2) Retrieving employee data - name correctly retrieved as 'A.S.N.Ranasinghe'. 3) Updating employee with different initials 'B.K.M.Fernando' - name correctly updated. 4) Testing various patterns: J.R.R.Tolkien, M.A.K.Silva, P.D.Q.Bach, A.B.C.D.E.Fernando - all 4 patterns preserved correctly. The capitalize_name function in the backend properly handles initials and preserves uppercase letters after periods."
+
+  - task: "Bug Fix 3: Delete Employee (Soft Delete)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Bug fix implemented for employee deletion. DELETE /api/employees/{employee_id} should perform soft delete (sets is_active: false) without runtime errors and remove employee from active list."
+      - working: true
+        agent: "testing"
+        comment: "✅ BUG FIX 3 TESTED: Delete employee (soft delete) working correctly. Successfully tested: 1) Created test employee for deletion. 2) Verified employee exists in active list. 3) DELETE API call successful with proper response message. 4) Employee correctly removed from active employee list. 5) Employee appears in deleted list with is_active: false (soft delete verified). 6) Non-existent employee deletion correctly returns 404. 7) No runtime errors detected - subsequent API calls work normally. The soft delete functionality is working as expected."
+
 frontend:
   - task: "Super Admin Re-send URL to Admin Feature UI"
     implemented: true
